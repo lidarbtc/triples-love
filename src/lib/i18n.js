@@ -93,8 +93,7 @@ export const ui = {
     },
     footer: {
       unofficial: 'not affiliated with MODHAUS or tripleS',
-      submit: 'submit a site',
-      meta: 'unofficial fan project index · {count} listed'
+      submit: 'submit a site'
     }
   },
   ko: {
@@ -188,8 +187,7 @@ export const ui = {
     },
     footer: {
       unofficial: 'MODHAUS 및 tripleS의 공식 사이트가 아닙니다',
-      submit: '사이트 제보',
-      meta: '비공식 팬 프로젝트 모음 · {count}개 등록'
+      submit: '사이트 제보'
     }
   }
 };

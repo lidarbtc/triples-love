@@ -2,7 +2,6 @@
   import { browser } from '$app/environment';
   import { page } from '$app/stores';
   import { projectCopy } from '$lib/project-copy.js';
-  import { badgePageHref } from '$lib/embed-badges.js';
   import '$lib/project.css';
 
   export let lang = 'en';
@@ -37,5 +36,5 @@
     </nav>
   </header>
   <main class="project-main"><slot /></main>
-  <footer class="project-footer"><a href={`/${lang}/`}>← {t.back}</a><a href={badgePageHref('', lang)}>{t.badgeCode}</a></footer>
+  <footer class="project-footer"><a href={`/${lang}/`}>← {t.back}</a></footer>
 </div>

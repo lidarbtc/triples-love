@@ -717,14 +717,12 @@
     </section>
 
     <footer class="foot">
+      <span>© 2026 triples.love</span>
       <div class="foot-row">
-        <span>© 2026 triples.love</span>
-        <span class="foot-sep">·</span>
         <span>{t.footer.unofficial}</span>
         <span class="foot-sep">·</span>
         <a href="mailto:hello@triples.love">{t.footer.submit}</a>
       </div>
-      <div class="foot-meta">{t.footer.meta.replace('{count}', sites.length)}</div>
     </footer>
   </main>
 </div>
