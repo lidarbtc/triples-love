@@ -376,6 +376,30 @@ export const sites = [
     badges: ["trading", "price guide"],
     accent: "amber",
   },
+  {
+    id: "wavtv",
+    name: "WAVTV",
+    domain: "wavtv.app",
+    url: "https://wavtv.app/",
+    category: "hub",
+    addedAt: "2026-10-17T14:18:15+09:00",
+    tagline: "24/7 tripleS TV",
+    description: "Watch tripleS videos around the clock on themed channels, from SIGNAL episodes to music videos and variety shows. Browse or search the TV-style program guide to see what's playing next.",
+    badges: ["videos", "24/7 TV", "program guide"],
+    accent: "blue",
+  },
+  {
+    id: "objectx",
+    name: "ObjectX",
+    domain: "objectx.netlify.app",
+    url: "https://objectx.netlify.app/",
+    category: "market",
+    addedAt: "2026-10-17T14:18:15+09:00",
+    tagline: "Objekt trade matching",
+    description: "Find matching collectors for digital and in-person tripleS Objekt trades. Manage your collection, browse release news, or check the schedule calendar and fan community.",
+    badges: ["trading", "matches", "collection"],
+    accent: "amber",
+  },
 ];
 
 export const categories = [

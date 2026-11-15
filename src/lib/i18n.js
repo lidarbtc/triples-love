@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'October 10, 2026',
-      updateTitle: 'WAVbase, preserved',
+      date: 'October 17, 2026',
+      updateTitle: 'WAVTV and ObjectX added',
       updateBody:
-        'WAVbase is currently unavailable. Its listing and saved screenshot are now in the archive.',
+        'Watch tripleS videos on WAVTV’s round-the-clock channels, or find Objekt trade matches and manage your collection on ObjectX.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'October 10, 2026',
+      statusValue: 'October 17, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -98,13 +98,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 10월 10일',
-      updateTitle: 'WAVbase 기록 보관',
+      date: '2026년 10월 17일',
+      updateTitle: 'WAVTV·ObjectX 추가',
       updateBody:
-        '현재 접속할 수 없는 WAVbase의 소개와 당시 화면을 아카이브에 남겼습니다.',
+        'tripleS 영상을 24시간 편성해 보여주는 WAVTV와 오브젝트 교환 상대 찾기·컬렉션 관리를 지원하는 ObjectX를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 10월 10일',
+      statusValue: '2026년 10월 17일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -403,6 +403,18 @@ export const siteCopy = {
       description:
         'tripleS 오브젝트를 사고팔거나 교환할 상대를 찾을 수 있습니다. 운영진이 정리한 오브젝트별 시세도 거래 참고용으로 제공합니다.',
       badges: ['거래', '시세']
+    },
+    wavtv: {
+      tagline: '24시간 tripleS TV',
+      description:
+        'SIGNAL, 뮤직비디오, 예능 등 tripleS 영상을 TV처럼 편성표에 따라 24시간 이어서 볼 수 있습니다. 테마별 채널을 바꾸거나 편성표에서 영상을 검색할 수 있습니다.',
+      badges: ['영상', '24시간 TV', '편성표']
+    },
+    objectx: {
+      tagline: '오브젝트 교환 상대 찾기',
+      description:
+        '디지털·오프라인 행사에서 tripleS 오브젝트를 교환할 상대를 자동으로 찾아줍니다. 컬렉션 관리와 발매 소식, 일정 캘린더, 팬 커뮤니티도 이용할 수 있습니다.',
+      badges: ['거래', '매칭', '컬렉션']
     }
   }
 };
@@ -423,7 +435,9 @@ export const siteSearchAliases = {
   hayeonarchive: ['하연 아카이브', '하연아카이브', '코스모톡', 'S19'],
   sssflix: ['sss flix', '시그널', 'SIGNAL', '배지전쟁', 'Badge War', '코스모 라이브'],
   'wav-archive': ['웨이브 아카이브', '웨이브아카이브', 'bbangshion', 'DIMENSION', '디멘션', '입덕 가이드'],
-  wavbase: ['wav base', '웨이브베이스', '웨이브 베이스', 'dearseoah', '가격표', '시세표', 'pricing']
+  wavbase: ['wav base', '웨이브베이스', '웨이브 베이스', 'dearseoah', '가격표', '시세표', 'pricing'],
+  wavtv: ['wav tv', '웨이브티비', '웨이브 티비', '웨이브TV', '시그널', 'SIGNAL', '편성표'],
+  objectx: ['object x', '오브젝트엑스', '오브젝트 엑스', '트레이딩', '자동 매칭']
 };
 
 export function isSupportedLang(value) {
