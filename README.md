@@ -31,6 +31,21 @@ npm run preview
 
 The generated static files are written to `build/`.
 
+## Capture fan site screenshots
+
+```sh
+npm run screenshots
+```
+
+This visits every site in `src/lib/data.js` and writes deployable card previews
+to `static/site-screenshots/{site.id}.jpg`.
+
+Capture one listing:
+
+```sh
+npm run screenshots -- --site apollo
+```
+
 ## Deploy to Cloudflare Workers
 
 ```sh

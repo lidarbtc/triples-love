@@ -167,6 +167,14 @@
     if (accent === 'violet') return '#9788d6';
     return '#6f9bff';
   }
+
+  function screenshotPath(site) {
+    return `/site-screenshots/${site.id}.jpg`;
+  }
+
+  function hideBrokenThumbnail(event) {
+    event.currentTarget.hidden = true;
+  }
 </script>
 
 <svelte:head>
@@ -313,36 +321,46 @@
             on:keydown={(event) => handleCardKeydown(event, site.id)}
           >
             <div class="thumb">
-              <svg viewBox="0 0 400 240" preserveAspectRatio="none" width="100%" height="100%">
-                <defs>
-                  <pattern
-                    id={`stripes-${site.id}`}
-                    patternUnits="userSpaceOnUse"
-                    width="14"
-                    height="14"
-                    patternTransform={`rotate(${stripeAngle(site)})`}
-                  >
-                    <rect width="14" height="14" fill="#fbfbfd" />
-                    <line
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="14"
-                      stroke={stripeColor(site.accent)}
-                      stroke-width="1"
-                      stroke-opacity="0.18"
-                    />
-                  </pattern>
-                </defs>
-                <rect width="400" height="240" fill={`url(#stripes-${site.id})`} />
-                <g opacity="0.42">
-                  <rect x="20" y="20" width="360" height="22" rx="4" fill="#ffffff" stroke="#dfe1ea" />
-                  <circle cx="32" cy="31" r="2.5" fill="#dfe1ea" />
-                  <circle cx="42" cy="31" r="2.5" fill="#dfe1ea" />
-                  <circle cx="52" cy="31" r="2.5" fill="#dfe1ea" />
-                  <rect x="68" y="25" width="240" height="12" rx="2" fill="#f1f2f6" />
-                </g>
-              </svg>
+              <div class="thumb-fallback" aria-hidden="true">
+                <svg viewBox="0 0 400 240" preserveAspectRatio="none" width="100%" height="100%">
+                  <defs>
+                    <pattern
+                      id={`stripes-${site.id}`}
+                      patternUnits="userSpaceOnUse"
+                      width="14"
+                      height="14"
+                      patternTransform={`rotate(${stripeAngle(site)})`}
+                    >
+                      <rect width="14" height="14" fill="#fbfbfd" />
+                      <line
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="14"
+                        stroke={stripeColor(site.accent)}
+                        stroke-width="1"
+                        stroke-opacity="0.18"
+                      />
+                    </pattern>
+                  </defs>
+                  <rect width="400" height="240" fill={`url(#stripes-${site.id})`} />
+                  <g opacity="0.42">
+                    <rect x="20" y="20" width="360" height="22" rx="4" fill="#ffffff" stroke="#dfe1ea" />
+                    <circle cx="32" cy="31" r="2.5" fill="#dfe1ea" />
+                    <circle cx="42" cy="31" r="2.5" fill="#dfe1ea" />
+                    <circle cx="52" cy="31" r="2.5" fill="#dfe1ea" />
+                    <rect x="68" y="25" width="240" height="12" rx="2" fill="#f1f2f6" />
+                  </g>
+                </svg>
+              </div>
+              <img
+                class="thumb-image"
+                src={screenshotPath(site)}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                on:error={hideBrokenThumbnail}
+              />
               <div class="thumb-caption">{site.domain}</div>
             </div>
 
