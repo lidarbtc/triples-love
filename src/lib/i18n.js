@@ -12,13 +12,13 @@ export const ui = {
       titleBefore: 'a collection of',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'August 24, 2026',
+      date: 'August 30, 2026',
       updateTitle: 'Updated weekly',
       updateBody:
         'An ever-growing directory of tools, trackers, and resources built by the tripleS & COSMO community.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'August 24, 2026',
+      statusValue: 'August 30, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -82,13 +82,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 8월 24일',
+      date: '2026년 8월 30일',
       updateTitle: '매주 업데이트',
       updateBody:
         'tripleS와 COSMO 팬들이 만든 도구, 트래커, 자료를 꾸준히 모아 소개합니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 8월 24일',
+      statusValue: '2026년 8월 30일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -333,6 +333,18 @@ export const siteCopy = {
       description:
         'tripleS와 ARTMS 오브젝트의 보유·구함 목록을 등록하고, 조건이 맞는 수집가를 찾거나 전체 매물을 둘러볼 수 있습니다.',
       badges: ['거래', '매칭', '보유·구함']
+    },
+    joojoo: {
+      tagline: 'tripleS·LOONA 아카이브',
+      description:
+        'COSMO Live 녹화본, Room 스토리, Talk 프로필·스티커, 썸네일, 유튜브 재생목록을 여러 언어로 둘러볼 수 있는 아카이브입니다.',
+      badges: ['COSMO 아카이브', '라이브', '재생목록']
+    },
+    'triple-s-game': {
+      tagline: 'tripleS 미니게임 14종',
+      description:
+        '일일 멤버 워들, 사진·목소리·노래·MV 퀴즈, 학습 모드, 오브젝트 월드컵, HAUS 수박게임을 제공하는 다국어 게임 허브입니다.',
+      badges: ['미니게임', '멤버 퀴즈', '다국어']
     }
   }
 };
@@ -346,7 +358,9 @@ export const siteSearchAliases = {
   umbra: ['collecting game', '수집 게임'],
   wavmarks: ['subsearch', 'timestamp', '타임코드'],
   'objekt-link': ['games', '게임'],
-  'objekts-trading-platform': ['trade', 'want/have', '교환']
+  'objekts-trading-platform': ['trade', 'want/have', '교환'],
+  joojoo: ['itsjoo', 'archive', '아카이브', 'LOONA', '이달의 소녀'],
+  'triple-s-game': ['認人遊戲', 'Wordle', '워들', '멤버 맞히기', '수박게임']
 };
 
 export function isSupportedLang(value) {

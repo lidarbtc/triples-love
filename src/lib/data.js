@@ -289,6 +289,30 @@ export const sites = [
     badges: ["trading", "matches", "want/have"],
     accent: "amber",
   },
+  {
+    id: "joojoo",
+    name: "Joojoo 주주",
+    domain: "itsjoo.xyz",
+    url: "https://itsjoo.xyz/",
+    category: "hub",
+    addedAt: "2026-08-30T18:16:19+09:00",
+    tagline: "tripleS & LOONA archive",
+    description: "Multilingual archive for COSMO Live recordings, Room stories, Talk profiles and stickers, thumbnails, and curated YouTube playlists.",
+    badges: ["COSMO archive", "lives", "playlists"],
+    accent: "blue",
+  },
+  {
+    id: "triple-s-game",
+    name: "tripleS Member Quiz",
+    domain: "triple-s-game.vercel.app",
+    url: "https://triple-s-game.vercel.app/",
+    category: "tools",
+    addedAt: "2026-08-30T18:16:19+09:00",
+    tagline: "14 tripleS mini-games",
+    description: "Multilingual game hub with daily Member Wordle, photo, voice, song and MV quizzes, study modes, Objekt World Cup, and HAUS Suika Game.",
+    badges: ["mini-games", "member quiz", "multilingual"],
+    accent: "violet",
+  },
 ];
 
 export const categories = [
