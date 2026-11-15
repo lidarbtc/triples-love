@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'October 17, 2026',
-      updateTitle: 'tripleS fans and tripleS WAV added',
+      date: 'October 18, 2026',
+      updateTitle: 'Fifty added',
       updateBody:
-        'Explore member and music guides on tripleS fans, or find official websites, social accounts, and streaming links on tripleS WAV.',
+        'Explore tripleS Objekts in 3D with Fifty, a visual viewer.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'October 17, 2026',
+      statusValue: 'October 18, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -98,13 +98,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 10월 17일',
-      updateTitle: 'tripleS fans·tripleS WAV 추가',
+      date: '2026년 10월 18일',
+      updateTitle: 'Fifty 추가',
       updateBody:
-        '멤버·음악·활동 정보를 정리한 tripleS fans와 공식 사이트·SNS·음원 서비스 링크를 모은 tripleS WAV를 추가했습니다.',
+        'tripleS 오브젝트를 3D로 감상하는 비주얼 뷰어, Fifty를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 10월 17일',
+      statusValue: '2026년 10월 18일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -427,6 +427,12 @@ export const siteCopy = {
       description:
         'tripleS 공식 사이트와 SNS, 디스코드, 음원 서비스 링크를 모은 팬사이트입니다. 일본 공식 팬클럽과 COSMO 쇼핑몰로도 이동할 수 있습니다.',
       badges: ['공식 링크', 'SNS', '음악']
+    },
+    fifty: {
+      tagline: '3D 오브젝트 뷰어',
+      description:
+        'tripleS 오브젝트를 3D로 감상할 수 있는 비주얼 뷰어입니다.',
+      badges: ['3D', '비주얼 뷰어']
     }
   }
 };
@@ -451,7 +457,8 @@ export const siteSearchAliases = {
   wavtv: ['wav tv', '웨이브티비', '웨이브 티비', '웨이브TV', '시그널', 'SIGNAL', '편성표'],
   objectx: ['object x', '오브젝트엑스', '오브젝트 엑스', '트레이딩', '자동 매칭'],
   triplesfans: ['tripleSfans', 'tripleS fans', '트리플에스 팬스', '트리플에스팬스', 'DIMENSION', '디멘션', '입덕 가이드', 'Badge War', '배지전쟁'],
-  'triples-wav': ['tripleS WAV', '트리플에스 웨이브', '트리플에스웨이브', '공식 링크', '링크 모음', 'link hub']
+  'triples-wav': ['tripleS WAV', '트리플에스 웨이브', '트리플에스웨이브', '공식 링크', '링크 모음', 'link hub'],
+  fifty: ['wav fifty', 'wav-fifty', '피프티', '웨이브 피프티', '웨이브피프티', '3D viewer', '3D 뷰어', '비주얼 뷰어']
 };
 
 export function isSupportedLang(value) {

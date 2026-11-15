@@ -424,6 +424,18 @@ export const sites = [
     badges: ["official links", "social media", "music"],
     accent: "blue",
   },
+  {
+    id: "fifty",
+    name: "Fifty",
+    domain: "wav-fifty.site",
+    url: "https://www.wav-fifty.site/",
+    category: "objekts",
+    addedAt: "2026-10-18T05:48:26+09:00",
+    tagline: "3D Objekt viewer",
+    description: "A visual viewer for exploring tripleS Objekts in 3D.",
+    badges: ["3D", "visual viewer"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [
