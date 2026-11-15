@@ -52,6 +52,7 @@
   <div class="editor-heading"><div><span class="project-eyebrow">{t.edit}</span><h1 class="project-flow-title">{t.editTitle}</h1><p class="project-intro">{t.editIntro}</p></div><div class="editor-actions"><a class="btn btn-ghost" href={badgePageHref(project.id, lang)}>{t.badgeCode}</a><a class="project-btn project-btn-secondary" href={projectHref(project.id, lang)}>{t.view} ↗</a></div></div>
   {#if form?.message}<div class="project-message project-message-error" role="alert">{form.message}</div>{/if}
   {#if form?.saved}<div class="project-message" role="status">{t.saved}</div>{:else if $page.url.searchParams.get('claimed') === '1'}<div class="project-message" role="status">{t.claimedSuccess}</div>{/if}
+  <p class="editor-featured" class:on={data.featured}><span class="editor-featured-dot" aria-hidden="true"></span>{data.featured ? t.featuredOn : t.featuredOff} <a href={badgePageHref(project.id, lang)}>{data.featured ? t.featuredManage : t.featuredGet} →</a></p>
   <div class="editor-layout">
     <form method="POST" action={`?lang=${lang}`} use:enhance={savePage} class="editor-form">
       <input type="hidden" name="version" value={draft.version} />

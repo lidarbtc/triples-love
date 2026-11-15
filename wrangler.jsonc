@@ -26,6 +26,10 @@
   "vars": {
     "APP_ORIGIN": "https://triples.love"
   },
+  // Renders client-side apps when checking website-banner links.
+  "browser": { "binding": "BROWSER" },
+  // Hourly banner rechecks; scripts/add-scheduled-handler.mjs adds the handler after the build.
+  "triggers": { "crons": ["23 * * * *"] },
   "d1_databases": [
     {
       "binding": "DB",

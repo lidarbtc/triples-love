@@ -33,6 +33,10 @@
 .project-help { margin: 8px 0 0; color: var(--ink-2); font-size: 12px; line-height: 1.6; }
 .project-message { padding: 14px 17px; margin: 20px 0; border-radius: 10px; font-size: 13px; line-height: 1.6; border: 1px solid #d2dfd7; background: #f0f7f2; color: #29513a; overflow-wrap: anywhere; }
 .project-message-error { border-color: #e6c5c3; background: #fcf1f0; color: #8d3831; }
+.editor-featured { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 20px; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.editor-featured a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.editor-featured-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
+.editor-featured.on .editor-featured-dot { background: #2f9e6a; }
 .project-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 21px; min-width: 0; }
 .project-field:last-child { margin-bottom: 0; }
 .project-field label, .project-field-label { font-size: 12px; font-weight: 600; }

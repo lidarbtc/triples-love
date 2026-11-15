@@ -49,7 +49,7 @@ export function recordUnexpected(event, operation, cause) {
   // Keep only locations in known application modules. Error messages, function
   // names, arbitrary paths, URLs and the Error.cause chain may contain secrets.
   const stack = typeof cause?.stack === 'string' ? cause.stack : '';
-  const stack_locations = [...stack.matchAll(/(?:\/|\b)(observability|auth|db|claims|proof|projects|hooks\.server|_worker)\.js:(\d+):(\d+)(?=[)\s]|$)/g)]
+  const stack_locations = [...stack.matchAll(/(?:\/|\b)(observability|auth|db|claims|proof|projects|backlinks|backlink-cron|render|hooks\.server|_worker)\.js:(\d+):(\d+)(?=[)\s]|$)/g)]
     .slice(0, 8).map(match => `${match[1]}.js:${match[2]}:${match[3]}`);
   recordResult(event, operation, 500, 'unexpected_error', { stack_locations });
 }

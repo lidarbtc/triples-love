@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node scripts/add-scheduled-handler.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "cf:dev": "wrangler dev",
     "pretest": "node scripts/seed-projects.mjs",
@@ -32,6 +32,7 @@
     "wrangler": "4.155.0"
   },
   "dependencies": {
+    "@cloudflare/puppeteer": "^1.4.0",
     "parse5": "^8.0.1"
   }
 }

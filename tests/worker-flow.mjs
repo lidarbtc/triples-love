@@ -17,6 +17,8 @@ const movedUrl = 'https://moved-fixture.example.com/new/';
 const hosts = new Set([...Object.values(projectUrls), movedUrl].map(url => new URL(url).hostname));
 const dnsProofs = new Map();
 const htmlProofs = new Map();
+const bannerPages = new Map();
+let bannerFetches = 0;
 const outboundCounts = { token: 0, profile: 0, A: 0, AAAA: 0, TXT: 0, html: 0 };
 const unexpectedOutbound = [];
 let expectedPkce;
@@ -43,6 +45,8 @@ const bundle = await build({
     console[level] = (...args) => original(...(args.length === 1 && args[0]?.event
       ? [JSON.stringify(args[0])] : args));
   }` },
+  // Resolve packages like Wrangler does for Workers (used by @cloudflare/puppeteer).
+  conditions: ['workerd', 'worker', 'browser'], mainFields: ['browser', 'module', 'main'],
   external: ['cloudflare:*', 'node:*'], logLevel: 'silent'
 });
 
@@ -88,6 +92,14 @@ const worker = new Miniflare({
         : type === 'TXT' && dnsProofs.has(name) ? [{ name, type: 16, TTL: 60, data: JSON.stringify(`triples-love-verification=${dnsProofs.get(name)}`) }]
           : [];
       return Response.json({ Status: 0, Answer: answer });
+    }
+    if (bannerPages.has(url.href)) {
+      bannerFetches++;
+      assert.equal(request.headers.get('cookie'), null);
+      assert.equal(request.headers.get('user-agent'), 'triples.love banner check');
+      return new Response(`<!doctype html><html><head></head><body>${bannerPages.get(url.href)}</body></html>`, {
+        headers: { 'content-type': 'text/html; charset=utf-8' }
+      });
     }
     if (htmlProofs.has(url.href)) {
       outboundCounts.html++;
@@ -292,6 +304,39 @@ try {
   assert.equal((await db.prepare('SELECT version FROM projects WHERE id=?').bind('flow-dns').first()).version, 4);
   console.log('PASS owner URL re-verification -> verified URL update -> second versioned page save');
 
+  const bannerUrl = projectUrls['flow-html'];
+  const featuredCards = html => elements(parse(html), node => node.tagName === 'a' && (attributes(node).class || '').split(' ').includes('featured-card'));
+  const emptyDirectory = await request('/en/');
+  assertPage(emptyDirectory, ['Featured', 'Sites that link back to triples.love', 'Your site here'], 'Directory before any banner');
+  assert.equal(featuredCards(emptyDirectory.html).filter(node => attributes(node)['data-umami-event-surface'] === 'featured').length, 0);
+  const badgePath = '/badges/?lang=ko&type=listed&theme=light&project=flow-html';
+  const badgePage = await request(badgePath);
+  assertPage(badgePage, ['첫 화면에 소개되기', '아직 소개되지 않았어요.', bannerUrl], 'Korean banner check panel');
+  const check = findForm(badgePage.html, attrs => attrs.action?.startsWith('?/check'));
+  assert.equal(check.values.get('project'), 'flow-html');
+  bannerPages.set(bannerUrl, '<div id="app"></div>');
+  const notFound = await request(new URL(check.action, origin + badgePath).href, check.values);
+  assertPage(notFound, ['triples.love 배너 링크를 찾지 못했어요'], 'Banner missing result');
+  bannerPages.set(bannerUrl, '<footer><a href="https://triples.love/p/flow-html/?lang=ko&amp;utm_source=badge"><img src="https://triples.love/badges/listed-light.svg" alt="Listed on triples.love"></a></footer>');
+  const found = await request(new URL(check.action, origin + badgePath).href, check.values);
+  assertPage(found, ['배너를 찾았어요. 이제 첫 화면에 소개됩니다.', '지금 첫 화면에 소개되고 있어요.'], 'Banner found result');
+  const stored = await db.prepare('SELECT state, detected_by, link_href, miss_count FROM project_backlinks WHERE project_id=?').bind('flow-html').first();
+  assert.deepEqual(stored, { state: 'found', detected_by: 'html', link_href: 'https://triples.love/p/flow-html/?lang=ko&utm_source=badge', miss_count: 0 });
+  const featuredDirectory = await request('/ko/');
+  assertPage(featuredDirectory, ['주목할 사이트', 'flow-html'], 'Korean directory with a featured project');
+  const [featuredCard] = featuredCards(featuredDirectory.html).filter(node => attributes(node)['data-umami-event-surface'] === 'featured');
+  assert.ok(featuredCard, 'Featured project links out with its own analytics surface');
+  assert.equal(attributes(featuredCard)['data-umami-event-project'], 'html-fixture.example.com');
+  assert.equal(attributes(featuredCard).href, `${bannerUrl}?utm_source=triples.love`);
+  assertPage(await request('/p/flow-html/edit/?lang=en'), ['Featured on the triples.love homepage.'], 'Owner editor featured status');
+  bannerPages.set(bannerUrl, '<p>Banner removed</p>');
+  await request(new URL(check.action, origin + badgePath).href, check.values);
+  assert.equal((await db.prepare('SELECT miss_count FROM project_backlinks WHERE project_id=?').bind('flow-html').first()).miss_count, 1);
+  assert.equal(featuredCards((await request('/en/')).html).filter(node => attributes(node)['data-umami-event-surface'] === 'featured').length, 1,
+    'One missed check keeps the project featured');
+  assert.equal(bannerFetches, 3);
+  console.log('PASS banner check -> D1 record -> featured directory card -> owner status -> one-miss grace');
+
   const sessionBeforeLogout = cookies.get('__Host-triples_session');
   const logout = await request('/auth/logout', new URLSearchParams());
   assert.equal(logout.status, 303);
@@ -305,6 +350,12 @@ try {
   assert.ok(afterLogout.headers.get('location').startsWith('/auth/github?'));
   assert.ok(!cookies.has('__Host-triples_session'));
   console.log('PASS logout deletes D1 session; replayed old cookie cannot reopen editor');
+  cookies.delete('__Host-triples_session');
+  const signedOutCheck = await request('/badges/?/check&lang=en&project=flow-html', new URLSearchParams({ project: 'flow-html' }));
+  assert.equal(signedOutCheck.status, 303);
+  assert.ok(signedOutCheck.headers.get('location').startsWith('/auth/github?'));
+  assert.equal(bannerFetches, 3, 'Signed-out visitors cannot trigger site checks');
+  console.log('PASS signed-out banner checks redirect to sign-in without fetching the site');
 
   assert.equal(outboundCounts.token, 1);
   assert.equal(outboundCounts.profile, 1);

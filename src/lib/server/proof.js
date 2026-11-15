@@ -187,6 +187,69 @@ export function decodeTxtRecord(value) {
   return segments ? result : null;
 }
 
+/**
+ * Fetch raw HTML from an already validated public target. Each redirect hop is
+ * validated and resolved again and must stay on the registered origin. No
+ * browser cookies, authorization headers or tokens are ever forwarded.
+ */
+async function readPublicHtml(target, { resolve, fetcher, signal, userAgent }) {
+  let current = target;
+  for (let redirects = 0; redirects <= 3; redirects += 1) {
+    if (redirects) await assertPublicTarget(current, { resolve, fetcher, signal });
+    const response = await fetcher(current.href, {
+      method: 'GET', redirect: 'manual', signal, cache: 'no-store',
+      headers: { accept: 'text/html,application/xhtml+xml', 'user-agent': userAgent }
+    });
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      await response.body?.cancel();
+      if (!location || redirects === 3) throw new ProofError('redirect', 'Too many redirects. Try DNS verification.');
+      let next;
+      try { next = validateTargetUrl(new URL(location, current).href); }
+      catch { throw new ProofError('redirect', 'The website redirected to an unsafe address. Try DNS verification.'); }
+      if (next.origin !== target.origin) {
+        throw new ProofError('redirect', 'The website redirects to another hostname. Use DNS verification for the registered hostname.');
+      }
+      current = next;
+      continue;
+    }
+    if (!response.ok) {
+      await response.body?.cancel();
+      throw new ProofError('http_failed', 'The website did not return a successful page. Try again or use DNS verification.');
+    }
+    const type = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
+    if (type !== 'text/html' && type !== 'application/xhtml+xml') {
+      await response.body?.cancel();
+      throw new ProofError('not_html', 'The website did not return HTML. Use DNS verification instead.');
+    }
+    return { url: current, html: await readLimitedText(response, MAX_HTML_BYTES, signal) };
+  }
+  throw new ProofError('redirect', 'Too many redirects. Try DNS verification.');
+}
+
+function unexpectedFetchError(error, signal) {
+  if (error instanceof ProofError) return error;
+  if (signal.aborted) return new ProofError('timeout', 'Verification timed out. Please try again.');
+  return new ProofError('fetch_failed', 'The website could not be checked. Please try again.');
+}
+
+/** Bounded public HTML fetch for non-proof checks, such as website-banner links. */
+export async function fetchSiteHtml(targetUrl, options = {}) {
+  const fetcher = options.fetcher || fetch;
+  const resolve = options.resolve || resolveDns;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs || PROOF_TIMEOUT_MS);
+  const signal = controller.signal;
+  try {
+    const target = await assertPublicTarget(targetUrl, { resolve, fetcher, signal });
+    return await readPublicHtml(target, { resolve, fetcher, signal, userAgent: options.userAgent || 'triples.love site check' });
+  } catch (error) {
+    throw unexpectedFetchError(error, signal);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function verifySiteProof({ method, targetUrl, token }, options = {}) {
   if (method !== 'dns' && method !== 'meta') throw new ProofError('invalid_method', 'Choose DNS or HTML verification.');
   const fetcher = options.fetcher || fetch;
@@ -200,44 +263,10 @@ export async function verifySiteProof({ method, targetUrl, token }, options = {}
       const answers = await resolve(`_triples-love.${target.hostname}`, 'TXT', { fetcher, signal });
       return answers.some((answer) => decodeTxtRecord(answer) === `${PROOF_META_NAME}=${token}`);
     }
-    let current = target;
-    for (let redirects = 0; redirects <= 3; redirects += 1) {
-      // Each hop is validated and resolved again; never forward browser cookies,
-      // authorization headers or the verification token in a URL/header.
-      if (redirects) await assertPublicTarget(current, { resolve, fetcher, signal });
-      const response = await fetcher(current.href, {
-        method: 'GET', redirect: 'manual', signal, cache: 'no-store',
-        headers: { accept: 'text/html,application/xhtml+xml', 'user-agent': 'triples.love ownership verification' }
-      });
-      if ([301, 302, 303, 307, 308].includes(response.status)) {
-        const location = response.headers.get('location');
-        await response.body?.cancel();
-        if (!location || redirects === 3) throw new ProofError('redirect', 'Too many redirects. Try DNS verification.');
-        let next;
-        try { next = validateTargetUrl(new URL(location, current).href); }
-        catch { throw new ProofError('redirect', 'The website redirected to an unsafe address. Try DNS verification.'); }
-        if (next.origin !== target.origin) {
-          throw new ProofError('redirect', 'The website redirects to another hostname. Use DNS verification for the registered hostname.');
-        }
-        current = next;
-        continue;
-      }
-      if (!response.ok) {
-        await response.body?.cancel();
-        throw new ProofError('http_failed', 'The website did not return a successful page. Try again or use DNS verification.');
-      }
-      const type = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
-      if (type !== 'text/html' && type !== 'application/xhtml+xml') {
-        await response.body?.cancel();
-        throw new ProofError('not_html', 'The website did not return HTML. Use DNS verification instead.');
-      }
-      return hasVerificationMeta(await readLimitedText(response, MAX_HTML_BYTES, signal), token);
-    }
-    return false;
+    const { html } = await readPublicHtml(target, { resolve, fetcher, signal, userAgent: 'triples.love ownership verification' });
+    return hasVerificationMeta(html, token);
   } catch (error) {
-    if (error instanceof ProofError) throw error;
-    if (signal.aborted) throw new ProofError('timeout', 'Verification timed out. Please try again.');
-    throw new ProofError('fetch_failed', 'The website could not be checked. Please try again.');
+    throw unexpectedFetchError(error, signal);
   } finally {
     clearTimeout(timeout);
   }

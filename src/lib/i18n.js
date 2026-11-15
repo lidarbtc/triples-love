@@ -58,6 +58,13 @@ export const ui = {
       claimHint: 'Is this your site?',
       claim: 'Get your verified badge →'
     },
+    featured: {
+      title: 'Featured',
+      subtitle: 'Sites that link back to triples.love',
+      cta: 'Get featured →',
+      emptyTitle: 'Your site here',
+      emptyBody: 'Add a triples.love banner to your listed site to be featured here.'
+    },
     about: {
       titleBefore: 'what is',
       titleAfter: '?',
@@ -146,6 +153,13 @@ export const ui = {
       verified: '소유권 인증됨',
       claimHint: '운영하는 사이트인가요?',
       claim: '인증 배지 받기 →'
+    },
+    featured: {
+      title: '주목할 사이트',
+      subtitle: 'triples.love 배너를 단 사이트예요',
+      cta: '내 사이트 소개하기 →',
+      emptyTitle: '여기에 내 사이트를',
+      emptyBody: '등록된 사이트에 triples.love 배너를 달면 이곳에 소개돼요.'
     },
     about: {
       titleBefore: '',

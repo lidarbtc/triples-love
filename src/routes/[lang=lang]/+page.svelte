@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
   import { categories } from '$lib/data.js';
+  import { badgePageHref } from '$lib/embed-badges.js';
   import { categoryLabels, categoryNames, ui } from '$lib/i18n.js';
   import { projectHref, splitLastWord } from '$lib/project-copy.js';
 
@@ -139,6 +140,10 @@
   })();
 
   $: directorySites = filtered.filter((site) => site.status !== 'archived');
+  $: featuredSites = (data.featuredIds || [])
+    .map((id) => localizedSites.find((site) => site.id === id))
+    .filter((site) => site && site.status !== 'archived');
+  $: showFeatured = active === 'all' && !query.trim();
   $: archivedSites = filtered.filter((site) => site.status === 'archived');
   $: archivedCount = sites.filter((site) => site.status === 'archived').length;
   $: archiveOpen = Boolean(query.trim() && archivedSites.length);
@@ -527,6 +532,52 @@
         </div>
       </div>
     </div>
+
+    {#if showFeatured}
+      <section class="featured" aria-labelledby="featured-title">
+        <div class="featured-head">
+          <div>
+            <h2 class="featured-title" id="featured-title">{t.featured.title}</h2>
+            <p class="featured-sub">{t.featured.subtitle}</p>
+          </div>
+          {#if featuredSites.length >= 4}
+            <a class="featured-link" href={badgePageHref('', lang)}>{t.featured.cta}</a>
+          {/if}
+        </div>
+        <div class="featured-grid">
+          {#each featuredSites as site (site.id)}
+            <a
+              class="featured-card"
+              href={outboundHref(site.url)}
+              target="_blank"
+              rel="noopener"
+              data-umami-event="project_click"
+              data-umami-event-project={site.domain}
+              data-umami-event-category={site.category}
+              data-umami-event-surface="featured"
+            >
+              <span class="featured-thumb">
+                <img src={screenshotPath(site)} alt="" loading="lazy" decoding="async" on:error={hideBrokenImage} />
+              </span>
+              <span class="featured-body">
+                <span class="featured-meta">{names[site.category]} · {site.domain}</span>
+                <span class="featured-name">
+                  {site.name}{#if site.owner}<span class="featured-seal"><VerifiedSeal label={t.owner.verified} /></span>{/if}
+                </span>
+                <span class="featured-tagline">{site.tagline}</span>
+              </span>
+            </a>
+          {/each}
+          {#if featuredSites.length < 4}
+            <a class="featured-card featured-empty" href={badgePageHref('', lang)}>
+              <span class="featured-empty-title">{t.featured.emptyTitle}</span>
+              <span class="featured-empty-body">{t.featured.emptyBody}</span>
+              <span class="featured-empty-cta">{t.featured.cta}</span>
+            </a>
+          {/if}
+        </div>
+      </section>
+    {/if}
 
     {#if filtered.length === 0}
       <div class="empty">

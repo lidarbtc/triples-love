@@ -3,6 +3,7 @@ import { error, fail, isHttpError } from '@sveltejs/kit';
 import { getDb, consumeRateLimit } from '$lib/server/db.js';
 import { requireUser } from '$lib/server/auth.js';
 import { getProject, pageLanguage, validateProjectForm, saveProject } from '$lib/server/projects.js';
+import { getBacklinkStatus } from '$lib/server/backlinks.js';
 
 async function ownerContext(event) {
   const user = await requireUser(event);
@@ -21,8 +22,8 @@ async function ownerContext(event) {
 }
 
 export async function load(event) {
-  const { project, user } = await ownerContext(event);
-  return { project, user, lang: pageLanguage(event) };
+  const { db, project, user } = await ownerContext(event);
+  return { project, user, lang: pageLanguage(event), featured: Boolean((await getBacklinkStatus(db, project.id))?.featured) };
 }
 
 export const actions = {

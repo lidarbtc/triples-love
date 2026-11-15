@@ -268,5 +268,32 @@ an archived or changed project, then verify the remote row and live page. Manual
 approval does not create a DNS/HTML proof or expose a self-service verification
 method.
 
+## Featured projects
+
+Apply `migrations/0004_project_backlinks.sql` to remote D1 before deploying a
+Worker that reads it; the directory query fails without the table. The
+`BROWSER` binding and the hourly Cron trigger come from `wrangler.jsonc`. After
+deployment, confirm that `/en/` and `/ko/` render, that a signed-in banner check
+on `/badges/` completes, and that the Cron run appears in Worker logs as
+`cron.backlinks` with counts only.
+
+When a maker's site cannot be checked (for example a bot challenge) and the
+banner has been confirmed by hand, feature it with an explicit audit note.
+Exclude an abusive project, such as one hiding the link, the same way with
+`force_off`. Overridden projects are not rechecked, so remove the override when
+it is no longer needed.
+
+```sql
+INSERT INTO project_backlinks (project_id, state, detected_by, last_checked_at, override, override_note)
+SELECT id, 'found', 'manual', unixepoch() * 1000, 'force_on', 'manual:<date> <how it was confirmed>'
+FROM projects WHERE id = '<project-id>' AND status = 'active'
+ON CONFLICT(project_id) DO UPDATE SET override = excluded.override, override_note = excluded.override_note;
+```
+
+`npm test` covers link matching, check order, state transitions, rotation, the
+render budget and Cron selection. `npm run test:flow` checks the real routes:
+banner check, D1 record, the featured card, the owner status and the one-miss
+grace. Neither uses a real browser renderer.
+
 Keep deployment credentials outside the repository. Local `.env` files and
 Wrangler state are ignored by Git.

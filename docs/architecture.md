@@ -23,6 +23,10 @@ entry page is prerendered.
 | `src/lib/server/claims.js` | One-time challenges and atomic ownership grants |
 | `src/lib/server/proof.js` | Bounded DNS and raw HTML verification |
 | `src/lib/server/projects.js` | D1 reads and owner-only edits |
+| `src/lib/server/backlinks.js` | Website-banner link checks and featured eligibility |
+| `src/lib/server/render.js` | Browser Rendering for client-side banner links |
+| `src/lib/server/backlink-cron.js` | Hourly banner rechecks |
+| `scripts/add-scheduled-handler.mjs` | Adds the Cron handler to the built Worker |
 | `src/lib/server/observability.js` | Allowlisted request/operation logs and request correlation |
 | `src/routes/p/[slug]/` | Public project, claim and editing pages |
 | `migrations/` | Versioned D1 schema |
@@ -123,3 +127,43 @@ it includes no JavaScript, iframe or ownership-verification claim. The four
 self-contained light/dark SVGs in `static/badges/` are served as static assets
 with a one-day public cache. Only existing directory records can be selected
 for Listed links in the chooser. Downloaded SVGs can also be self-hosted.
+
+## Featured projects
+
+A project whose registered page links back to triples.love appears in the
+homepage's Featured section (`주목할 사이트` in Korean). Ownership verification
+is not required. The section shows at most four projects on the unfiltered
+directory, in an order that changes once per Korean calendar day; searches and
+category filters hide it so results stay neutral. When fewer than four projects
+qualify, the last card invites makers to `/badges/`. Featured cards link straight
+to the site and record `project_click` with `surface=featured`.
+
+A link counts when a real `<a href>` points to `https://triples.love/`, `/en/`,
+`/ko/` or the same project's `/p/<id>/` page. Text in comments, scripts,
+noscript or template content does not count, and the banner image URL is not
+used, so self-hosted SVGs work. Only the registered URL is checked; visitors
+cannot submit another address.
+
+A check first fetches raw HTML with the same public-address, same-origin
+redirect, time and size limits as ownership proofs. If the link is absent or
+the raw fetch fails (for example a 403 or an oversized page), Cloudflare Browser
+Rendering (`BROWSER` binding) loads the page and collects rendered anchor URLs.
+Most listed sites are client-rendered apps, so this second step matters. Browser
+time is limited by a shared budget of 40 renders per day. Sites behind a bot
+challenge cannot be checked automatically.
+
+Signed-in users start a check from `/badges/` (10 per hour per user, 4 per ten
+minutes per project). An hourly Cron run rechecks the three projects checked
+longest ago, so the directory is revisited about twice a day; it renders only
+projects whose banner was previously found by rendering.
+
+`project_backlinks` stores one row per project. Found resets the miss count;
+missing increments it; unreachable (outage, render failure, budget exhausted)
+keeps the previous evidence. A project is featured while its link was found
+within the last 7 days and the miss count is below 2. A maintainer can set
+`override` to `force_on` or `force_off`; overridden projects are not rechecked.
+
+adapter-cloudflare emits only a fetch handler and writes it to Wrangler's `main`
+path, so `npm run build` runs `scripts/add-scheduled-handler.mjs` afterwards. It
+renames the generated Worker to `_sveltekit_worker.js`, writes a `_worker.js` that
+adds `scheduled`, and excludes the server bundle from static assets.
