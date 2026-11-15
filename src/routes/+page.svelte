@@ -144,12 +144,20 @@
     <div class="hero-inner">
       <div class="hero-row hero-row-top">
         <div class="brand">
-          <span class="brand-mark">三</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M6.2 7.4c1.4-2.2 4-3.2 6.5-2.5 2.6.7 4.4 2.8 4.8 5.3" />
+              <path d="M18.1 15.8c-1.3 2.3-4 3.4-6.6 2.8-2.6-.6-4.6-2.6-5.1-5.1" />
+              <path d="M6.4 13.4c-1.9-1.8-2.3-4.7-.9-6.9 1.4-2.2 4-3.3 6.5-2.6" />
+              <circle cx="17.7" cy="10.7" r="1.8" />
+              <circle cx="6.3" cy="13.2" r="1.8" />
+              <circle cx="12.2" cy="4.7" r="1.8" />
+            </svg>
+          </span>
           <span class="brand-name">triples<span class="brand-dot">.</span>love</span>
         </div>
         <nav class="hero-nav">
-          <a href="#about">about</a>
-          <a href="#submit">submit a site</a>
+          <a href="mailto:hello@triples.love">submit a site</a>
           <a href="#top" class="hero-pill">en</a>
         </nav>
       </div>
@@ -166,7 +174,6 @@
             An ever-growing index of community-built tools, trackers, and resources around tripleS &amp;
             COSMO.
           </div>
-          <a href="#submit" class="hero-aside-cta" aria-label="submit">→</a>
         </aside>
       </div>
 
@@ -395,17 +402,17 @@
           <div class="about-viz viz-archive" aria-hidden="true">
             <div class="archive-row">
               <span class="archive-tag">'24</span>
-              <span class="archive-name">apollo.cafe</span>
+              <span class="archive-name">orbitobjekts.example</span>
               <span class="archive-status archive-ok">snapshot</span>
             </div>
             <div class="archive-row">
               <span class="archive-tag">'25</span>
-              <span class="archive-name">objektify.xyz</span>
+              <span class="archive-name">wav-archive.example</span>
               <span class="archive-status archive-ok">snapshot</span>
             </div>
             <div class="archive-row archive-live">
               <span class="archive-tag">'26</span>
-              <span class="archive-name">tracker.objekt.tools</span>
+              <span class="archive-name">cosmo-ledger.example</span>
               <span class="archive-status archive-now"><span class="dot live"></span>live</span>
             </div>
           </div>
@@ -446,9 +453,7 @@
         <span class="foot-sep">·</span>
         <span>not affiliated with MODHAUS or tripleS</span>
         <span class="foot-sep">·</span>
-        <a href="#submit">submit a site</a>
-        <span class="foot-sep">·</span>
-        <a href="#about">about</a>
+        <a href="mailto:hello@triples.love">submit a site</a>
       </div>
       <div class="foot-meta">built by fans, for fans · {sites.length} sites indexed</div>
     </footer>
