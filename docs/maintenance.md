@@ -1,5 +1,22 @@
 # Maintenance guide
 
+## When a listing is published
+
+A listing is published only after its production D1 records and live pages have
+been verified. `git push`, a successful build, or a Worker deployment alone does
+not complete a listing addition.
+
+The directory cards, descriptions, and search aliases come from **remote D1**.
+Hero news and screenshot files come from the **Worker deployment**. An announcement
+can therefore say a site was added while its card is still missing. Local D1,
+`npm test`, and `npm run db:seed:local` never populate production D1.
+
+For publication, complete the [production checklist](#production-checklist).
+When reporting progress, distinguish **source pushed**, **remote D1 updated**,
+**Worker deployed**, and **live pages verified**. If work stops at a local change
+or push, or any production step fails, state which steps remain pending rather
+than reporting the site as added to the live directory.
+
 ## Add or update a listing
 
 1. Visit the site to confirm its features and availability. Check the directory
@@ -34,9 +51,9 @@
    Verify the new card's image, copy, and outbound link; name and alias search;
    category filters; recent-addition sorting; and news wrapping on mobile.
    Review `git diff --check` and `git diff` for omissions or unintended changes.
-7. Commit the data, translations, news, and images together. Deploy using the
-   instructions below, then check the new cards, news, images, and outbound links
-   on both language routes of the live site.
+7. Commit the data, translations, news, and images together. For publication,
+   follow the [production checklist](#production-checklist), including remote D1
+   import and live verification even when a push triggers automatic deployment.
 
 ## Archive or restore a listing
 
@@ -92,10 +109,11 @@ Run `npm run screenshots -- --help` for viewport, format, and timeout options.
 
 ## Deploy to Cloudflare Workers
 
-Authenticate Wrangler with the Cloudflare account that owns the deployment:
+Check the Wrangler identity with `npx wrangler whoami`. If authentication is
+needed, run `npx wrangler login` with the account that owns the deployment.
+Use the following commands as part of the production checklist:
 
 ```sh
-npx wrangler login
 npm run db:migrate:remote
 npm run db:seed:remote
 npm run deploy
@@ -105,6 +123,9 @@ The D1 instance is `triples-love-db`, bound as `DB` in `wrangler.jsonc`.
 The Wrangler account is pinned to the existing `lidarbtc` deployment, so signing
 in to an account with multiple memberships does not change the target.
 `npm run deploy` builds and deploys `.svelte-kit/cloudflare/`, including the Worker.
+Neither `npm run build` nor `npm run deploy` runs the remote seed. A Git-triggered
+deployment also needs the D1 import unless its configured build process explicitly
+runs it; confirm the remote records regardless of deployment status.
 Apply pending schema migrations before deploying code that needs them. Seeding is
 safe to repeat, but changes to an existing listing must use the editor or a
 targeted migration. Do not modify an already-applied migration file.
@@ -114,6 +135,87 @@ For local work, run `npm run db:migrate:local`, `npm run db:seed:local`, then
 `npm run cf:dev`. Local D1 state is separate from production. OAuth deliberately
 uses the canonical HTTPS origin, so sign-in from a local/preview URL moves to the
 production site; it does not create a local signed-in session.
+
+### Production checklist
+
+1. Use the intended, reviewed commit for both seed data and deployment. Confirm
+   it was pushed to the target branch. If the checkout contains unrelated changes,
+   use a separate clean checkout of that commit; do not deploy those changes.
+2. Run the [production inventory check](#check-production-inventory) before import.
+   Check all source IDs and their English/Korean translation rows, including
+   archived projects, so earlier missed additions are found too.
+3. Apply pending migrations, then run `node scripts/seed-projects.mjs` and review
+   `.wrangler/seed-projects.sql` against the inventory result. Run
+   `npm run db:seed:remote` for the intended missing listings/translations. The full
+   seed may also insert earlier missing entries. For a narrower scope, prepare
+   reviewed SQL limited to the intended project IDs and use
+   `npx wrangler d1 execute DB --remote --file=<reviewed-sql-file>`.
+4. Verify the Worker deployment for that commit has succeeded, or run
+   `npm run deploy` if it has not been deployed. If the live news and assets are
+   already current and only D1 records were missing, another deployment is not
+   needed.
+5. Rerun the production inventory check after import. For each new listing,
+   verify the final URL, category, aliases, and both translations against the
+   intended source data. `INSERT OR IGNORE` preserves existing records, so another
+   seed does **not** apply later copy, alias, or archive-status corrections. Owners
+   can update copy and aliases in the editor. Maintainer corrections and all
+   archive/restore changes require a reviewed migration with explicit project IDs.
+6. Open the actual `https://triples.love/en/` and `/ko/` pages, reloading after the
+   import. For every addition, verify its card, final description, loaded image,
+   outbound URL, name/alias search, category filter, recent-addition order, and
+   `/p/<id>/?lang=en` and `?lang=ko` detail pages. Check news wrapping on mobile
+   when its text changed. Search-engine snapshots and an updated announcement
+   are not evidence that a card is live.
+
+If news is current but a card is absent, check remote D1 first. If the card exists
+but its image or news is missing, check the Worker deployment. Record any failed
+stage and resolve it before claiming publication is complete.
+
+### Check production inventory
+
+Run from the intended source checkout. This reads production; it does not change
+the database. The JSON snapshot is saved under the ignored `.wrangler/` directory.
+Stop if the Wrangler query fails; do not use an older snapshot as current evidence.
+
+```sh
+mkdir -p .wrangler
+npx wrangler d1 execute DB --remote --json --command \
+  "SELECT id FROM projects ORDER BY id; SELECT project_id, lang FROM project_translations ORDER BY project_id, lang;" \
+  > .wrangler/production-listings.json
+
+node --input-type=module <<'NODE'
+import { readFileSync } from 'node:fs';
+import { sites } from './src/lib/data.js';
+
+const responses = JSON.parse(readFileSync('.wrangler/production-listings.json', 'utf8'));
+if (!Array.isArray(responses) || responses.length !== 2 ||
+    responses.some(result => result.success !== true || !Array.isArray(result.results))) {
+  throw new Error('Production inventory query failed. Check Wrangler authentication and DB target.');
+}
+const [projects, translations] = responses.map(result => result.results);
+const expectedIds = new Set(sites.map(site => site.id));
+const actualIds = new Set(projects.map(project => project.id));
+const localePairs = new Set(translations.map(row => `${row.project_id}:${row.lang}`));
+const missingProjects = [...expectedIds].filter(id => !actualIds.has(id));
+const missingTranslations = [...expectedIds].flatMap(id =>
+  ['en', 'ko'].filter(lang => !localePairs.has(`${id}:${lang}`)).map(lang => `${id}:${lang}`)
+);
+const extraProjects = [...actualIds].filter(id => !expectedIds.has(id));
+console.log(JSON.stringify({
+  expectedProjects: expectedIds.size, actualProjects: actualIds.size,
+  expectedTranslations: expectedIds.size * 2, actualTranslations: translations.length,
+  missingProjects, missingTranslations, extraProjects
+}, null, 2));
+if (missingProjects.length || missingTranslations.length) process.exitCode = 1;
+NODE
+```
+
+Both missing lists must be empty. Counts are a summary, not a substitute for ID
+and language-pair checks; expected totals come from the source, not a fixed number.
+Investigate extra remote projects without deleting them. This check establishes
+record presence only: it does not validate description text, aliases, images, or
+the deployed UI. A Korean card can fall back to English, so seeing it on `/ko/`
+alone does not prove its Korean translation row exists.
 
 ## GitHub sign-in setup
 

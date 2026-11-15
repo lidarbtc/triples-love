@@ -42,4 +42,9 @@ See the [maintenance guide](docs/maintenance.md) for listing updates, translatio
 screenshots, and deployment. The [architecture notes](docs/architecture.md) describe
 the source layout and language routing.
 
+Publishing a listing requires both a Worker deployment and a remote D1 import.
+A push or successful build alone does not add its card. Complete the
+[production checklist](docs/maintenance.md#production-checklist), including the
+inventory check and verification on both live language routes.
+
 Unofficial fan project. Not affiliated with MODHAUS or tripleS.
