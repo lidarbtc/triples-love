@@ -1,5 +1,5 @@
 // Curated list of fan-made tripleS sites. Categories assigned by best guess.
-window.TRIPLES_SITES = [
+export const sites = [
   {
     id: "apollo",
     name: "Apollo",
@@ -189,7 +189,7 @@ window.TRIPLES_SITES = [
   },
 ];
 
-window.TRIPLES_CATEGORIES = [
+export const categories = [
   { id: "all",      label: "everything" },
   { id: "objekts",  label: "objekts" },
   { id: "stats",    label: "stats" },

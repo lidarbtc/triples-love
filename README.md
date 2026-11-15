@@ -6,23 +6,35 @@ vercel deploys, all in one place.
 
 ## Stack
 
-Static site, no build step. React + Babel are loaded from CDN and the JSX is
-compiled in the browser.
+SvelteKit SSG with `@sveltejs/adapter-static`. The built `build/` directory is
+served as Cloudflare Workers Static Assets via Wrangler.
 
-- `index.html` — markup, CSS, and CDN imports
-- `data.js` — site list + category definitions (`window.TRIPLES_SITES`)
-- `app.jsx` — header, toolbar (tabs + search + sort), card grid, about block
-- `tweaks-panel.jsx` — design-time tweaks shell (hidden in production; only
-  opens when a parent frame posts `__activate_edit_mode`)
-- `image-slot.js` — `<image-slot>` custom element for drop-to-fill images
-  (read-only outside the design host)
+- `src/routes/+page.svelte` — header, toolbar, card grid, about block, footer
+- `src/app.css` — migrated styling from the original static page
+- `src/lib/data.js` — site list + category definitions
+- `static/image-slot.js` — `<image-slot>` custom element asset
+- `wrangler.jsonc` — Workers static assets deployment config
 
 ## Run locally
 
-Any static server works — for example:
-
 ```sh
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Then open <http://localhost:8000>.
+## Build and preview
+
+```sh
+npm run build
+npm run preview
+```
+
+The generated static files are written to `build/`.
+
+## Deploy to Cloudflare Workers
+
+```sh
+npm run deploy
+```
+
+This runs the SvelteKit static build and deploys `build/` with Wrangler.
