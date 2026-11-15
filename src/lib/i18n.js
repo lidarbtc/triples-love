@@ -15,9 +15,9 @@ export const ui = {
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
       date: 'November 15, 2026',
-      updateTitle: 'HaYeon OS added',
+      updateTitle: 'HaYeon OS added, COSMO Live Stats archived',
       updateBody:
-        'Log in to HaYeon OS, a fan-made desktop themed around Jeong HaYeon, to browse her photos, sign the live guestbook, and play Hedgehog Finder.',
+        'Log in to HaYeon OS, a fan-made desktop themed around Jeong HaYeon, to browse her photos, sign the live guestbook, and play Hedgehog Finder. COSMO Live Stats is currently unavailable, so its listing and saved screenshot are now in the archive.',
       today: 'today',
       status: 'last updated',
       statusValue: 'November 15, 2026',
@@ -112,9 +112,9 @@ export const ui = {
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
       date: '2026년 11월 15일',
-      updateTitle: 'HaYeon OS 추가',
+      updateTitle: 'HaYeon OS 추가, COSMO Live Stats 기록 보관',
       updateBody:
-        '정하연 테마의 팬메이드 데스크톱에서 사진을 둘러보고 실시간 방명록을 남기고 고슴도치 찾기도 할 수 있는 HaYeon OS를 추가했습니다.',
+        '정하연 테마의 팬메이드 데스크톱에서 사진을 둘러보고 실시간 방명록을 남기고 고슴도치 찾기도 할 수 있는 HaYeon OS를 추가했습니다. 현재 접속할 수 없는 COSMO Live Stats의 소개와 당시 화면은 아카이브에 남겼습니다.',
       today: '오늘',
       status: '최근 업데이트',
       statusValue: '2026년 11월 15일',
@@ -349,7 +349,7 @@ export const siteCopy = {
     cosmolive: {
       tagline: 'COSMO Live 통계',
       description:
-        '팬이 만든 tripleS COSMO Live 영상 목록과 통계입니다. 방송 횟수와 누적 방송 시간에 따른 순위표를 볼 수 있습니다.',
+        '팬이 만든 tripleS COSMO Live 영상 목록과 통계였습니다. 방송 횟수와 누적 방송 시간에 따른 순위표를 볼 수 있었습니다.',
       badges: ['COSMO Live', '순위표']
     },
     nebula: {
