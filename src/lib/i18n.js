@@ -25,6 +25,9 @@ export const ui = {
     },
     toolbar: {
       searchPlaceholder: 'search by name, domain, or tag…',
+      searchLabel: 'search projects',
+      categories: 'categories',
+      directory: 'project directory',
       clear: 'clear search',
       sort: 'sort',
       sortAlpha: 'a to z',
@@ -119,6 +122,9 @@ export const ui = {
     },
     toolbar: {
       searchPlaceholder: '이름, 도메인, 태그로 검색…',
+      searchLabel: '프로젝트 검색',
+      categories: '카테고리',
+      directory: '프로젝트 목록',
       clear: '검색어 지우기',
       sort: '정렬',
       sortAlpha: '이름순 (A-Z)',

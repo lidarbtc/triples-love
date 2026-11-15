@@ -1,7 +1,7 @@
 <script>
   import { browser } from '$app/environment';
   import { page } from '$app/stores';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
   import { categories } from '$lib/data.js';
   import { badgePageHref } from '$lib/embed-badges.js';
@@ -26,6 +26,11 @@
   let sort = 'alpha';
   let interactive = false;
   let archiveOpen = false;
+  let directoryEl;
+  let tabsEl;
+  // The category strip fades at whichever end has more chips to scroll to.
+  let tabsMoreStart = false;
+  let tabsMoreEnd = true;
 
   let now = null;
   $: locale = lang === 'ko' ? 'ko-KR' : 'en-GB';
@@ -47,7 +52,12 @@
 
     updateClock();
     const id = setInterval(updateClock, 1000);
-    return () => clearInterval(id);
+    updateTabEdges();
+    window.addEventListener('resize', updateTabEdges);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('resize', updateTabEdges);
+    };
   });
 
   function getLanguageHref(nextLang, currentUrl) {
@@ -96,6 +106,7 @@
 
   $: if (browser) {
     document.documentElement.lang = lang;
+    tick().then(updateTabEdges);
     try {
       window.localStorage.setItem('triples-love.lang', lang);
     } catch {
@@ -153,14 +164,42 @@
   $: archivedCount = sites.filter((site) => site.status === 'archived').length;
   $: archiveOpen = Boolean(query.trim() && archivedSites.length);
 
-  function setActiveTab(id) {
+  function setActiveTab(id, chip) {
     active = id;
     expandedId = null;
+    centerChip(chip);
+    keepDirectoryInView();
   }
 
   function updateQuery(value) {
     query = value;
     expandedId = null;
+    keepDirectoryInView();
+  }
+
+  function updateTabEdges() {
+    if (!tabsEl) return;
+    const max = tabsEl.scrollWidth - tabsEl.clientWidth;
+    tabsMoreStart = tabsEl.scrollLeft > 2;
+    tabsMoreEnd = tabsEl.scrollLeft < max - 2;
+  }
+
+  // On phones the categories scroll sideways; bring the chosen one to the middle.
+  function centerChip(chip) {
+    if (!chip || !tabsEl || tabsEl.scrollWidth <= tabsEl.clientWidth) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    tabsEl.scrollTo({
+      left: chip.offsetLeft - (tabsEl.clientWidth - chip.offsetWidth) / 2,
+      behavior: reduced ? 'auto' : 'smooth'
+    });
+  }
+
+  // A shorter result list would otherwise leave the reader stranded further down the page.
+  async function keepDirectoryInView() {
+    await tick();
+    if (!directoryEl) return;
+    const top = directoryEl.getBoundingClientRect().top;
+    if (top < 0) window.scrollTo({ top: window.scrollY + top, behavior: 'instant' });
   }
 
   function resetFilters() {
@@ -525,51 +564,74 @@
   </header>
 
   <main class="content">
-    <div class="toolbar">
-      <div class="tabs" role="tablist">
-        {#each categories as category}
-          <button
-            class="tab"
-            class:tab-active={active === category.id}
-            type="button"
-            on:click={() => setActiveTab(category.id)}
+    <section class="directory" aria-label={t.toolbar.directory} bind:this={directoryEl}>
+    <div class="toolbar-dock">
+      <div class="toolbar">
+        <div class="tabs-dock">
+          <div
+            class="tabs"
+            class:tabs-more-start={tabsMoreStart}
+            class:tabs-more-end={tabsMoreEnd}
+            role="group"
+            aria-label={t.toolbar.categories}
+            bind:this={tabsEl}
+            on:scroll={updateTabEdges}
           >
-            <span>{labels[category.id] ?? category.label}</span>
-            <span class="tab-count">{counts[category.id] ?? 0}</span>
-          </button>
-        {/each}
-      </div>
-
-      <div class="toolbar-right">
-        <div class="search">
-          <svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true">
-            <circle cx="7.2" cy="7.2" r="4.4" />
-            <path d="m10.6 10.6 2.9 2.9" />
-          </svg>
-          <input
-            value={query}
-            on:input={(event) => updateQuery(event.currentTarget.value)}
-            placeholder={t.toolbar.searchPlaceholder}
-          />
-          {#if query}
-            <button
-              class="search-clear"
-              type="button"
-              aria-label={t.toolbar.clear}
-              on:click={() => updateQuery('')}
-            >
-              ×
-            </button>
-          {/if}
+            {#each categories as category}
+              <button
+                class="tab"
+                class:tab-active={active === category.id}
+                type="button"
+                aria-pressed={active === category.id}
+                on:click={(event) => setActiveTab(category.id, event.currentTarget)}
+              >
+                <span>{labels[category.id] ?? category.label}</span>
+                <span class="tab-count">{counts[category.id] ?? 0}</span>
+              </button>
+            {/each}
+          </div>
         </div>
 
-        <div class="sort">
-          <label for="site-sort">{t.toolbar.sort}</label>
-          <select id="site-sort" bind:value={sort}>
-            <option value="alpha">{t.toolbar.sortAlpha}</option>
-            <option value="category">{t.toolbar.sortCategory}</option>
-            <option value="recent">{t.toolbar.sortRecent}</option>
-          </select>
+        <div class="toolbar-right">
+          <div class="search">
+            <svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="7.2" cy="7.2" r="4.4" />
+              <path d="m10.6 10.6 2.9 2.9" />
+            </svg>
+            <input
+              type="search"
+              enterkeyhint="search"
+              autocomplete="off"
+              value={query}
+              on:input={(event) => updateQuery(event.currentTarget.value)}
+              placeholder={t.toolbar.searchPlaceholder}
+              aria-label={t.toolbar.searchLabel}
+            />
+            {#if query}
+              <button
+                class="search-clear"
+                type="button"
+                aria-label={t.toolbar.clear}
+                on:click={() => updateQuery('')}
+              >
+                ×
+              </button>
+            {/if}
+          </div>
+
+          <div class="sort">
+            <label for="site-sort">{t.toolbar.sort}</label>
+            <span class="sort-control" class:sort-changed={sort !== 'alpha'}>
+              <svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M2.5 4.5h11M2.5 8h7.5M2.5 11.5h4" />
+              </svg>
+              <select id="site-sort" bind:value={sort} on:change={keepDirectoryInView}>
+                <option value="alpha">{t.toolbar.sortAlpha}</option>
+                <option value="category">{t.toolbar.sortCategory}</option>
+                <option value="recent">{t.toolbar.sortRecent}</option>
+              </select>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -612,6 +674,7 @@
         </div>
       </details>
     {/if}
+    </section>
 
     <section class="about" id="about">
       <div class="about-head">

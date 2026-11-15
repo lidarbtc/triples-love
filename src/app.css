@@ -14,6 +14,13 @@
     --radius-lg: 20px;
     --radius: 12px;
     --radius-sm: 8px;
+    /* Frosted surface for the floating filter bar. */
+    --glass: color-mix(in srgb, var(--card) 80%, transparent);
+    --glass-filter: blur(20px) saturate(1.7);
+    --glass-shadow:
+      inset 0 1px 0 rgba(255,255,255,.85),
+      0 1px 2px color-mix(in oklab, var(--ink) 5%, transparent),
+      0 12px 28px -20px color-mix(in oklab, var(--ink) 40%, transparent);
     --sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
     --sans-ko: "Pretendard", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
     --serif: "Instrument Serif", "Times New Roman", serif;
@@ -150,53 +157,74 @@
 
   .content { margin-top: 24px; }
 
+  /* The filter bar floats only while its own list scrolls. The dock fades the
+     list out toward the top edge, so cards never show above the bar. */
+  .toolbar-dock, .tabs-dock { --dock-gap: 12px; }
+  .toolbar-dock {
+    position: sticky; top: 0; z-index: 10;
+    margin: calc(var(--dock-gap) * -1) 0 20px;
+    padding-top: var(--dock-gap);
+    pointer-events: none;
+  }
+  .toolbar-dock::before, .tabs-dock::before {
+    position: absolute; z-index: -1;
+    inset: 0 -22px -12px;
+    background: linear-gradient(to bottom, var(--bg) var(--dock-gap), transparent);
+    pointer-events: none;
+  }
+  .toolbar-dock::before { content: ""; }
+
   .toolbar {
-    position: sticky; top: 12px; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
-    gap: 14px; flex-wrap: wrap;
-    padding: 8px;
-    border-radius: var(--radius);
-    background: color-mix(in srgb, var(--bg) 75%, transparent);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
+    gap: 8px 14px; flex-wrap: wrap;
+    padding: 6px;
+    border-radius: 14px;
     border: 1px solid var(--line);
-    box-shadow: 0 2px 10px -6px color-mix(in oklab, var(--ink) 20%, transparent);
-    margin-bottom: 20px;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
+    pointer-events: auto;
   }
 
+  .tabs-dock { min-width: 0; }
   .tabs { display: flex; gap: 2px; flex-wrap: wrap; }
   .tab {
     appearance: none; border: 0; background: transparent;
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 6px 11px; border-radius: var(--radius-sm);
-    font-size: 13px; color: var(--ink-2); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+    height: 32px; padding: 0 11px; border-radius: var(--radius-sm);
+    font-size: 13px; line-height: 1; white-space: nowrap;
+    color: var(--ink-2); cursor: pointer;
     transition: background .12s ease, color .12s ease;
   }
-  .tab:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); color: var(--ink); }
+  .tab:hover { background: color-mix(in oklab, var(--ink) 6%, transparent); color: var(--ink); }
   .tab-active, .tab-active:hover { background: var(--ink); color: white; }
   .tab-count {
     font-family: var(--mono);
     font-size: 10.5px;
-    color: inherit; opacity: .5;
+    color: color-mix(in oklab, var(--ink-2) 82%, transparent);
   }
-  .tab-active .tab-count { opacity: .7; }
+  .tab-active .tab-count { color: rgba(255,255,255,.72); }
 
-  .toolbar-right { display: flex; align-items: center; gap: 10px; }
+  .toolbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex: 1 1 auto; }
 
   .search {
     position: relative;
     display: flex; align-items: center;
     background: var(--card); border: 1px solid var(--line-mid);
     border-radius: var(--radius-sm); padding: 0 8px 0 30px; height: 32px;
-    width: 270px;
+    flex: 1 1 270px; max-width: 270px;
     transition: border-color .15s ease;
   }
   .search input {
     appearance: none; border: 0; outline: 0; background: transparent;
-    width: 100%; height: 100%; font-size: 13px; font-family: inherit;
-    color: var(--ink);
+    width: 100%; height: 100%; min-width: 0; padding: 0;
+    font-size: 13px; font-family: inherit;
+    color: var(--ink); text-overflow: ellipsis;
   }
   .search input::placeholder { color: var(--ink-3); }
+  .search input::-webkit-search-decoration,
+  .search input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
   .search-icon {
     position: absolute; left: 10px;
     width: 13px; height: 13px;
@@ -216,6 +244,8 @@
     font-family: var(--mono); font-size: 10px;
     letter-spacing: 0.08em; text-transform: uppercase;
   }
+  .sort-control { position: relative; display: inline-flex; }
+  .sort-icon { display: none; }
   .sort select {
     appearance: none;
     border: 1px solid var(--line-mid); background: var(--card);
@@ -223,6 +253,95 @@
     font-size: 13px; font-family: inherit; color: var(--ink);
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%238c8c96' fill='none' stroke-width='1.4'/></svg>");
     background-repeat: no-repeat; background-position: right 10px center;
+  }
+
+  /* When the bar wraps to two rows, search takes the whole second row. */
+  @media (max-width: 1140px) {
+    .search { max-width: none; }
+  }
+
+  /* Phones: categories become one floating strip that scrolls sideways;
+     search and sort stay in the page above the list. */
+  @media (max-width: 720px) {
+    .toolbar-dock, .toolbar { display: contents; }
+    .toolbar-dock::before { content: none; }
+
+    .tabs-dock {
+      --dock-gap: 8px;
+      position: sticky; top: 0; z-index: 10;
+      margin-top: calc(var(--dock-gap) * -1);
+      padding-top: var(--dock-gap);
+      pointer-events: none;
+    }
+    .tabs-dock::before { content: ""; }
+    .tabs-dock::after {
+      content: ""; position: absolute; z-index: -1;
+      inset: var(--dock-gap) 0 0;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--glass);
+      -webkit-backdrop-filter: var(--glass-filter);
+      backdrop-filter: var(--glass-filter);
+      box-shadow: var(--glass-shadow);
+    }
+    /* Chips fade out at whichever end still has more to scroll. */
+    .tabs {
+      --fade: linear-gradient(
+        to right,
+        transparent, #000 var(--fade-start, 0px),
+        #000 calc(100% - var(--fade-end, 0px)), transparent
+      );
+      position: relative;
+      flex-wrap: nowrap;
+      overflow-x: auto; overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      padding: 5px;
+      border-radius: 999px;
+      -webkit-mask-image: var(--fade);
+      mask-image: var(--fade);
+      pointer-events: auto;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tabs-more-start { --fade-start: 36px; }
+    .tabs-more-end { --fade-end: 36px; }
+    .tab { height: 38px; padding: 0 14px; border-radius: 999px; font-size: 14px; }
+    .tab-count { font-size: 11px; }
+
+    .toolbar-right { gap: 8px; margin: 10px 0 16px; }
+    .search { min-width: 0; height: 44px; padding: 0 10px 0 38px; border-radius: var(--radius); }
+    .search input { font-size: 16px; }
+    .search-icon { left: 13px; width: 15px; height: 15px; }
+    .search-clear { width: 32px; height: 32px; margin-right: -6px; font-size: 20px; }
+
+    /* The sort menu collapses to an icon; a dot marks a non-default order. */
+    .sort label {
+      position: absolute; width: 1px; height: 1px; margin: -1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
+    .sort-control {
+      width: 44px; height: 44px;
+      align-items: center; justify-content: center;
+      background: var(--card); border: 1px solid var(--line-mid);
+      border-radius: var(--radius);
+    }
+    .sort-control:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .sort-icon {
+      display: block; width: 18px; height: 18px;
+      fill: none; stroke: var(--ink-2); stroke-width: 1.5; stroke-linecap: round;
+    }
+    .sort-changed::after {
+      content: ""; position: absolute; top: 9px; right: 9px;
+      width: 7px; height: 7px; border-radius: 999px;
+      background: var(--accent); box-shadow: 0 0 0 2px var(--card);
+    }
+    .sort select {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      padding: 0; border: 0; opacity: 0; font-size: 16px; cursor: pointer;
+    }
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :root { --glass: var(--card); }
   }
 
   /* ─── GRID + CARDS ───────────────────────────────────────────────── */
@@ -243,6 +362,8 @@
     display: block;
   }
   .card:hover { border-color: var(--line-strong); }
+  /* An open card should not stretch its row neighbours into empty boxes. */
+  .grid:has(> .card[open]) { align-items: start; }
   .card[open] {
     grid-column: span 2;
     cursor: default;
@@ -396,7 +517,7 @@
     margin-top: 28px;
     border-top: 1px solid var(--line-mid);
     border-bottom: 1px solid var(--line-mid);
-    scroll-margin-top: 24px;
+    scroll-margin-top: 84px;
   }
   .project-archive-summary {
     display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px;
@@ -627,9 +748,6 @@
     .hero-stats { grid-template-columns: 1fr; gap: 10px; }
     .hero-stat { padding-right: 0; }
     .hero-stat + .hero-stat { padding-left: 0; border-left: 0; padding-top: 10px; border-top: 1px solid var(--line-mid); }
-    .toolbar { flex-direction: column; align-items: stretch; }
-    .toolbar-right { justify-content: space-between; }
-    .search { width: 100%; flex: 1; }
     .card[open] { grid-column: span 1; }
   }
   @media (max-width: 600px) {
@@ -639,6 +757,8 @@
     .hero-nav .lang-toggle { min-width: 44px; margin-left: auto; }
     .about-grid { grid-template-columns: 1fr; }
     .about-card-tint { grid-column: span 1; }
+    .about-card { min-height: 0; }
+    .about-card-stat { padding-top: 36px; }
   }
   @media (max-width: 360px) {
     .hero-nav { flex-wrap: wrap; }
