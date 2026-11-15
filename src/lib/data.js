@@ -337,6 +337,18 @@ export const sites = [
     badges: ["videos", "English subs"],
     accent: "blue",
   },
+  {
+    id: "havant",
+    name: "HAVANT",
+    domain: "havant.xyz",
+    url: "https://havant.xyz/",
+    category: "objekts",
+    addedAt: "2026-09-20T16:47:52+09:00",
+    tagline: "Objekt catalog and collection tools",
+    description: "Browse tripleS, ARTMS, and idntt Objekts by season, member, and class. View COSMO collections, compare users, or make have/want lists.",
+    badges: ["catalog", "collection", "want/have"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [

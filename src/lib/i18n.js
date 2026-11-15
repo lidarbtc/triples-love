@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'September 19, 2026',
-      updateTitle: 'New: sssflix & Hayeon Archive',
+      date: 'September 20, 2026',
+      updateTitle: 'New: HAVANT',
       updateBody:
-        'Find tripleS videos on sssflix and Jeong Hayeon’s photos, videos, and translated messages on Hayeon Archive. Both are now in the directory.',
+        'HAVANT is now in the directory. Browse the Objekt catalog, compare COSMO collections, and make have/want lists.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'September 19, 2026',
+      statusValue: 'September 20, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -86,13 +86,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 9월 19일',
-      updateTitle: 'sssflix · Hayeon Archive 추가',
+      date: '2026년 9월 20일',
+      updateTitle: 'HAVANT 추가',
       updateBody:
-        'tripleS 영상을 모은 sssflix와 정하연의 사진·영상, 메시지 번역을 볼 수 있는 Hayeon Archive를 목록에 추가했습니다.',
+        '오브젝트 도감을 살펴보고 COSMO 컬렉션 비교와 보유·희망 목록을 만들 수 있는 HAVANT를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 9월 19일',
+      statusValue: '2026년 9월 20일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -356,6 +356,12 @@ export const siteCopy = {
         'tripleS 정하연의 사진과 영상을 모아둔 팬 아카이브입니다. 프롬·COSMO Talk 메시지의 한국어 원문과 영어 번역, 프로필도 볼 수 있습니다.',
       badges: ['사진·영상', '메시지 번역']
     },
+    havant: {
+      tagline: '오브젝트 도감과 컬렉션 도구',
+      description:
+        'tripleS, ARTMS, idntt 오브젝트를 시즌·멤버·클래스별로 찾아볼 수 있습니다. COSMO 컬렉션 조회와 사용자 간 비교, 보유·희망 목록 만들기도 지원합니다.',
+      badges: ['도감', '컬렉션', '보유·희망']
+    },
     sssflix: {
       tagline: 'tripleS 영상 아카이브',
       description:
@@ -366,6 +372,7 @@ export const siteCopy = {
 };
 
 export const siteSearchAliases = {
+  havant: ['하반트', '해번트', 'have want', 'want/have'],
   tracker: ['want/have'],
   objektmy: ['want/have'],
   objekttop: ['실물'],
