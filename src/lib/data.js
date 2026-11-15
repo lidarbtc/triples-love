@@ -32,9 +32,9 @@ export const sites = [
     url: "https://wav.haus/",
     category: "hub",
     addedAt: "2026-05-10T22:12:02+09:00",
-    tagline: "Fan project subdomains",
-    description: "Provides wav.haus subdomains for fan-made tripleS projects.",
-    badges: ["subdomains", "hosting"],
+    tagline: "Free subdomains for fan projects",
+    description: "Get a free .wav.haus subdomain for your tripleS fan project.",
+    badges: ["subdomains", "free"],
     accent: "blue",
   },
   {
@@ -459,6 +459,18 @@ export const sites = [
     description: "Follow tripleS Objekt mints, trades, and spins as they happen. Check 24-hour activity, member rankings, trends, and records, or browse Objekts and the collection release calendar.",
     badges: ["live activity", "trends", "records"],
     accent: "violet",
+  },
+  {
+    id: "shionarchive",
+    name: "SHION ARCHIVE",
+    domain: "shionarchive.wav.haus",
+    url: "https://shionarchive.wav.haus/",
+    category: "hub",
+    addedAt: "2026-11-14T22:40:00+09:00",
+    tagline: "Park ShiOn fan archive",
+    description: "A fan archive of tripleS member Park ShiOn's photos and videos. Browse her profile and Objekts, or pick a favorite card in the Objekt World Cup.",
+    badges: ["photos & videos", "Objekts", "world cup"],
+    accent: "blue",
   },
 ];
 

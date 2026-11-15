@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'November 13, 2026',
-      updateTitle: 'kosmoSSS added',
+      date: 'November 14, 2026',
+      updateTitle: 'SHION ARCHIVE added',
       updateBody:
-        'Follow tripleS Objekt mints, trades, and spins as they happen in kosmoSSS, with member rankings, trends, and records.',
+        'Browse photos, videos, and Objekts of Park ShiOn in SHION ARCHIVE, or pick a favorite card in its Objekt World Cup.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'November 13, 2026',
+      statusValue: 'November 14, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -111,13 +111,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 11월 13일',
-      updateTitle: 'kosmoSSS 추가',
+      date: '2026년 11월 14일',
+      updateTitle: 'SHION ARCHIVE 추가',
       updateBody:
-        'tripleS 오브젝트의 민팅, 트레이드, 스핀을 실시간으로 보고 멤버 순위와 트렌드, 기록까지 확인하는 kosmoSSS를 추가했습니다.',
+        '박시온의 사진과 영상, 오브젝트를 둘러보고 오브젝트 월드컵도 즐길 수 있는 SHION ARCHIVE를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 11월 13일',
+      statusValue: '2026년 11월 14일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -257,10 +257,10 @@ export const siteCopy = {
       badges: ['일정', '아카이브']
     },
     wavhaus: {
-      tagline: '팬 프로젝트용 서브도메인',
+      tagline: '팬 프로젝트용 무료 서브도메인',
       description:
-        'tripleS 팬 프로젝트에 쓸 wav.haus 서브도메인을 제공합니다.',
-      badges: ['서브도메인', '호스팅']
+        'tripleS 팬 프로젝트에 쓸 .wav.haus 서브도메인을 무료로 받을 수 있습니다.',
+      badges: ['서브도메인', '무료']
     },
     objektify: {
       tagline: '오브젝트 스타일 카드 제작',
@@ -471,6 +471,12 @@ export const siteCopy = {
       description:
         'tripleS 오브젝트의 민팅, 트레이드, 스핀 활동을 실시간으로 볼 수 있습니다. 24시간 활동량과 멤버 순위, 트렌드, 기록을 확인하고 오브젝트와 컬렉션 출시 캘린더도 둘러볼 수 있습니다.',
       badges: ['실시간 활동', '트렌드', '기록']
+    },
+    shionarchive: {
+      tagline: '박시온 팬 아카이브',
+      description:
+        'tripleS 박시온의 사진과 영상을 모아둔 팬 아카이브입니다. 프로필과 오브젝트를 둘러보고, 오브젝트 월드컵에서 마음에 드는 카드를 골라볼 수도 있습니다.',
+      badges: ['사진·영상', '오브젝트', '월드컵']
     }
   }
 };
@@ -498,7 +504,8 @@ export const siteSearchAliases = {
   'triples-wav': ['tripleS WAV', '트리플에스 웨이브', '트리플에스웨이브', '공식 링크', '링크 모음', 'link hub'],
   fifty: ['wav fifty', 'wav-fifty', '피프티', '웨이브 피프티', '웨이브피프티', '3D viewer', '3D 뷰어', '비주얼 뷰어'],
   ssslot: ['sss slot', '트리플에스 슬롯', '슬롯', '슬롯머신', 'slot machine', '수집 게임'],
-  kosmosss: ['kosmo SSS', 'kosmo', '코스모SSS', '코스모 SSS', '민팅', 'mint', '실시간 활동', 'live activity']
+  kosmosss: ['kosmo SSS', 'kosmo', '코스모SSS', '코스모 SSS', '민팅', 'mint', '실시간 활동', 'live activity'],
+  shionarchive: ['시온 아카이브', '시온아카이브', '박시온', 'Park ShiOn', 'ShiOn', 'S20', 'bbangshion', '월드컵', 'world cup']
 };
 
 export function isSupportedLang(value) {
