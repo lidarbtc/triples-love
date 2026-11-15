@@ -45,15 +45,18 @@ response bodies. Unexpected exceptions retain only file/line/column locations in
 known application modules; messages, arbitrary paths and causes are omitted.
 Logger failures do not change the application's response behavior.
 
-Wrangler 4.90.0's installed schema does not support `redact_query_string`.
-Automatic invocation logs would include OAuth callback URLs, so this release
-uses application request summaries instead. Do not enable invocation logs or
-traces until their URL/header redaction has been verified in a disposable
-environment with fake credentials. Local tests verify application output; they
-do not prove how Cloudflare handles platform-generated metadata or fatal runtime
-exceptions. Before production rollout, inspect a disposable deployment's stored
-records for fixture code/state/cookies and confirm that custom records' platform
-metadata also omits or redacts them.
+Wrangler is pinned to 4.155.0 so `redact_query_string: true` is supported.
+Cloudflare attaches request URLs to custom-log metadata even with invocation
+logs disabled. Query redaction is therefore mandatory: disabling invocation logs
+alone does not protect OAuth code/state. The application still uses its own
+request summaries to avoid duplicate records and excessive request metadata.
+Do not enable invocation logs or traces without checking their URL/header data.
+
+Disposable-deployment validation must inspect the entire stored record, including
+platform metadata, for fixture code/state/cookies/authorization/referrer values.
+Local tests alone cannot establish platform redaction behavior. Retest after
+changing Wrangler or these settings; do not use real authentication secrets as
+probe values.
 
 Static assets and the prerendered language entry page can bypass SvelteKit;
 their requests are not counted by these summaries. Use Cloudflare traffic metrics

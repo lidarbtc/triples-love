@@ -8,12 +8,13 @@
   "upload_source_maps": true,
   "observability": {
     "enabled": true,
+    "redact_query_string": true,
     "logs": {
       "enabled": true,
       "head_sampling_rate": 1,
       "persist": true,
-      // Automatic invocation URLs can include OAuth code/state. The application
-      // emits allowlisted request.complete records instead.
+      // Use one allowlisted request.complete record instead of a second automatic
+      // invocation record. Query redaction also protects custom-log metadata.
       "invocation_logs": false
     },
     "traces": { "enabled": false }
