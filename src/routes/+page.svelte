@@ -31,15 +31,7 @@
   let todayTime = '00:00:00';
 
   onMount(() => {
-    const queryLang = new URLSearchParams(window.location.search).get('lang');
-    const savedLang = window.localStorage.getItem(languageStorageKey);
-    const initialLang = isSupportedLang(queryLang)
-      ? queryLang
-      : isSupportedLang(savedLang)
-        ? savedLang
-        : 'en';
-
-    setLang(initialLang, { updateUrl: false });
+    setLang(getInitialLang(), { updateUrl: false });
 
     const updateClock = () => {
       const now = new Date();
@@ -58,6 +50,29 @@
     const id = setInterval(updateClock, 1000);
     return () => clearInterval(id);
   });
+
+  function getInitialLang() {
+    const queryLang = new URLSearchParams(window.location.search).get('lang');
+    const savedLang = window.localStorage.getItem(languageStorageKey);
+    const browserLang = getBrowserLang();
+
+    if (isSupportedLang(queryLang)) return queryLang;
+    if (isSupportedLang(savedLang)) return savedLang;
+    if (isSupportedLang(browserLang)) return browserLang;
+
+    return 'en';
+  }
+
+  function getBrowserLang() {
+    const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
+    const normalized = languages.map((language) => language.toLowerCase());
+
+    if (normalized.some((language) => language === 'ko' || language.startsWith('ko-'))) {
+      return 'ko';
+    }
+
+    return 'en';
+  }
 
   $: t = ui[lang];
   $: labels = categoryLabels[lang];
