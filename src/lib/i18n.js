@@ -12,13 +12,13 @@ export const ui = {
       titleBefore: 'a collection of',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'August 1, 2026',
+      date: 'August 24, 2026',
       updateTitle: 'Updated weekly',
       updateBody:
         'An ever-growing directory of tools, trackers, and resources built by the tripleS & COSMO community.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'August 1, 2026',
+      statusValue: 'August 24, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -82,13 +82,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 8월 1일',
+      date: '2026년 8월 24일',
       updateTitle: '매주 업데이트',
       updateBody:
         'tripleS와 COSMO 팬들이 만든 도구, 트래커, 자료를 꾸준히 모아 소개합니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 8월 1일',
+      statusValue: '2026년 8월 24일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -303,6 +303,36 @@ export const siteCopy = {
       description:
         'tripleS·ARTMS·idntt 오브젝트를 교환할 상대를 찾을 수 있는 팬이 만든 COSMO 거래 플랫폼입니다.',
       badges: ['거래', '매칭']
+    },
+    hausmates: {
+      tagline: 'tripleS 로직 퍼즐',
+      description:
+        '멤버 관계 규칙에 맞게 tripleS 멤버를 테마별 방에 배치하는 퍼즐 게임입니다. 무한 진행, 일일 퍼즐, 고정 고난도 모드를 제공합니다.',
+      badges: ['로직 퍼즐', '웹게임', '일일 퍼즐']
+    },
+    umbra: {
+      tagline: '팬메이드 카드 수집 게임',
+      description:
+        '컵슬리브 이벤트와 팬미팅 등에서 배포되는 팬메이드 카드를 모을 수 있으며 계정과 카드 스캔 기능을 지원합니다.',
+      badges: ['카드 게임', '팬메이드 카드', '이벤트']
+    },
+    wavmarks: {
+      tagline: '검색 가능한 영상 타임스탬프',
+      description:
+        '유튜브와 데일리모션 영상 속 장면을 이름으로 검색해 바로 이동하고, 나만의 타임스탬프 북마크도 저장할 수 있습니다.',
+      badges: ['타임스탬프', '영상 검색', '북마크']
+    },
+    'objekt-link': {
+      tagline: '오브젝트 게임 허브',
+      description:
+        '공용 프로필과 배지, 프로젝트 데이터베이스로 연결된 팬메이드 오브젝트 미니게임들을 한곳에서 만나는 허브입니다.',
+      badges: ['미니게임', '공용 프로필', 'PWA']
+    },
+    'objekts-trading-platform': {
+      tagline: '오브젝트 거래 목록',
+      description:
+        'tripleS와 ARTMS 오브젝트의 보유·구함 목록을 등록하고, 조건이 맞는 수집가를 찾거나 전체 매물을 둘러볼 수 있습니다.',
+      badges: ['거래', '매칭', '보유·구함']
     }
   }
 };
@@ -311,7 +341,12 @@ export const siteSearchAliases = {
   tracker: ['want/have'],
   objektmy: ['want/have'],
   objekttop: ['실물'],
-  cosmolive: ['ranking', '리더보드']
+  cosmolive: ['ranking', '리더보드'],
+  hausmates: ['game', '게임'],
+  umbra: ['collecting game', '수집 게임'],
+  wavmarks: ['subsearch', 'timestamp', '타임코드'],
+  'objekt-link': ['games', '게임'],
+  'objekts-trading-platform': ['trade', 'want/have', '교환']
 };
 
 export function isSupportedLang(value) {
