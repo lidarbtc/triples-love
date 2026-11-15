@@ -94,6 +94,9 @@
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
   }
+  .hero-nav .hero-github { display: inline-flex; align-items: center; justify-content: center; color: var(--ink-2); }
+  .hero-nav .hero-github:hover { color: var(--ink); }
+  .hero-github svg { display: block; width: 18px; height: 18px; fill: currentColor; }
   .hero-pill {
     appearance: none; font-family: inherit; color: inherit; cursor: pointer;
     padding: 4px 12px; border: 1px solid var(--line-strong);
@@ -755,6 +758,9 @@
     .hero-nav > a, .hero-signout { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; }
     .hero-nav form { flex: 1; }
     .hero-nav .lang-toggle { min-width: 44px; margin-left: auto; }
+    /* The nav row is full on phones, so the icon moves to the end of the brand row. */
+    .hero-row-top { position: relative; }
+    .hero-nav .hero-github { position: absolute; top: -9px; right: 0; min-width: 44px; }
     .about-grid { grid-template-columns: 1fr; }
     .about-card-tint { grid-column: span 1; }
   }

@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'November 14, 2026',
-      updateTitle: 'SHION ARCHIVE added',
+      date: 'November 15, 2026',
+      updateTitle: 'HaYeon OS added',
       updateBody:
-        'Browse photos, videos, and Objekts of Park ShiOn in SHION ARCHIVE, or pick a favorite card in its Objekt World Cup.',
+        'Log in to HaYeon OS, a fan-made desktop themed around Jeong HaYeon, to browse her photos, sign the live guestbook, and play Hedgehog Finder.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'November 14, 2026',
+      statusValue: 'November 15, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -111,13 +111,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 11월 14일',
-      updateTitle: 'SHION ARCHIVE 추가',
+      date: '2026년 11월 15일',
+      updateTitle: 'HaYeon OS 추가',
       updateBody:
-        '박시온의 사진과 영상, 오브젝트를 둘러보고 오브젝트 월드컵도 즐길 수 있는 SHION ARCHIVE를 추가했습니다.',
+        '정하연 테마의 팬메이드 데스크톱에서 사진을 둘러보고 실시간 방명록을 남기고 고슴도치 찾기도 할 수 있는 HaYeon OS를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 11월 14일',
+      statusValue: '2026년 11월 15일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -477,6 +477,12 @@ export const siteCopy = {
       description:
         'tripleS 박시온의 사진과 영상을 모아둔 팬 아카이브입니다. 프로필과 오브젝트를 둘러보고, 오브젝트 월드컵에서 마음에 드는 카드를 골라볼 수도 있습니다.',
       badges: ['사진·영상', '오브젝트', '월드컵']
+    },
+    hayeonos: {
+      tagline: '정하연 팬메이드 데스크톱',
+      description:
+        'tripleS 정하연을 테마로 만든 윈도우 XP·7 스타일의 팬메이드 데스크톱입니다. 사진과 프로필을 둘러보고, 실시간 방명록에 쪽지를 남기거나 고슴도치 찾기를 하고, 하연이 참여한 노래의 일렉트로닉 리믹스도 들을 수 있습니다.',
+      badges: ['데스크톱', '사진', '방명록']
     }
   }
 };
@@ -505,7 +511,8 @@ export const siteSearchAliases = {
   fifty: ['wav fifty', 'wav-fifty', '피프티', '웨이브 피프티', '웨이브피프티', '3D viewer', '3D 뷰어', '비주얼 뷰어'],
   ssslot: ['sss slot', '트리플에스 슬롯', '슬롯', '슬롯머신', 'slot machine', '수집 게임'],
   kosmosss: ['kosmo SSS', 'kosmo', '코스모SSS', '코스모 SSS', '민팅', 'mint', '실시간 활동', 'live activity'],
-  shionarchive: ['시온 아카이브', '시온아카이브', '박시온', 'Park ShiOn', 'ShiOn', 'S20', 'bbangshion', '월드컵', 'world cup']
+  shionarchive: ['시온 아카이브', '시온아카이브', '박시온', 'Park ShiOn', 'ShiOn', 'S20', 'bbangshion', '월드컵', 'world cup'],
+  hayeonos: ['하연 OS', '하연OS', '하연 운영체제', '정하연', 'Jeong HaYeon', 'HaYeon', 'S19', 'hayeon.eth', '방명록', 'guestbook', '고슴도치 찾기', 'Hedgehog Finder', '윈도우', 'Windows XP']
 };
 
 export function isSupportedLang(value) {

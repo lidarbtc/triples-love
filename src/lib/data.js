@@ -472,6 +472,18 @@ export const sites = [
     badges: ["photos & videos", "Objekts", "world cup"],
     accent: "blue",
   },
+  {
+    id: "hayeonos",
+    name: "HaYeon OS",
+    domain: "hayeon.eth.link",
+    url: "https://hayeon.eth.link/",
+    category: "hub",
+    addedAt: "2026-11-15T12:50:00+09:00",
+    tagline: "Jeong HaYeon fan-made desktop",
+    description: "A fan-made Windows XP/7-style desktop themed around tripleS member Jeong HaYeon. Browse her photos and profile, leave a note in the live guestbook, play Hedgehog Finder, or listen to electronic remixes of her songs.",
+    badges: ["desktop", "photos", "guestbook"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [
