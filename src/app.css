@@ -328,6 +328,66 @@
   .badge + .badge::before { content: "·"; margin: 0 8px; opacity: .5; }
   .card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
+  /* Verified projects carry a seal after the name; the expanded card explains it. */
+  .verified-seal {
+    display: inline-block; flex-shrink: 0;
+    width: 1em; height: 1em;
+    fill: var(--accent);
+  }
+  .verified-seal-check {
+    fill: none; stroke: white; stroke-width: 2.1;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .card-title-end { display: inline-block; }
+  .card-seal {
+    position: relative; display: inline-block;
+    width: 17px; height: 17px; margin-left: 5px;
+    vertical-align: -2px;
+  }
+  .card-seal .verified-seal { display: block; width: 100%; height: 100%; }
+  .card-seal-tip {
+    position: absolute; bottom: calc(100% + 9px); left: 50%; z-index: 3;
+    width: max-content; max-width: 240px;
+    padding: 7px 10px 8px; border-radius: var(--radius-sm);
+    background: var(--ink); color: white;
+    font-size: 12px; font-weight: 400; line-height: 1.4; letter-spacing: 0; white-space: nowrap;
+    box-shadow: 0 12px 28px -14px color-mix(in oklab, var(--ink) 60%, transparent);
+    transform: translateX(calc(-50% + var(--tip-shift, 0px)));
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .12s ease, visibility .12s ease;
+  }
+  .card-seal-tip::after {
+    content: ""; position: absolute; top: 100%;
+    left: calc(50% - var(--tip-shift, 0px)); margin-left: -5px;
+    border: 5px solid transparent; border-top-color: var(--ink);
+  }
+  .card-seal-tip strong { display: block; font-weight: 600; }
+  .card-seal-tip span {
+    display: block; overflow: hidden; text-overflow: ellipsis;
+    color: rgba(255,255,255,.68);
+  }
+  @media (hover: hover) {
+    .card-seal:hover .card-seal-tip { opacity: 1; visibility: visible; }
+  }
+
+  .card-owner {
+    display: flex; align-items: center; gap: 7px;
+    margin-top: 16px; padding-top: 13px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px; line-height: 1.4; color: var(--ink-2);
+  }
+  .card-owner .verified-seal { width: 16px; height: 16px; }
+  .card-owner-label { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .card-owner-sep { color: var(--ink-3); }
+  .card-owner-handle { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+  .card-owner-handle:hover { color: var(--ink); }
+  .card-owner-handle span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-owner-avatar {
+    flex-shrink: 0; width: 18px; height: 18px;
+    border-radius: 999px; background: var(--bg-soft);
+  }
+  .card-owner-avatar[hidden] { display: none; }
+
   /* Archived projects keep the same readable cards and saved previews. */
   .stat-archive { color: var(--ink-2); }
   .project-archive {

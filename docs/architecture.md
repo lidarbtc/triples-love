@@ -81,6 +81,9 @@ a new attempt invalidates that user's previous unused attempt for the project.
 Checks are manual and rate-limited. Tokens are consumed in the same D1 transaction
 as the unique project ownership record. Another account cannot replace an owner.
 
+Verified projects show a seal after their name in the directory and on the project
+page. Expanded cards and project pages also show the owner's GitHub account.
+
 HTML checks allow public HTTPS hostnames, validate A and AAAA records, follow only
 same-origin redirects and impose time/body limits. Proof inside script, comment,
 template or body content does not count. An HTML check may fail on an oversized

@@ -1,7 +1,8 @@
 <script>
   import ProjectShell from '$lib/components/ProjectShell.svelte';
+  import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
   import { categoryNames } from '$lib/i18n.js';
-  import { localizedProject, projectCopy, projectHref } from '$lib/project-copy.js';
+  import { localizedProject, projectCopy, projectHref, splitLastWord } from '$lib/project-copy.js';
   import { badgePageHref } from '$lib/embed-badges.js';
 
   export let data;
@@ -45,7 +46,14 @@
     <div class="project-profile-body">
       <div class="project-profile-heading">
         <div>
-          <h1 class="project-title">{project.name}</h1>
+          <h1 class="project-title">
+            {#if project.owner}
+              {@const [nameStart, nameEnd] = splitLastWord(project.name)}
+              {nameStart}<span class="project-title-end">{nameEnd}<VerifiedSeal label={t.verified} /></span>
+            {:else}
+              {project.name}
+            {/if}
+          </h1>
           <p class="project-tagline">{copy.tagline}</p>
         </div>
         <div class="project-profile-visit">
@@ -78,12 +86,15 @@
       </div>
     </div>
   </article>
-  <aside class="project-ownership">
+  <aside class="project-ownership" class:project-ownership-verified={project.owner}>
     {#if project.owner}
-      <div>
-        <div class="project-owner">
-          <span class="project-owner-check" aria-hidden="true">✓</span>
-          <span>{t.claimed} <a href={`https://github.com/${encodeURIComponent(project.owner.handle)}`} target="_blank" rel="noopener noreferrer">@{project.owner.handle}</a></span>
+      <div class="project-owner">
+        {#if project.owner.avatarUrl}
+          <img class="project-owner-avatar" src={project.owner.avatarUrl} alt="" width="40" height="40" referrerpolicy="no-referrer" on:error={(event) => event.currentTarget.hidden = true} />
+        {/if}
+        <div class="project-owner-text">
+          <span class="project-owner-status"><VerifiedSeal />{t.verified}</span>
+          <span class="project-owner-meta">{t.verifiedByBefore}<a href={`https://github.com/${encodeURIComponent(project.owner.handle)}`} target="_blank" rel="noopener noreferrer">@{project.owner.handle}</a>{t.verifiedByAfter}</span>
         </div>
       </div>
       {#if isOwner && !archived}<a class="project-btn project-btn-secondary" href={projectHref(project.id, lang, 'edit')}>{t.edit}</a>{/if}
@@ -121,6 +132,9 @@
   .project-ownership h2 { font-size: 13px; margin: 0 0 7px; font-weight: 500; }
   .project-ownership p { margin: 7px 0 0; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
   .project-ownership .project-btn { flex-shrink: 0; }
+  .project-ownership-verified { margin-top: 22px; padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
+  .project-title-end { display: inline-block; }
+  .project-title-end :global(.verified-seal) { width: .6em; height: .6em; margin-left: .18em; vertical-align: .06em; }
   .project-badge-link { margin: 20px 4px 0; font-size: 13px; color: var(--ink-2); }
   .project-badge-link a { text-decoration: underline; text-underline-offset: 3px; }
   @media (max-width: 680px) {

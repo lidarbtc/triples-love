@@ -53,6 +53,9 @@ export const ui = {
         unavailable: 'This site is currently unavailable. We have kept its listing and saved screenshot.'
       }
     },
+    owner: {
+      verified: 'Ownership verified'
+    },
     about: {
       titleBefore: 'what is',
       titleAfter: '?',
@@ -136,6 +139,9 @@ export const ui = {
       reasons: {
         unavailable: '현재 접속할 수 없어 소개와 당시 화면을 보관합니다.'
       }
+    },
+    owner: {
+      verified: '소유권 인증됨'
     },
     about: {
       titleBefore: '',

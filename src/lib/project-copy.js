@@ -3,7 +3,7 @@ export const projectCopy = {
     back: 'All projects', signIn: 'Sign in with GitHub', signOut: 'Sign out', language: '한국어', badgeCode: 'Get badge code',
     fanProject: 'Project', visit: 'Visit site ↗', about: 'About', links: 'Links',
     archived: 'Archived', archivedNote: 'This project is preserved in the directory. Ownership claims are unavailable for archived projects.',
-    savedScreenshot: 'View saved screenshot ↗', claimed: 'Claimed by', unclaimed: 'Manage this project',
+    savedScreenshot: 'View saved screenshot ↗', verified: 'Ownership verified', verifiedByBefore: 'Verified by ', verifiedByAfter: '', unclaimed: 'Manage this project',
     claimIntro: 'Verify site ownership to edit this page.', claim: 'Verify ownership', edit: 'Edit page',
     ownerNote: 'Site ownership verified.', editNote: '',
     claimTitle: 'Verify site ownership', changeTitle: 'Change site address',
@@ -40,7 +40,7 @@ export const projectCopy = {
     back: '모든 프로젝트', signIn: 'GitHub로 로그인', signOut: '로그아웃', language: 'English', badgeCode: '배지 코드',
     fanProject: '프로젝트', visit: '사이트 열기 ↗', about: '프로젝트 소개', links: '관련 링크',
     archived: '아카이브', archivedNote: '기록으로 보관 중인 프로젝트입니다. 아카이브된 프로젝트는 소유권을 인증할 수 없습니다.',
-    savedScreenshot: '저장된 스크린샷 보기 ↗', claimed: '소유권 인증', unclaimed: '프로젝트 관리',
+    savedScreenshot: '저장된 스크린샷 보기 ↗', verified: '소유권 인증됨', verifiedByBefore: '', verifiedByAfter: ' 님이 사이트 소유권을 인증했습니다.', unclaimed: '프로젝트 관리',
     claimIntro: '사이트 소유권을 인증하면 이 페이지를 편집할 수 있습니다.', claim: '소유권 인증', edit: '페이지 편집',
     ownerNote: '사이트 소유권이 인증되었습니다.', editNote: '',
     claimTitle: '사이트 소유권 인증', changeTitle: '사이트 주소 변경',
@@ -77,6 +77,12 @@ export const projectCopy = {
 
 export function projectHref(id, lang = 'en', suffix = '') {
   return `/p/${encodeURIComponent(id)}/${suffix}${suffix ? '/' : ''}?lang=${lang === 'ko' ? 'ko' : 'en'}`;
+}
+
+// Splits off the last word so a verified seal wraps together with it.
+export function splitLastWord(text) {
+  const start = text.lastIndexOf(' ') + 1;
+  return [text.slice(0, start), text.slice(start)];
 }
 
 export function localizedProject(project, lang) {

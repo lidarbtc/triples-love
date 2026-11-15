@@ -2,8 +2,10 @@
   import { browser } from '$app/environment';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
+  import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
   import { categories } from '$lib/data.js';
   import { categoryLabels, categoryNames, ui } from '$lib/i18n.js';
+  import { splitLastWord } from '$lib/project-copy.js';
 
   export let data;
 
@@ -194,8 +196,22 @@
     return url.href;
   }
 
-  function hideBrokenThumbnail(event) {
+  function hideBrokenImage(event) {
     event.currentTarget.hidden = true;
+  }
+
+  // Cards clip overflow, so nudge the seal tooltip back inside its card.
+  function keepTipInCard(seal) {
+    const fit = () => {
+      const tip = seal.querySelector('.card-seal-tip');
+      const card = seal.closest('.card').getBoundingClientRect();
+      tip.style.removeProperty('--tip-shift');
+      const box = tip.getBoundingClientRect();
+      const shift = Math.max(card.left + 8 - box.left, Math.min(0, card.right - 8 - box.right));
+      if (shift) tip.style.setProperty('--tip-shift', `${shift}px`);
+    };
+    seal.addEventListener('pointerenter', fit);
+    return { destroy: () => seal.removeEventListener('pointerenter', fit) };
   }
 </script>
 
@@ -273,7 +289,7 @@
           alt=""
           loading="lazy"
           decoding="async"
-          on:error={hideBrokenThumbnail}
+          on:error={hideBrokenImage}
         />
       </span>
 
@@ -283,7 +299,18 @@
         <span class="card-domain">{site.domain}</span>
       </span>
       <h3 class="card-title">
-        {site.name}
+        {#if site.owner}
+          {@const [nameStart, nameEnd] = splitLastWord(site.name)}
+          {nameStart}<span class="card-title-end">{nameEnd}<span class="card-seal" use:keepTipInCard>
+            <VerifiedSeal label={t.owner.verified} />
+            <span class="card-seal-tip" aria-hidden="true">
+              <strong>{t.owner.verified}</strong>
+              <span>@{site.owner.handle}</span>
+            </span>
+          </span></span>
+        {:else}
+          {site.name}
+        {/if}
         {#if site.status === 'archived'}
           <span class="archive-badge">{t.archive.badge}</span>
         {/if}
@@ -338,7 +365,32 @@
         {/if}
       </div>
       {#if site.owner}
-        <p class="card-owner">{lang === 'ko' ? '소유권 인증' : 'Claimed by'} @{site.owner.handle}</p>
+        <div class="card-owner">
+          <VerifiedSeal />
+          <span class="card-owner-label">{t.owner.verified}</span>
+          <span class="card-owner-sep" aria-hidden="true">·</span>
+          <a
+            class="card-owner-handle"
+            href={`https://github.com/${encodeURIComponent(site.owner.handle)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {#if site.owner.avatarUrl}
+              <img
+                class="card-owner-avatar"
+                src={site.owner.avatarUrl}
+                alt=""
+                width="18"
+                height="18"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+                on:error={hideBrokenImage}
+              />
+            {/if}
+            <span>@{site.owner.handle}</span>
+          </a>
+        </div>
       {/if}
     </div>
   </details>

@@ -141,7 +141,8 @@ function findForm(html, matches) {
 }
 function assertPage(response, expected, label) {
   assert.equal(response.status, 200, `${label}: expected successful HTML response`);
-  const text = nodeText(parse(response.html));
+  // Collapse whitespace like a browser does; nodeText pads every element boundary.
+  const text = nodeText(parse(response.html)).replace(/\s+/g, ' ');
   for (const value of expected) assert.ok(text.includes(value), `${label}: expected visible text ${value}`);
 }
 
@@ -195,9 +196,9 @@ async function edit(id, page, revision) {
   const nextEditor = findForm(saved.html, attrs => (attrs.class || '').split(' ').includes('editor-form'));
   assert.equal(Number(nextEditor.values.get('version')), previousVersion + 1);
   assert.equal((await db.prepare('SELECT version FROM projects WHERE id=?').bind(id).first()).version, previousVersion + 1);
-  assertPage(await request(`/p/${id}/?lang=en`), [name, en, descriptionEn], 'English public detail');
-  assertPage(await request(`/p/${id}/?lang=ko`), [name, ko, descriptionKo], 'Korean public detail');
-  assertPage(await request('/ko/'), [name, ko], 'Korean directory');
+  assertPage(await request(`/p/${id}/?lang=en`), [name, en, descriptionEn, 'Ownership verified', 'Verified by @flow-maker'], 'English public detail');
+  assertPage(await request(`/p/${id}/?lang=ko`), [name, ko, descriptionKo, '소유권 인증됨', '@flow-maker 님이 사이트 소유권을 인증했습니다'], 'Korean public detail');
+  assertPage(await request('/ko/'), [name, ko, '소유권 인증됨', '@flow-maker'], 'Korean directory');
   return saved;
 }
 
