@@ -4,16 +4,6 @@
   import { categories, sites } from '$lib/data.js';
   import { categoryLabels, categoryNames, isSupportedLang, siteCopy, ui } from '$lib/i18n.js';
 
-  const catDots = {
-    objekts: '#3b6dff',
-    stats: '#1f4ad6',
-    schedule: '#d68a2a',
-    market: '#c47a2a',
-    tools: '#7b6cd1',
-    wiki: '#a07028',
-    hub: '#5b7eee'
-  };
-
   const languageStorageKey = 'triples-love.lang';
   const metaDescription =
     'A curated directory of fan-made tripleS & COSMO sites, tools, trackers, and resources.';
@@ -26,11 +16,6 @@
   let query = '';
   let expandedId = null;
   let sort = 'alpha';
-
-  const accentHue = 255;
-  const density = 'regular';
-  const showThumbnails = true;
-  const glassIntensity = 2;
 
   let todayDate = '10 May';
   let todayTime = '00:00:00';
@@ -221,13 +206,8 @@
   <meta name="twitter:image:alt" content={metaImageAlt} />
 </svelte:head>
 
-<div
-  id="top"
-  class={`app density-${density}`}
-  style:--accent-hue={accentHue}
-  style:--glass-blur={`${glassIntensity * 4}px`}
->
-  <header class="hero" style:--hero-tint={`oklch(94% 0.04 ${accentHue})`}>
+<div id="top" class="app">
+  <header class="hero">
     <div class="hero-inner">
       <div class="hero-row hero-row-top">
         <div class="brand">
@@ -270,25 +250,16 @@
 
       <div class="hero-stats">
         <div class="hero-stat">
-          <span class="stat-icon" aria-hidden="true">◷</span>
-          <div>
-            <div class="stat-label">{t.hero.today}</div>
-            <div class="stat-val">{todayDate}, {todayTime}</div>
-          </div>
+          <div class="stat-label">{t.hero.today}</div>
+          <div class="stat-val">{todayDate}, {todayTime}</div>
         </div>
         <div class="hero-stat">
-          <span class="stat-icon" aria-hidden="true">◉</span>
-          <div>
-            <div class="stat-label">{t.hero.status}</div>
-            <div class="stat-val">{t.hero.statusValue}</div>
-          </div>
+          <div class="stat-label">{t.hero.status}</div>
+          <div class="stat-val">{t.hero.statusValue}</div>
         </div>
         <div class="hero-stat">
-          <span class="stat-icon" aria-hidden="true">▦</span>
-          <div>
-            <div class="stat-label">{sites.length}</div>
-            <div class="stat-val">{t.hero.directoryCount}</div>
-          </div>
+          <div class="stat-label">{sites.length}</div>
+          <div class="stat-val">{t.hero.directoryCount}</div>
         </div>
       </div>
     </div>
@@ -312,7 +283,10 @@
 
       <div class="toolbar-right">
         <div class="search">
-          <span class="search-icon" aria-hidden="true">⌕</span>
+          <svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="7.2" cy="7.2" r="4.4" />
+            <path d="m10.6 10.6 2.9 2.9" />
+          </svg>
           <input
             value={query}
             on:input={(event) => updateQuery(event.currentTarget.value)}
@@ -350,7 +324,7 @@
         <button class="btn btn-ghost" type="button" on:click={resetFilters}>{t.empty.reset}</button>
       </div>
     {:else}
-      <div class="grid" class:grid-no-thumbs={!showThumbnails}>
+      <div class="grid">
         {#each filtered as site (site.id)}
           <div
             class="card"
@@ -401,12 +375,10 @@
                 decoding="async"
                 on:error={hideBrokenThumbnail}
               />
-              <div class="thumb-caption">{site.domain}</div>
             </div>
 
             <div class="card-body">
               <div class="card-meta">
-                <span class="cat-dot" style:background={catDots[site.category] || '#999'}></span>
                 <span class="cat-name">{names[site.category]}</span>
                 <span class="meta-spacer"></span>
                 <span class="card-domain">{site.domain}</span>
