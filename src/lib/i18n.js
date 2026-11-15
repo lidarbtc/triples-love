@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'September 15, 2026',
-      updateTitle: 'Updated weekly',
+      date: 'September 19, 2026',
+      updateTitle: 'New: sssflix & Hayeon Archive',
       updateBody:
-        'Tools, trackers, and resources made by tripleS and COSMO fans. We keep adding sites as we find them.',
+        'Find tripleS videos on sssflix and Jeong Hayeon’s photos, videos, and translated messages on Hayeon Archive. Both are now in the directory.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'September 15, 2026',
+      statusValue: 'September 19, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -86,13 +86,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 9월 15일',
-      updateTitle: '매주 업데이트',
+      date: '2026년 9월 19일',
+      updateTitle: 'sssflix · Hayeon Archive 추가',
       updateBody:
-        '트리플에스(tripleS)와 COSMO 팬들이 만든 도구와 트래커, 자료를 모았습니다. 새로 찾은 사이트도 계속 추가합니다.',
+        'tripleS 영상을 모은 sssflix와 정하연의 사진·영상, 메시지 번역을 볼 수 있는 Hayeon Archive를 목록에 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 9월 15일',
+      statusValue: '2026년 9월 19일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
