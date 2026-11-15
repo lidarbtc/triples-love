@@ -25,12 +25,15 @@
 
     const updateClock = () => {
       const now = new Date();
-      todayTime = now.toLocaleTimeString('en-GB', {
+      const locale = lang === 'ko' ? 'ko-KR' : 'en-GB';
+
+      todayTime = now.toLocaleTimeString(locale, {
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit'
+        second: '2-digit',
+        hour12: false
       });
-      todayDate = now.toLocaleDateString('en-GB', {
+      todayDate = now.toLocaleDateString(locale, {
         day: 'numeric',
         month: 'short'
       });
@@ -318,8 +321,10 @@
     {#if filtered.length === 0}
       <div class="empty">
         <p>
-          {t.empty.before} <strong>"{query}"</strong> · {t.empty.middle}
-          <em>{active === 'all' ? names.all : names[active]}</em>
+          {t.empty.before}<strong>“{query.trim()}”</strong>{t.empty.after}
+          {#if active !== 'all'}
+            · {t.empty.category} <em>{names[active]}</em>
+          {/if}
         </p>
         <button class="btn btn-ghost" type="button" on:click={resetFilters}>{t.empty.reset}</button>
       </div>
