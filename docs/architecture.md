@@ -47,9 +47,6 @@ JavaScript, the entry page offers links to both languages.
 ## Analytics and outbound links
 
 `src/app.html` loads Umami from `l.triples.love` with a public website identifier.
-`static/js/umami-thumbmark.js` loads the vendored ThumbmarkJS library and sends a
-browser fingerprint as the `rough_id` session property, together with its profile
-version. This is an approximate identifier, not a verified user identity.
 
 Outbound site links include `utm_source=triples.love`. Their visit buttons record
 one Umami event, `project_click`, with these properties:
