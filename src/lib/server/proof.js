@@ -2,7 +2,7 @@ import { parse } from 'parse5';
 
 export const PROOF_META_NAME = 'triples-love-verification';
 export const PROOF_TIMEOUT_MS = 8000;
-export const MAX_HTML_BYTES = 256 * 1024;
+export const MAX_HTML_BYTES = 2 * 1024 * 1024;
 const MAX_DNS_BYTES = 32 * 1024;
 
 export class ProofError extends Error {
@@ -74,16 +74,26 @@ export function isPublicAddress(address) {
 }
 
 export async function readLimitedText(response, maxBytes, signal) {
+  return (await readBoundedText(response, maxBytes, signal, false)).text;
+}
+
+/**
+ * Read at most maxBytes. Without truncate, a larger response is rejected; with
+ * truncate, only the prefix is returned so callers can inspect early content
+ * such as <head> without downloading an arbitrarily large page.
+ */
+async function readBoundedText(response, maxBytes, signal, truncate) {
   const contentLength = Number(response.headers.get('content-length'));
-  if (contentLength > maxBytes) {
+  if (!truncate && contentLength > maxBytes) {
     await response.body?.cancel();
     throw new ProofError('too_large', 'The verification response is too large. Try DNS verification.');
   }
-  if (!response.body) return '';
+  if (!response.body) return { text: '', truncated: false };
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let bytes = 0;
   let text = '';
+  let truncated = false;
   const cancel = () => { void reader.cancel().catch(() => {}); };
   signal?.addEventListener('abort', cancel, { once: true });
   try {
@@ -92,14 +102,20 @@ export async function readLimitedText(response, maxBytes, signal) {
       const chunk = await reader.read();
       if (signal?.aborted) throw new ProofError('timeout', 'Verification timed out. Please try again.');
       if (chunk.done) break;
-      bytes += chunk.value.byteLength;
-      if (bytes > maxBytes) {
+      if (bytes + chunk.value.byteLength > maxBytes) {
+        if (truncate) {
+          text += decoder.decode(chunk.value.subarray(0, maxBytes - bytes), { stream: true });
+          truncated = true;
+          await reader.cancel();
+          break;
+        }
         await reader.cancel();
         throw new ProofError('too_large', 'The verification response is too large. Try DNS verification.');
       }
+      bytes += chunk.value.byteLength;
       text += decoder.decode(chunk.value, { stream: true });
     }
-    return text + decoder.decode();
+    return { text: text + decoder.decode(), truncated };
   } finally {
     signal?.removeEventListener('abort', cancel);
     reader.releaseLock();
@@ -192,7 +208,7 @@ export function decodeTxtRecord(value) {
  * validated and resolved again and must stay on the registered origin. No
  * browser cookies, authorization headers or tokens are ever forwarded.
  */
-async function readPublicHtml(target, { resolve, fetcher, signal, userAgent }) {
+async function readPublicHtml(target, { resolve, fetcher, signal, userAgent, truncate = false }) {
   let current = target;
   for (let redirects = 0; redirects <= 3; redirects += 1) {
     if (redirects) await assertPublicTarget(current, { resolve, fetcher, signal });
@@ -222,7 +238,8 @@ async function readPublicHtml(target, { resolve, fetcher, signal, userAgent }) {
       await response.body?.cancel();
       throw new ProofError('not_html', 'The website did not return HTML. Use DNS verification instead.');
     }
-    return { url: current, html: await readLimitedText(response, MAX_HTML_BYTES, signal) };
+    const { text, truncated } = await readBoundedText(response, MAX_HTML_BYTES, signal, truncate);
+    return { url: current, html: text, truncated };
   }
   throw new ProofError('redirect', 'Too many redirects. Try DNS verification.');
 }
@@ -263,8 +280,17 @@ export async function verifySiteProof({ method, targetUrl, token }, options = {}
       const answers = await resolve(`_triples-love.${target.hostname}`, 'TXT', { fetcher, signal });
       return answers.some((answer) => decodeTxtRecord(answer) === `${PROOF_META_NAME}=${token}`);
     }
-    const { html } = await readPublicHtml(target, { resolve, fetcher, signal, userAgent: 'triples.love ownership verification' });
-    return hasVerificationMeta(html, token);
+    // The tag must be in <head>, so the first MAX_HTML_BYTES are enough for
+    // pages with large inline bundles. Parsing a prefix cannot create an
+    // element that the full document would not contain.
+    const { html, truncated } = await readPublicHtml(target, {
+      resolve, fetcher, signal, userAgent: 'triples.love ownership verification', truncate: true
+    });
+    const found = hasVerificationMeta(html, token);
+    if (!found && truncated) {
+      throw new ProofError('meta_too_late', 'The verification tag was not found. Large pages are checked only in their first 2 MB, so confirm the token and place the tag near the top of <head>.');
+    }
+    return found;
   } catch (error) {
     throw unexpectedFetchError(error, signal);
   } finally {

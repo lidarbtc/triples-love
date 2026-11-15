@@ -159,16 +159,29 @@ test('private resolution on a later redirect is rejected before fetching', async
   assert.equal(fetches, 1);
 });
 
-test('HTML response must be successful, HTML and bounded in size', async () => {
+test('HTML response must be successful and HTML', async () => {
   for (const [response, code] of [
     [new Response('error', { status: 500 }), 'http_failed'],
-    [new Response(`<head>${meta}</head>`, { headers: { 'content-type': 'text/plain' } }), 'not_html'],
-    [html('x'.repeat(MAX_HTML_BYTES + 1)), 'too_large']
+    [new Response(`<head>${meta}</head>`, { headers: { 'content-type': 'text/plain' } }), 'not_html']
   ]) {
     await assert.rejects(verifySiteProof({ method: 'meta', targetUrl, token }, {
       resolve: publicDns, fetcher: async () => response
     }), { code });
   }
+});
+
+test('large HTML pages are checked by their first bytes only', async () => {
+  const filler = `<script>${'x'.repeat(MAX_HTML_BYTES)}</script>`;
+  const check = (content, extra = {}) => verifySiteProof({ method: 'meta', targetUrl, token }, {
+    resolve: publicDns,
+    fetcher: async () => new Response(content, {
+      headers: { 'content-type': 'text/html', 'content-length': String(new TextEncoder().encode(content).length), ...extra }
+    })
+  });
+  assert.equal(await check(`<head>${meta}${filler}</head><body></body>`), true);
+  await assert.rejects(check(`<head>${filler}${meta}</head>`), { code: 'meta_too_late' });
+  // A tag inside an unfinished script in the prefix is still not proof.
+  await assert.rejects(check(`<head><script>${meta}${'x'.repeat(MAX_HTML_BYTES)}</script></head>`), { code: 'meta_too_late' });
 });
 
 test('slow target fetch is aborted with a retryable timeout', async () => {
