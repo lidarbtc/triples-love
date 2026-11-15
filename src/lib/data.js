@@ -361,6 +361,18 @@ export const sites = [
     badges: ["member guide", "timeline", "fanchants"],
     accent: "blue",
   },
+  {
+    id: "wavbase",
+    name: "WAVbase",
+    domain: "wavbase.app",
+    url: "https://wavbase.app/",
+    category: "market",
+    addedAt: "2026-10-05T19:32:37+09:00",
+    tagline: "Objekt trading and curated prices",
+    description: "Find buyers, sellers, or trade partners for tripleS Objekts, with reference prices curated by the site's team.",
+    badges: ["trading", "price guide"],
+    accent: "amber",
+  },
 ];
 
 export const categories = [

@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'October 3, 2026',
-      updateTitle: 'New: WAV ARCHIVE',
+      date: 'October 5, 2026',
+      updateTitle: 'New: WAVbase',
       updateBody:
-        'WAV ARCHIVE has guides to tripleS members and units, an activity timeline, and fanchant videos.',
+        'WAVbase connects Objekt buyers, sellers, and traders, with reference prices curated by its team.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'October 3, 2026',
+      statusValue: 'October 5, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -86,13 +86,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 10월 3일',
-      updateTitle: 'WAV ARCHIVE 추가',
+      date: '2026년 10월 5일',
+      updateTitle: 'WAVbase 추가',
       updateBody:
-        '멤버·유닛 소개와 활동 연표, 응원법을 볼 수 있는 WAV ARCHIVE를 추가했습니다.',
+        '운영진이 정리한 오브젝트 시세를 참고해 거래 상대를 찾을 수 있는 WAVbase를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 10월 3일',
+      statusValue: '2026년 10월 5일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -373,6 +373,12 @@ export const siteCopy = {
       description:
         'tripleS 멤버와 유닛 소개, 활동 연표와 그래비티 결과를 모은 한국어 사이트입니다. 대표곡 영상과 응원법도 볼 수 있습니다.',
       badges: ['멤버 안내', '활동 연표', '응원법']
+    },
+    wavbase: {
+      tagline: '오브젝트 거래·시세 안내',
+      description:
+        'tripleS 오브젝트를 사고팔거나 교환할 상대를 찾을 수 있습니다. 운영진이 정리한 오브젝트별 시세도 거래 참고용으로 제공합니다.',
+      badges: ['거래', '시세']
     }
   }
 };
@@ -392,7 +398,8 @@ export const siteSearchAliases = {
   'triple-s-game': ['認人遊戲', 'Wordle', '워들', '멤버 맞히기', '수박게임'],
   hayeonarchive: ['하연 아카이브', '하연아카이브', '코스모톡', 'S19'],
   sssflix: ['sss flix', '시그널', 'SIGNAL', '배지전쟁', 'Badge War', '코스모 라이브'],
-  'wav-archive': ['웨이브 아카이브', '웨이브아카이브', 'bbangshion', 'DIMENSION', '디멘션', '입덕 가이드']
+  'wav-archive': ['웨이브 아카이브', '웨이브아카이브', 'bbangshion', 'DIMENSION', '디멘션', '입덕 가이드'],
+  wavbase: ['wav base', '웨이브베이스', '웨이브 베이스', 'dearseoah', '가격표', '시세표', 'pricing']
 };
 
 export function isSupportedLang(value) {
