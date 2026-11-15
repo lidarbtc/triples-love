@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'September 20, 2026',
-      updateTitle: 'New: HAVANT',
+      date: 'October 3, 2026',
+      updateTitle: 'New: WAV ARCHIVE',
       updateBody:
-        'HAVANT is now in the directory. Browse the Objekt catalog, compare COSMO collections, and make have/want lists.',
+        'WAV ARCHIVE has guides to tripleS members and units, an activity timeline, and fanchant videos.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'September 20, 2026',
+      statusValue: 'October 3, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -86,13 +86,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 9월 20일',
-      updateTitle: 'HAVANT 추가',
+      date: '2026년 10월 3일',
+      updateTitle: 'WAV ARCHIVE 추가',
       updateBody:
-        '오브젝트 도감을 살펴보고 COSMO 컬렉션 비교와 보유·희망 목록을 만들 수 있는 HAVANT를 추가했습니다.',
+        '멤버·유닛 소개와 활동 연표, 응원법을 볼 수 있는 WAV ARCHIVE를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 9월 20일',
+      statusValue: '2026년 10월 3일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -367,6 +367,12 @@ export const siteCopy = {
       description:
         'SIGNAL과 예능, 라이브 등 tripleS 영상을 모아둔 아카이브입니다. 멤버나 활동 시기별로 찾아보거나 영어 자막이 있는 영상만 골라볼 수 있습니다.',
       badges: ['영상', '영어 자막']
+    },
+    'wav-archive': {
+      tagline: 'tripleS 멤버·활동 안내',
+      description:
+        'tripleS 멤버와 유닛 소개, 활동 연표와 그래비티 결과를 모은 한국어 사이트입니다. 대표곡 영상과 응원법도 볼 수 있습니다.',
+      badges: ['멤버 안내', '활동 연표', '응원법']
     }
   }
 };
@@ -385,7 +391,8 @@ export const siteSearchAliases = {
   joojoo: ['itsjoo', 'archive', '아카이브', 'LOONA', '이달의 소녀'],
   'triple-s-game': ['認人遊戲', 'Wordle', '워들', '멤버 맞히기', '수박게임'],
   hayeonarchive: ['하연 아카이브', '하연아카이브', '코스모톡', 'S19'],
-  sssflix: ['sss flix', '시그널', 'SIGNAL', '배지전쟁', 'Badge War', '코스모 라이브']
+  sssflix: ['sss flix', '시그널', 'SIGNAL', '배지전쟁', 'Badge War', '코스모 라이브'],
+  'wav-archive': ['웨이브 아카이브', '웨이브아카이브', 'bbangshion', 'DIMENSION', '디멘션', '입덕 가이드']
 };
 
 export function isSupportedLang(value) {

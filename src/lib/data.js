@@ -349,6 +349,18 @@ export const sites = [
     badges: ["catalog", "collection", "want/have"],
     accent: "blue",
   },
+  {
+    id: "wav-archive",
+    name: "WAV ARCHIVE",
+    domain: "bbangshion.github.io",
+    url: "https://bbangshion.github.io/wav-archive/",
+    category: "hub",
+    addedAt: "2026-10-03T14:01:27+09:00",
+    tagline: "tripleS member and activity guide",
+    description: "Get to know tripleS members and units, browse their activity timeline and Gravity results, or watch music videos and fanchant guides. The site is in Korean.",
+    badges: ["member guide", "timeline", "fanchants"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [
