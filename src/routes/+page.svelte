@@ -12,6 +12,7 @@
   } from '$lib/i18n.js';
 
   const languageStorageKey = 'triples-love.lang';
+  const nameCollator = new Intl.Collator('en', { sensitivity: 'base' });
   const metaDescription =
     'A curated directory of fan-made tripleS & COSMO sites, tools, trackers, and resources.';
   const metaImage = 'https://triples.love/og-image.png';
@@ -129,10 +130,17 @@
     }
 
     if (sort === 'alpha') {
-      out = [...out].sort((a, b) => a.name.localeCompare(b.name));
+      out = [...out].sort((a, b) => nameCollator.compare(a.name, b.name));
     } else if (sort === 'category') {
       out = [...out].sort(
-        (a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name)
+        (a, b) => a.category.localeCompare(b.category) || nameCollator.compare(a.name, b.name)
+      );
+    } else if (sort === 'recent') {
+      out = [...out].sort(
+        (a, b) =>
+          Date.parse(b.addedAt) - Date.parse(a.addedAt) ||
+          nameCollator.compare(a.name, b.name) ||
+          a.id.localeCompare(b.id)
       );
     }
 
