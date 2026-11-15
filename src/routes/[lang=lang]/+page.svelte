@@ -424,7 +424,7 @@
             class="card-owner-handle"
             href={`https://github.com/${encodeURIComponent(site.owner.handle)}`}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener"
           >
             {#if site.owner.avatarUrl}
               <img
@@ -521,7 +521,7 @@
             class="hero-github"
             href="https://github.com/lidarbtc/triples-love"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener"
             aria-label={lang === 'ko' ? 'GitHub에서 triples.love 소스 보기' : 'triples.love source on GitHub'}
             title="GitHub"
           >

@@ -80,7 +80,7 @@
           <section class="project-extra-links">
             <h2>{t.links}</h2>
             {#each project.links as link}
-              <a href={link.url} target="_blank" rel="noopener noreferrer"><span>{link.label}</span><span aria-hidden="true">↗</span></a>
+              <a href={link.url} target="_blank" rel="noopener"><span>{link.label}</span><span aria-hidden="true">↗</span></a>
             {/each}
           </section>
         {/if}
@@ -95,7 +95,7 @@
         {/if}
         <div class="project-owner-text">
           <span class="project-owner-status"><VerifiedSeal />{t.verified}</span>
-          <span class="project-owner-meta">{t.verifiedByBefore}<a href={`https://github.com/${encodeURIComponent(project.owner.handle)}`} target="_blank" rel="noopener noreferrer">@{project.owner.handle}</a>{t.verifiedByAfter}</span>
+          <span class="project-owner-meta">{t.verifiedByBefore}<a href={`https://github.com/${encodeURIComponent(project.owner.handle)}`} target="_blank" rel="noopener">@{project.owner.handle}</a>{t.verifiedByAfter}</span>
         </div>
       </div>
       {#if isOwner && !archived}<a class="project-btn project-btn-secondary" href={projectHref(project.id, lang, 'edit')}>{t.edit}</a>{/if}

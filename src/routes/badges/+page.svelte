@@ -162,13 +162,13 @@
     <section class="badge-output" aria-label={t.preview}>
       <div class="badge-preview" class:dark={theme === 'dark'}>
         {#if embed}
-          <a href={embed.href} target="_blank" rel="noopener noreferrer">
+          <a href={embed.href} target="_blank" rel="noopener">
             <img src={`/badges/${type}-${theme}.svg`} alt={embed.alt} width={embed.width} height={embed.height} />
           </a>
         {:else}<p>{t.choose}</p>{/if}
       </div>
       {#if embed}
-        <p class="badge-destination"><span>{t.destination}</span><a href={embed.href} target="_blank" rel="noopener noreferrer">{embed.href}</a></p>
+        <p class="badge-destination"><span>{t.destination}</span><a href={embed.href} target="_blank" rel="noopener">{embed.href}</a></p>
         <div class="badge-code-head">
           <label for="badge-code">{t.code}</label>
           <div class="format-buttons" aria-label={t.code}>
@@ -192,7 +192,7 @@
       <div class="feature-copy">
         <h2 id="feature-title">{t.featureTitle}</h2>
         <p>{t.featureIntro}</p>
-        <p class="feature-target"><span>{t.checkedPage}</span><a href={selectedProject.url} target="_blank" rel="noopener noreferrer">{selectedProject.url}</a></p>
+        <p class="feature-target"><span>{t.checkedPage}</span><a href={selectedProject.url} target="_blank" rel="noopener">{selectedProject.url}</a></p>
       </div>
       <div class="feature-action">
         {#if selectedProject.status !== 'active'}

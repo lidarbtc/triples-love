@@ -23,7 +23,7 @@ for (const type of ['listed', 'discover']) {
       const anchor = fragment.childNodes[0];
       assert.equal(anchor.tagName, 'a');
       assert.deepEqual(Object.fromEntries(anchor.attrs.map(({ name, value }) => [name, value])), {
-        href, target: '_blank', rel: 'noopener noreferrer'
+        href, target: '_blank', rel: 'noopener'
       });
       const children = anchor.childNodes.filter(node => node.tagName);
       assert.equal(children.length, 1);

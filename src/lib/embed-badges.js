@@ -30,7 +30,7 @@ export function createBadgeEmbed({ type = 'discover', theme = 'light', projectId
   const src = `${ORIGIN}/badges/${type}-${theme}.svg`;
   const alt = type === 'listed' ? badgeTypes.listed.label : 'Discover more fan projects on triples.love';
   const { width, height } = badgeTypes[type];
-  const html = `<a href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">\n` +
+  const html = `<a href="${escapeAttribute(href)}" target="_blank" rel="noopener">\n` +
     `  <img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}" width="${width}" height="${height}" loading="lazy" decoding="async" style="display:block;max-width:100%;height:auto;border:0">\n` +
     '</a>';
   const markdown = `[![${alt}](${src})](${href})`;
