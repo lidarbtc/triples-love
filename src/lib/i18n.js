@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'October 18, 2026',
-      updateTitle: 'Fifty added',
+      date: 'October 26, 2026',
+      updateTitle: 'SSSlot added',
       updateBody:
-        'Explore tripleS Objekts in 3D with Fifty, a visual viewer.',
+        'Collect in-game tripleS Objekts, complete grids, and unlock seasons in SSSlot, a fan-made slot game.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'October 18, 2026',
+      statusValue: 'October 26, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -101,13 +101,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 10월 18일',
-      updateTitle: 'Fifty 추가',
+      date: '2026년 10월 26일',
+      updateTitle: 'SSSlot 추가',
       updateBody:
-        'tripleS 오브젝트를 3D로 감상하는 비주얼 뷰어, Fifty를 추가했습니다.',
+        '게임 속 tripleS 오브젝트를 모아 그리드를 완성하고 새 시즌을 여는 팬메이드 슬롯 게임, SSSlot을 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 10월 18일',
+      statusValue: '2026년 10월 26일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -439,6 +439,12 @@ export const siteCopy = {
       description:
         'tripleS 오브젝트를 3D로 감상할 수 있는 비주얼 뷰어입니다.',
       badges: ['3D', '비주얼 뷰어']
+    },
+    ssslot: {
+      tagline: '오브젝트 수집 슬롯 게임',
+      description:
+        '슬롯을 돌려 게임 속 tripleS 오브젝트를 모으는 비상업 팬메이드 게임입니다. 그리드를 완성해 새 시즌을 열고 일일 미션에 도전할 수 있습니다.',
+      badges: ['웹게임', '오브젝트 수집', '일일 미션']
     }
   }
 };
@@ -464,7 +470,8 @@ export const siteSearchAliases = {
   objectx: ['object x', '오브젝트엑스', '오브젝트 엑스', '트레이딩', '자동 매칭'],
   triplesfans: ['tripleSfans', 'tripleS fans', '트리플에스 팬스', '트리플에스팬스', 'DIMENSION', '디멘션', '입덕 가이드', 'Badge War', '배지전쟁'],
   'triples-wav': ['tripleS WAV', '트리플에스 웨이브', '트리플에스웨이브', '공식 링크', '링크 모음', 'link hub'],
-  fifty: ['wav fifty', 'wav-fifty', '피프티', '웨이브 피프티', '웨이브피프티', '3D viewer', '3D 뷰어', '비주얼 뷰어']
+  fifty: ['wav fifty', 'wav-fifty', '피프티', '웨이브 피프티', '웨이브피프티', '3D viewer', '3D 뷰어', '비주얼 뷰어'],
+  ssslot: ['sss slot', '트리플에스 슬롯', '슬롯', '슬롯머신', 'slot machine', '수집 게임']
 };
 
 export function isSupportedLang(value) {

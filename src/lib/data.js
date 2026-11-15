@@ -436,6 +436,18 @@ export const sites = [
     badges: ["3D", "visual viewer"],
     accent: "blue",
   },
+  {
+    id: "ssslot",
+    name: "SSSlot",
+    domain: "ssslot.ssslot.workers.dev",
+    url: "https://ssslot.ssslot.workers.dev/",
+    category: "tools",
+    addedAt: "2026-10-26T00:41:27+09:00",
+    tagline: "Objekt-collecting slot game",
+    description: "A non-commercial, fan-made tripleS slot game where you collect in-game Objekts. Complete grids to unlock new seasons and take on daily missions.",
+    badges: ["web game", "Objekt collection", "daily missions"],
+    accent: "violet",
+  },
 ];
 
 export const categories = [
