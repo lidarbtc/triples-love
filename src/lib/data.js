@@ -78,6 +78,17 @@ export const sites = [
     accent: "violet",
   },
   {
+    id: "generation",
+    name: "generation.SSS",
+    domain: "generation.wav.haus",
+    url: "https://generation.wav.haus/",
+    category: "tools",
+    tagline: "Incremental web game",
+    description: "A tripleS-inspired idle/incremental game about generating S, unlocking members, collecting Objekts, and progressing through Gravity-style resets.",
+    badges: ["web game", "idle", "gravity"],
+    accent: "violet",
+  },
+  {
     id: "comets",
     name: "comets",
     domain: "comets.zip",
