@@ -166,6 +166,17 @@ export const sites = [
     accent: "violet",
   },
   {
+    id: "triplesstream",
+    name: "tripleS Stream",
+    domain: "triplesstream.com",
+    url: "https://www.triplesstream.com/",
+    category: "tools",
+    tagline: "Streaming support hub",
+    description: "Korean fan support hub for streaming guides, voting, group orders, events, live chart checks, and one-click streaming links.",
+    badges: ["streaming", "voting", "charts"],
+    accent: "violet",
+  },
+  {
     id: "cosmolive",
     name: "COSMO Live Stats",
     domain: "henryyyzzz98.github.io",
