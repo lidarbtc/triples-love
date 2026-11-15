@@ -440,8 +440,6 @@
     </span>
     <span class="card-meta">
       <span class="cat-name card-featured-mark">{t.featured.mark}</span>
-      <span class="meta-spacer"></span>
-      <span class="card-domain">{t.featured.slot}</span>
     </span>
     <span class="card-title">{t.featured.emptyTitle}</span>
     <span class="card-tagline">{t.featured.emptyBody}</span>

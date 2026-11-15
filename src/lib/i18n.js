@@ -60,7 +60,6 @@ export const ui = {
     },
     featured: {
       mark: 'Featured',
-      slot: 'open spot',
       emptyTitle: 'Your site could be here',
       emptyBody: 'Add a triples.love banner to your site to be featured right here, at the front of the directory.',
       cta: 'Add the banner →'
@@ -155,7 +154,6 @@ export const ui = {
     },
     featured: {
       mark: 'Featured',
-      slot: '빈자리',
       emptyTitle: '이 자리에 내 사이트를',
       emptyBody: '사이트에 triples.love 배너를 달면 목록 맨 앞, 바로 이 자리에 소개돼요.',
       cta: '배너 달고 소개받기 →'
