@@ -5,6 +5,19 @@
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2026-05-10",
   "compatibility_flags": ["nodejs_compat"],
+  "upload_source_maps": true,
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      // Automatic invocation URLs can include OAuth code/state. The application
+      // emits allowlisted request.complete records instead.
+      "invocation_logs": false
+    },
+    "traces": { "enabled": false }
+  },
   "assets": {
     "directory": ".svelte-kit/cloudflare",
     "binding": "ASSETS"

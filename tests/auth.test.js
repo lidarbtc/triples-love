@@ -274,3 +274,34 @@ test('protected pages return to the requested page after authentication', async 
   await signIn(f);
   assert.equal((await requireUser(f.event('/p/apollo/edit'))).handle, 'wav-maker');
 });
+
+test('OAuth logs distinguish endpoint, HTTP, timeout and malformed responses without credentials', async t => {
+  const logs = [];
+  for (const level of ['info', 'warn', 'error']) t.mock.method(console, level, text => logs.push({ level, ...text }));
+  for (const scenario of ['token_http', 'profile_http', 'timeout', 'bad_json', 'invalid_token', 'invalid_profile']) {
+    const f = fixture(t);
+    await redirected(() => startGitHubLogin(f.event()));
+    const request = f.event(`/auth/github/callback?state=${f.jar.get(STATE_COOKIE)}&code=PRIVATE_CODE`);
+    const original = request.fetch;
+    request.fetch = async (url, options) => {
+      if (scenario === 'timeout') throw new DOMException('PRIVATE_TIMEOUT', 'TimeoutError');
+      if (scenario === 'bad_json') return new Response('PRIVATE_BAD_JSON');
+      if (scenario === 'invalid_token') return Response.json({ access_token: 'PRIVATE_TOKEN' });
+      if (scenario === 'invalid_profile' && url.endsWith('/user')) return Response.json({ login: 'PRIVATE_PROFILE' });
+      if (scenario === 'token_http' || (scenario === 'profile_http' && url.endsWith('/user'))) return new Response('PRIVATE_UPSTREAM_BODY', { status: 503 });
+      return original(url, options);
+    };
+    const before = logs.length;
+    await rejectsStatus(() => completeGitHubLogin(request), 502);
+    assert.equal(logs.length, before + 1);
+    const log = logs.at(-1);
+    assert.equal(log.level, 'error');
+    assert.equal(log.operation, scenario.startsWith('profile') || scenario === 'invalid_profile' ? 'oauth.profile' : 'oauth.token_exchange');
+    assert.equal(log.error_code, { token_http: 'upstream_http', profile_http: 'upstream_http', timeout: 'timeout', bad_json: 'invalid_response', invalid_token: 'invalid_token_response', invalid_profile: 'invalid_profile' }[scenario]);
+    if (scenario.endsWith('_http')) assert.equal(log.upstream_status, 503);
+    assert.equal(f.jar.has(SESSION_COOKIE), false);
+    assert.ok(!JSON.stringify(logs).includes('PRIVATE'));
+    assert.ok(!JSON.stringify(logs).includes(f.jar.get(STATE_COOKIE) ?? 'NEVER_LOG_THIS'));
+    assert.ok(!JSON.stringify(logs).includes('test-secret'));
+  }
+});

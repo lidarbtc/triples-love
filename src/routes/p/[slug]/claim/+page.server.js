@@ -1,3 +1,4 @@
+import { recordResult } from '$lib/server/observability.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { requireUser } from '$lib/server/auth.js';
 import { ClaimError, startClaim, verifyClaim } from '$lib/server/claims.js';
@@ -47,8 +48,9 @@ const koreanErrors = {
   fetch_failed: '사이트에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.'
 };
 
-function claimFailure(caught, lang) {
+function claimFailure(caught, lang, event, operation) {
   if (!(caught instanceof ClaimError)) throw caught;
+  recordResult(event, operation, caught.status, caught.code, { method: caught.challenge?.method });
   const message = lang === 'ko' ? (koreanErrors[caught.code] || caught.message) : caught.message;
   return fail(caught.status, { message, challenge: caught.challenge });
 }
@@ -60,12 +62,13 @@ export const actions = {
     const project = await projectFor(event);
     const data = await event.request.formData();
     try {
-      const challenge = await startClaim(getDb(event), {
+      const challenge = await startClaim(getDb(event, 'claim.start'), {
         project, userId: user.id, method: data.get('method'), targetUrl: data.get('targetUrl')
       });
+      recordResult(event, 'claim.start', 200, undefined, { method: challenge.method });
       return { challenge };
     } catch (caught) {
-      return claimFailure(caught, language(event));
+      return claimFailure(caught, language(event), event, 'claim.start');
     }
   },
   verify: async (event) => {
@@ -74,11 +77,12 @@ export const actions = {
     const project = await projectFor(event);
     const data = await event.request.formData();
     try {
-      await verifyClaim(getDb(event), {
+      const verified = await verifyClaim(getDb(event, 'claim.verify'), {
         project, userId: user.id, challengeId: data.get('challengeId'), token: data.get('token')
       });
+      recordResult(event, 'claim.verify', 303, undefined, { method: verified.method });
     } catch (caught) {
-      return claimFailure(caught, language(event));
+      return claimFailure(caught, language(event), event, 'claim.verify');
     }
     redirect(303, `/p/${encodeURIComponent(project.id)}/edit/?claimed=1&lang=${language(event)}`);
   }

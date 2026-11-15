@@ -1,9 +1,39 @@
 import { error } from '@sveltejs/kit';
+import { recordResult } from './observability.js';
 
-export function getDb(event) {
+export function getDb(event, operation = 'project.read') {
   const db = event.platform?.env?.DB;
-  if (!db) error(503, 'The project database is unavailable. Please try again later.');
-  return db;
+  if (!db) {
+    recordResult(event, operation, 503, 'db_unavailable');
+    error(503, 'The project database is unavailable. Please try again later.');
+  }
+  const originals = new WeakMap();
+  async function execute(work) {
+    const start = performance.now();
+    try { return await work(); } catch (cause) {
+      recordResult(event, operation, 500, 'db_failed', { operation_ms: performance.now() - start });
+      throw cause;
+    }
+  }
+  function statement(raw) {
+    const wrapped = {
+      bind: (...values) => statement(raw.bind(...values)),
+      first: (...args) => execute(() => raw.first(...args)),
+      all: (...args) => execute(() => raw.all(...args)),
+      run: (...args) => execute(() => raw.run(...args))
+    };
+    originals.set(wrapped, raw);
+    return wrapped;
+  }
+  return {
+    prepare: sql => {
+      try { return statement(db.prepare(sql)); } catch (cause) {
+        recordResult(event, operation, 500, 'db_failed');
+        throw cause;
+      }
+    },
+    batch: statements => execute(() => db.batch(statements.map(item => originals.get(item) ?? item)))
+  };
 }
 
 export async function consumeRateLimit(db, key, limit, windowMs) {

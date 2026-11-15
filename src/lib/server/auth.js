@@ -1,5 +1,11 @@
 import { error, redirect } from '@sveltejs/kit';
 import { consumeRateLimit, getDb } from './db.js';
+import { recordResult } from './observability.js';
+
+function authFailure(event, operation, code, status, message, extras) {
+  recordResult(event, operation, status, code, extras);
+  error(status, message);
+}
 
 const SESSION_COOKIE = '__Host-triples_session';
 const STATE_COOKIE = '__Host-triples_oauth';
@@ -30,10 +36,10 @@ function authConfig(event, needsCredentials = true) {
     }
     origin = url.origin;
   } catch {
-    error(503, 'Sign-in is not configured yet.');
+    authFailure(event, 'auth.config', 'invalid_origin', 503, 'Sign-in is not configured yet.');
   }
   if (needsCredentials && (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET)) {
-    error(503, 'GitHub sign-in is not configured yet.');
+    authFailure(event, 'auth.config', 'credentials_missing', 503, 'GitHub sign-in is not configured yet.');
   }
   return {
     origin,
@@ -72,7 +78,7 @@ export async function getUser(event) {
     event.cookies.delete(SESSION_COOKIE, COOKIE_OPTIONS);
     return null;
   }
-  const user = await getDb(event).prepare(`
+  const user = await getDb(event, 'session.read').prepare(`
     SELECT users.id, users.handle, users.display_name, users.avatar_url
     FROM sessions JOIN users ON users.id = sessions.user_id
     WHERE sessions.token_hash = ? AND sessions.expires_at > ?
@@ -99,7 +105,7 @@ export async function startGitHubLogin(event) {
   if (event.url.origin !== config.origin) {
     redirect(303, `${config.origin}/auth/github?${new URLSearchParams({ returnTo })}`);
   }
-  const db = getDb(event);
+  const db = getDb(event, 'oauth.state');
   // SvelteKit supplies this address in production. The fallback is for test events.
   const clientAddress = typeof event.getClientAddress === 'function' ? event.getClientAddress() : 'test';
   await consumeRateLimit(db, `oauth:${await hashToken(clientAddress)}`, 30, STATE_SECONDS * 1000);
@@ -126,49 +132,56 @@ export async function startGitHubLogin(event) {
     code_challenge: await hashToken(verifier),
     code_challenge_method: 'S256'
   }).toString();
+  recordResult(event, 'oauth.start', 303);
   redirect(303, authorization.href);
 }
 
-async function githubJson(fetcher, url, options) {
+async function githubJson(event, operation, url, options) {
+  const start = performance.now();
+  let upstreamStatus;
+  let failure = 'network_failed';
+  const signal = AbortSignal.timeout(10_000);
   try {
-    const response = await fetcher(url, {
-      ...options,
-      credentials: 'omit',
-      redirect: 'manual',
-      signal: AbortSignal.timeout(10_000)
+    const response = await event.fetch(url, {
+      ...options, credentials: 'omit', redirect: 'manual', signal
     });
-    if (!response.ok) throw new Error('GitHub request failed');
+    upstreamStatus = response.status;
+    failure = 'upstream_http';
+    if (!response.ok) throw new Error();
+    failure = 'invalid_response';
     const data = await response.json();
-    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid response');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error();
     return data;
-  } catch {
-    // Never expose upstream error bodies or URLs containing OAuth credentials.
-    error(502, 'GitHub sign-in could not be completed. Please try again.');
+  } catch (cause) {
+    if (signal.aborted || cause?.name === 'TimeoutError') failure = 'timeout';
+    authFailure(event, operation, failure, 502,
+      'GitHub sign-in could not be completed. Please try again.',
+      { upstream_status: upstreamStatus, operation_ms: performance.now() - start });
   }
 }
 
 export async function completeGitHubLogin(event) {
   noStore(event);
   const config = authConfig(event);
-  if (event.url.origin !== config.origin) error(400, 'Use the sign-in link on triples.love.');
+  if (event.url.origin !== config.origin) authFailure(event, 'oauth.callback', 'wrong_origin', 400, 'Use the sign-in link on triples.love.');
   const state = event.url.searchParams.get('state');
   const cookieState = event.cookies.get(STATE_COOKIE);
   if (!state || !OPAQUE_TOKEN.test(state) || !cookieState || state !== cookieState) {
-    error(400, 'This sign-in request is invalid or expired. Please start again.');
+    authFailure(event, 'oauth.callback', 'state_mismatch', 400, 'This sign-in request is invalid or expired. Please start again.');
   }
   event.cookies.delete(STATE_COOKIE, COOKIE_OPTIONS);
-  const db = getDb(event);
+  let db = getDb(event, 'oauth.state');
   // DELETE RETURNING consumes the state atomically, so a callback cannot be replayed.
   const attempt = await db.prepare(`
     DELETE FROM oauth_states WHERE state_hash = ? AND expires_at > ?
     RETURNING code_verifier, return_to
   `).bind(await hashToken(state), Date.now()).first();
-  if (!attempt) error(400, 'This sign-in request is invalid or expired. Please start again.');
-  if (event.url.searchParams.has('error')) error(400, 'GitHub sign-in was cancelled. You can try again.');
+  if (!attempt) authFailure(event, 'oauth.callback', 'state_expired', 400, 'This sign-in request is invalid or expired. Please start again.');
+  if (event.url.searchParams.has('error')) authFailure(event, 'oauth.callback', 'cancelled', 400, 'GitHub sign-in was cancelled. You can try again.');
   const code = event.url.searchParams.get('code');
-  if (!code || code.length > 1024) error(400, 'GitHub did not provide a valid sign-in code.');
+  if (!code || code.length > 1024) authFailure(event, 'oauth.callback', 'code_invalid', 400, 'GitHub did not provide a valid sign-in code.');
 
-  const token = await githubJson(event.fetch, 'https://github.com/login/oauth/access_token', {
+  const token = await githubJson(event, 'oauth.token_exchange', 'https://github.com/login/oauth/access_token', {
     method: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -180,9 +193,9 @@ export async function completeGitHubLogin(event) {
     })
   });
   if (typeof token.access_token !== 'string' || !token.access_token || token.access_token.length > 8192 || typeof token.token_type !== 'string' || token.token_type.toLowerCase() !== 'bearer') {
-    error(502, 'GitHub sign-in could not be completed. Please try again.');
+    authFailure(event, 'oauth.token_exchange', 'invalid_token_response', 502, 'GitHub sign-in could not be completed. Please try again.');
   }
-  const profile = await githubJson(event.fetch, 'https://api.github.com/user', {
+  const profile = await githubJson(event, 'oauth.profile', 'https://api.github.com/user', {
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token.access_token}`,
@@ -191,9 +204,10 @@ export async function completeGitHubLogin(event) {
     }
   });
   if (!Number.isSafeInteger(profile.id) || profile.id <= 0 || typeof profile.login !== 'string' || !/^[A-Za-z0-9-]{1,39}$/.test(profile.login)) {
-    error(502, 'GitHub did not return a valid profile. Please try again.');
+    authFailure(event, 'oauth.profile', 'invalid_profile', 502, 'GitHub did not return a valid profile. Please try again.');
   }
   const now = Date.now();
+  db = getDb(event, 'user.upsert');
   // GitHub's numeric account ID is stable across handle changes.
   const user = await db.prepare(`
     INSERT INTO users (id, github_id, handle, display_name, avatar_url, created_at)
@@ -207,6 +221,7 @@ export async function completeGitHubLogin(event) {
     `https://avatars.githubusercontent.com/u/${profile.id}?v=4`, now
   ).first();
 
+  db = getDb(event, 'session.create');
   const session = randomToken();
   const statements = [db.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now)];
   const previousSession = event.cookies.get(SESSION_COOKIE);
@@ -219,6 +234,7 @@ export async function completeGitHubLogin(event) {
   await db.batch(statements);
   event.cookies.set(SESSION_COOKIE, session, { ...COOKIE_OPTIONS, maxAge: SESSION_SECONDS });
   event.locals.user = publicUser(user);
+  recordResult(event, 'oauth.callback', 303);
   redirect(303, safeReturnTo(attempt.return_to, config.origin));
 }
 
@@ -226,13 +242,14 @@ export async function logout(event) {
   noStore(event);
   const { origin } = authConfig(event, false);
   if (event.url.origin !== origin || event.request.headers.get('origin') !== origin) {
-    error(403, 'Submit this request from triples.love.');
+    authFailure(event, 'session.logout', 'wrong_origin', 403, 'Submit this request from triples.love.');
   }
   const token = event.cookies.get(SESSION_COOKIE);
   if (token && OPAQUE_TOKEN.test(token)) {
-    await getDb(event).prepare('DELETE FROM sessions WHERE token_hash = ?').bind(await hashToken(token)).run();
+    await getDb(event, 'session.delete').prepare('DELETE FROM sessions WHERE token_hash = ?').bind(await hashToken(token)).run();
   }
   event.cookies.delete(SESSION_COOKIE, COOKIE_OPTIONS);
   event.locals.user = null;
+  recordResult(event, 'session.logout', 303);
   redirect(303, '/');
 }

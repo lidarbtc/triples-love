@@ -182,5 +182,5 @@ export async function verifyClaim(db, { project, userId, challengeId, token }, o
   if (result[0].meta.changes !== 1 || result[1].meta.changes !== 1 || result[2].meta.changes !== 1) {
     throw new ClaimError('changed', 'The project was claimed or changed while verification was running. Reload to see its current owner and address.', 409);
   }
-  return { projectId: project.id, verifiedAt };
+  return { projectId: project.id, verifiedAt, method: row.method };
 }

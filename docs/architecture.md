@@ -13,7 +13,7 @@ entry page is prerendered.
 | `src/lib/i18n.js` | Interface translations and initial Korean listing import |
 | `src/routes/[lang=lang]/+page.svelte` | Localized directory, search, filters, and site cards |
 | `src/routes/+page.svelte` | Language entry point and legacy-link redirect |
-| `src/hooks.server.js` | HTML language selection during prerendering |
+| `src/hooks.server.js` | Language selection, session lookup, response headers and request/error logging |
 | `src/app.css` | Shared styling |
 | `static/image-slot.js` | Image preview custom element |
 | `static/site-screenshots/` | Committed site previews |
@@ -23,9 +23,13 @@ entry page is prerendered.
 | `src/lib/server/claims.js` | One-time challenges and atomic ownership grants |
 | `src/lib/server/proof.js` | Bounded DNS and raw HTML verification |
 | `src/lib/server/projects.js` | D1 reads and owner-only edits |
+| `src/lib/server/observability.js` | Allowlisted request/operation logs and request correlation |
 | `src/routes/p/[slug]/` | Public project, claim and editing pages |
 | `migrations/` | Versioned D1 schema |
 | `scripts/seed-projects.mjs` | Non-destructive import of missing listings/locales |
+
+See [Server logs](observability.md) for log fields, data boundaries, validation
+and rollout checks.
 
 ## Language routing
 
