@@ -2,9 +2,9 @@ export const supportedLangs = ['en', 'ko'];
 
 export const ui = {
   en: {
-    metaTitle: 'triples.love | fan-made tripleS projects',
+    metaTitle: 'tripleS fan sites: Objekt tools, archives & games | triples.love',
     metaDescription:
-      'Sites made by tripleS and COSMO fans, with Objekt collection and trading tools, schedules, video archives, and games.',
+      'Track and trade Objekts, check schedules, search videos by subtitle, browse member archives, and play fan games. Fan-made tripleS sites, each one checked by hand.',
     languagePill: 'ko',
     languageToggleLabel: 'View in Korean',
     nav: {
@@ -99,9 +99,9 @@ export const ui = {
     }
   },
   ko: {
-    metaTitle: '트리플에스(tripleS) 팬사이트·도구 모음 | triples.love',
+    metaTitle: '트리플에스(tripleS) 팬사이트 모음: 오브젝트 도구·아카이브·게임 | triples.love',
     metaDescription:
-      '트리플에스(tripleS)와 COSMO 팬들이 만든 사이트를 모았습니다. 오브젝트 수집·거래 도구, 일정, 영상 아카이브와 게임을 찾아보세요.',
+      '오브젝트 교환과 컬렉션 정리, 스케줄, 영상·자막 검색, 멤버 아카이브, 미니게임까지. 팬들이 만든 트리플에스(tripleS) 사이트를 하나씩 직접 확인하고 한곳에 모았습니다.',
     languagePill: 'en',
     languageToggleLabel: '영어로 보기',
     nav: {

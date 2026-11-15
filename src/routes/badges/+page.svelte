@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import ProjectShell from '$lib/components/ProjectShell.svelte';
   import { badgeTypes, createBadgeEmbed } from '$lib/embed-badges.js';
+  import { localizedUrl } from '$lib/seo.js';
 
   export let data;
   export let form = null;
@@ -139,7 +140,10 @@
 <svelte:head>
   <title>{t.title} · triples.love</title>
   <meta name="description" content={t.intro} />
-  <link rel="canonical" href="https://triples.love/badges/" />
+  <link rel="canonical" href={localizedUrl('/badges/', lang)} />
+  <link rel="alternate" hreflang="en" href={localizedUrl('/badges/', 'en')} />
+  <link rel="alternate" hreflang="ko" href={localizedUrl('/badges/', 'ko')} />
+  <link rel="alternate" hreflang="x-default" href={localizedUrl('/badges/', 'en')} />
 </svelte:head>
 
 <ProjectShell {lang} user={data.user}>

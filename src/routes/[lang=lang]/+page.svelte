@@ -7,6 +7,7 @@
   import { badgePageHref } from '$lib/embed-badges.js';
   import { categoryLabels, categoryNames, ui } from '$lib/i18n.js';
   import { projectHref, splitLastWord } from '$lib/project-copy.js';
+  import { ROBOTS_CONTENT, jsonLdScript, siteJsonLd } from '$lib/seo.js';
 
   export let data;
 
@@ -267,6 +268,7 @@
 <svelte:head>
   <title>{t.metaTitle}</title>
   <meta name="description" content={t.metaDescription} />
+  <meta name="robots" content={ROBOTS_CONTENT} />
   <link rel="canonical" href={canonicalUrl} />
   <link rel="alternate" hreflang="en" href="https://triples.love/en/" />
   <link rel="alternate" hreflang="ko" href="https://triples.love/ko/" />
@@ -289,6 +291,7 @@
   <meta name="twitter:description" content={t.metaDescription} />
   <meta name="twitter:image" content={metaImage} />
   <meta name="twitter:image:alt" content={metaImageAlt} />
+  {@html jsonLdScript(siteJsonLd(lang, t.metaDescription))}
 </svelte:head>
 
 {#snippet projectCard(site, featured = false)}

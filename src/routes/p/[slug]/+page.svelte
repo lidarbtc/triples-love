@@ -5,6 +5,7 @@
   import { categoryNames } from '$lib/i18n.js';
   import { localizedProject, projectCopy, projectHref, splitLastWord } from '$lib/project-copy.js';
   import { badgePageHref } from '$lib/embed-badges.js';
+  import { ROBOTS_CONTENT, jsonLdScript, projectJsonLd, projectMeta, projectUrl } from '$lib/seo.js';
 
   export let data;
   $: ({ project, user, lang, featured } = data);
@@ -17,7 +18,7 @@
     url.searchParams.set('utm_source', 'triples.love');
     return url.href;
   })();
-  $: canonical = `https://triples.love/p/${encodeURIComponent(project.id)}/`;
+  $: meta = projectMeta(project, copy, lang);
   let screenshotFailed = false;
   let screenshotProjectId;
   $: if (screenshotProjectId !== project.id) {
@@ -27,14 +28,29 @@
 </script>
 
 <svelte:head>
-  <title>{project.name} · triples.love</title>
-  <meta name="description" content={copy.tagline || copy.description} />
-  <link rel="canonical" href={canonical} />
+  <title>{meta.title}</title>
+  <meta name="description" content={meta.description} />
+  <meta name="robots" content={ROBOTS_CONTENT} />
+  <link rel="canonical" href={meta.canonical} />
+  <link rel="alternate" hreflang="en" href={projectUrl(project.id, 'en')} />
+  <link rel="alternate" hreflang="ko" href={projectUrl(project.id, 'ko')} />
+  <link rel="alternate" hreflang="x-default" href={projectUrl(project.id, 'en')} />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content={`${project.name} · triples.love`} />
-  <meta property="og:description" content={copy.tagline || copy.description} />
-  <meta property="og:url" content={canonical} />
-  <meta property="og:image" content={`https://triples.love/site-screenshots/${project.id}.jpg`} />
+  <meta property="og:site_name" content="triples.love" />
+  <meta property="og:title" content={meta.heading} />
+  <meta property="og:description" content={meta.description} />
+  <meta property="og:url" content={meta.canonical} />
+  <meta property="og:image" content={meta.image} />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:alt" content={meta.imageAlt} />
+  <meta property="og:locale" content={lang === 'ko' ? 'ko_KR' : 'en_US'} />
+  <meta property="og:locale:alternate" content={lang === 'ko' ? 'en_US' : 'ko_KR'} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={meta.heading} />
+  <meta name="twitter:description" content={meta.description} />
+  <meta name="twitter:image" content={meta.image} />
+  <meta name="twitter:image:alt" content={meta.imageAlt} />
+  {@html jsonLdScript(projectJsonLd(project, meta, lang))}
 </svelte:head>
 
 <ProjectShell {lang} {user}>
