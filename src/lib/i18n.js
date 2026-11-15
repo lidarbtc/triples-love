@@ -307,6 +307,13 @@ export const siteCopy = {
   }
 };
 
+export const siteSearchAliases = {
+  tracker: ['want/have'],
+  objektmy: ['want/have'],
+  objekttop: ['실물'],
+  cosmolive: ['ranking', '리더보드']
+};
+
 export function isSupportedLang(value) {
   return supportedLangs.includes(value);
 }

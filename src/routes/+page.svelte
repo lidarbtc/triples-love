@@ -2,7 +2,14 @@
   import { browser } from '$app/environment';
   import { onMount } from 'svelte';
   import { categories, sites } from '$lib/data.js';
-  import { categoryLabels, categoryNames, isSupportedLang, siteCopy, ui } from '$lib/i18n.js';
+  import {
+    categoryLabels,
+    categoryNames,
+    isSupportedLang,
+    siteCopy,
+    siteSearchAliases,
+    ui
+  } from '$lib/i18n.js';
 
   const languageStorageKey = 'triples-love.lang';
   const metaDescription =
@@ -70,10 +77,34 @@
   $: t = ui[lang];
   $: labels = categoryLabels[lang];
   $: names = categoryNames[lang];
-  $: localizedSites = sites.map((site) => ({
-    ...site,
-    ...(siteCopy[lang]?.[site.id] || {})
-  }));
+  $: localizedSites = sites.map((site) => {
+    const localizedCopy = siteCopy[lang]?.[site.id] || {};
+    const koreanCopy = siteCopy.ko?.[site.id] || {};
+
+    return {
+      ...site,
+      ...localizedCopy,
+      searchText: [
+        site.name,
+        site.domain,
+        site.category,
+        site.tagline,
+        site.description,
+        ...(site.badges || []),
+        koreanCopy.tagline,
+        koreanCopy.description,
+        ...(koreanCopy.badges || []),
+        categoryLabels.en[site.category],
+        categoryLabels.ko[site.category],
+        categoryNames.en[site.category],
+        categoryNames.ko[site.category],
+        ...(siteSearchAliases[site.id] || [])
+      ]
+        .filter(Boolean)
+        .join('\n')
+        .toLocaleLowerCase()
+    };
+  });
 
   $: if (browser) {
     document.documentElement.lang = lang;
@@ -93,15 +124,8 @@
     if (active !== 'all') out = out.filter((site) => site.category === active);
 
     if (query.trim()) {
-      const q = query.toLowerCase();
-      out = out.filter(
-        (site) =>
-          site.name.toLowerCase().includes(q) ||
-          site.domain.toLowerCase().includes(q) ||
-          site.tagline.toLowerCase().includes(q) ||
-          site.description.toLowerCase().includes(q) ||
-          (site.badges || []).some((badge) => badge.toLowerCase().includes(q))
-      );
+      const q = query.trim().toLocaleLowerCase();
+      out = out.filter((site) => site.searchText.includes(q));
     }
 
     if (sort === 'alpha') {
