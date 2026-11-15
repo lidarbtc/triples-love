@@ -448,6 +448,18 @@ export const sites = [
     badges: ["web game", "Objekt collection", "daily missions"],
     accent: "violet",
   },
+  {
+    id: "kosmosss",
+    name: "kosmoSSS",
+    domain: "kosmosss.space",
+    url: "https://kosmosss.space/",
+    category: "stats",
+    addedAt: "2026-11-13T09:13:40+09:00",
+    tagline: "Live Objekt activity stats",
+    description: "Follow tripleS Objekt mints, trades, and spins as they happen. Check 24-hour activity, member rankings, trends, and records, or browse Objekts and the collection release calendar.",
+    badges: ["live activity", "trends", "records"],
+    accent: "violet",
+  },
 ];
 
 export const categories = [
