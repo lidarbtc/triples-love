@@ -41,4 +41,14 @@ JavaScript, the entry page offers links to both languages.
 browser fingerprint as the `rough_id` session property, together with its profile
 version. This is an approximate identifier, not a verified user identity.
 
-Outbound site links include `utm_source=triples.love`.
+Outbound site links include `utm_source=triples.love`. Their visit buttons record
+one Umami event, `project_click`, with these properties:
+
+- `project`: the listing's domain, such as `apollo.cafe`.
+- `category`: the category key, such as `objekts` or `schedule`.
+- `surface`: `search` when a non-empty search is active; otherwise `directory`,
+  including category-filtered lists.
+
+Card expansion is not an outbound click. Search text and impressions are not
+collected by this event. Review project click counts in Umami's Events properties;
+these counts do not measure impression-based click-through rates.

@@ -316,6 +316,10 @@
           href={outboundHref(site.url)}
           target="_blank"
           rel="noopener"
+          data-umami-event="project_click"
+          data-umami-event-project={site.domain}
+          data-umami-event-category={site.category}
+          data-umami-event-surface={query.trim() ? 'search' : 'directory'}
         >
           {t.card.visit}
         </a>
