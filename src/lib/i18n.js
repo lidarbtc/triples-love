@@ -74,8 +74,9 @@ export const ui = {
     }
   },
   ko: {
-    metaTitle: 'triples.love — tripleS 팬 프로젝트 모음',
-    metaDescription: 'tripleS와 COSMO 팬들이 만든 사이트, 도구, 트래커, 자료를 한곳에 모아 소개합니다.',
+    metaTitle: '트리플에스(tripleS) 팬사이트·도구 모음 | triples.love',
+    metaDescription:
+      '트리플에스(tripleS)와 COSMO 팬들이 만든 팬사이트·도구 모음. 오브젝트 수집과 거래, 일정, 영상 아카이브, 게임을 한곳에서 찾아보세요.',
     languagePill: 'en',
     languageToggleLabel: '영어로 보기',
     nav: {
@@ -88,7 +89,7 @@ export const ui = {
       date: '2026년 8월 30일',
       updateTitle: '매주 업데이트',
       updateBody:
-        'tripleS와 COSMO 팬들이 만든 도구, 트래커, 자료를 꾸준히 모아 소개합니다.',
+        '트리플에스(tripleS)와 COSMO 팬들이 만든 도구, 트래커, 자료를 꾸준히 모아 소개합니다.',
       today: '오늘',
       status: '최근 업데이트',
       statusValue: '2026년 8월 30일',
@@ -115,7 +116,7 @@ export const ui = {
     about: {
       titleBefore: '',
       titleAfter: '는 어떤 곳인가요?',
-      subtitle: 'tripleS와 COSMO 팬들이 만든 사이트를 직접 확인해 한곳에 정리한 디렉터리입니다.',
+      subtitle: '트리플에스(tripleS)와 COSMO 팬들이 만든 사이트를 직접 확인해 한곳에 정리한 디렉터리입니다.',
       subtitle2: '이곳에 소개된 프로젝트는 모두 비공식이며, 팬들이 팬들을 위해 만들었습니다.',
       eyebrow: '소개',
       indexTitle: '팬 프로젝트를 한곳에서',
