@@ -15,6 +15,11 @@
   };
 
   const languageStorageKey = 'triples-love.lang';
+  const metaDescription =
+    'A curated directory of fan-made tripleS & COSMO sites, tools, trackers, and resources.';
+  const metaImage = 'https://triples.love/og-image.png';
+  const metaImageAlt =
+    'triples.love directory preview showing fan-made tripleS project cards and site screenshots.';
 
   let lang = 'en';
   let active = 'all';
@@ -194,6 +199,26 @@
 
 <svelte:head>
   <title>{t.metaTitle}</title>
+  <meta name="description" content={metaDescription} />
+  <link rel="canonical" href="https://triples.love/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="triples.love" />
+  <meta property="og:title" content="triples.love — fan-made tripleS projects" />
+  <meta property="og:description" content={metaDescription} />
+  <meta property="og:url" content="https://triples.love/" />
+  <meta property="og:image" content={metaImage} />
+  <meta property="og:image:secure_url" content={metaImage} />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={metaImageAlt} />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="ko_KR" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="triples.love — fan-made tripleS projects" />
+  <meta name="twitter:description" content={metaDescription} />
+  <meta name="twitter:image" content={metaImage} />
+  <meta name="twitter:image:alt" content={metaImageAlt} />
 </svelte:head>
 
 <div
