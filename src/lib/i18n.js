@@ -15,7 +15,7 @@ export const ui = {
       date: 'August 1, 2026',
       updateTitle: 'Updated weekly',
       updateBody:
-        'An ever-growing index of community-built tools, trackers, and resources around tripleS & COSMO.',
+        'An ever-growing directory of tools, trackers, and resources built by the tripleS & COSMO community.',
       today: 'today',
       status: 'last updated',
       statusValue: 'August 1, 2026',
@@ -42,26 +42,26 @@ export const ui = {
       titleBefore: 'what is',
       titleAfter: '?',
       subtitle:
-        'an index of fan-made sites built around tripleS & COSMO, checked and organized by hand.',
+        'a hand-checked directory of fan-made sites for the tripleS & COSMO community.',
       subtitle2: 'everything here is unofficial — made by fans, for fans.',
       eyebrow: 'about',
-      indexTitle: 'a single index for every fan project',
+      indexTitle: 'fan projects, all in one place',
       indexBody:
-        "scattered across personal domains, github pages, and vercel deploys — we collect them in one place so you can find the right tool for the moment, whether you're tracking a livestream, planning a trade, or just looking up an Objekt.",
-      statLabel: 'sites indexed & growing',
+        "fan projects are scattered across personal domains, GitHub Pages, and Vercel deployments. we bring them together so you can quickly find the right tool—whether you're tracking a livestream, planning a trade, or looking up an Objekt.",
+      statLabel: 'sites listed & growing',
       curatedTitle: 'checked by hand',
       curatedBody:
-        'submitted sites are opened, checked, and sorted into the category where they make the most sense.',
-      memoryTitle: 'the long memory',
+        'we visit and review every submitted site, then list it under the category where it fits best.',
+      memoryTitle: 'keeping a record',
       memoryBody:
-        "fan projects come and go. when a site retires, we keep its entry with a snapshot link — so the work isn't lost when a domain expires.",
+        'fan projects come and go. when a site retires, we keep its entry with a snapshot link so the work stays accessible after the domain expires.',
       snapshot: 'snapshot',
       live: 'live',
       submitTitle: 'built something?',
       submitBody: "made a tool, tracker, or wiki for tripleS? we'd love to add it to the directory.",
       submitButton: 'submit a site ↗',
-      flowSubmit: 'submit',
-      flowReview: 'review',
+      flowSubmit: 'submitted',
+      flowReview: 'reviewed',
       flowListed: 'listed'
     },
     footer: {
