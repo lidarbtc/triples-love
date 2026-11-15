@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createTestDb } from './helpers/d1.js';
 import { getProject } from '../src/lib/server/projects.js';
 import { CHALLENGE_LIFETIME_MS, MAX_PROOF_ATTEMPTS, hashClaimToken, startClaim, verifyClaim } from '../src/lib/server/claims.js';
@@ -47,6 +48,54 @@ test('starting a replacement challenge invalidates previous unconsumed token', a
   assert.notEqual(old.token, fresh.token);
   assert.equal(db.sqlite.prepare('SELECT COUNT(*) AS count FROM verification_challenges').get().count, 1);
   await assert.rejects(verifyClaim(db, request(project, old), { now: now + 2, verifyProof: async () => true }), { code: 'invalid_challenge' });
+});
+
+test('proofs survive 47 hours of propagation while user rate limits remain hourly', async (t) => {
+  const started = Date.now();
+  const { db, project, now } = await fixture(t);
+  const challenge = await begin(db, project, now);
+  assert.equal(challenge.expiresAt - now, 48 * 60 * 60 * 1000);
+  await verifyClaim(db, request(project, challenge), {
+    now: now + 47 * 60 * 60 * 1000,
+    verifyProof: async () => true
+  });
+  for (const key of ['claim:start:user:owner-a', 'claim:verify:user:owner-a']) {
+    const { reset_at } = db.sqlite.prepare('SELECT reset_at FROM rate_limits WHERE key = ?').get(key);
+    assert.ok(reset_at >= started + 60 * 60 * 1000);
+    assert.ok(reset_at <= Date.now() + 60 * 60 * 1000);
+  }
+});
+
+test('expiry migration preserves deployed tokens, consumed proofs and longer custom expiry', async (t) => {
+  const { db, project, now } = await fixture(t);
+  const hour = 60 * 60 * 1000;
+  const challenge = await begin(db, project, now);
+  db.sqlite.prepare('UPDATE verification_challenges SET expires_at = ? WHERE id = ?')
+    .run(now + hour, challenge.id);
+  const insert = db.sqlite.prepare(`INSERT INTO verification_challenges
+    (id, project_id, user_id, token_hash, method, target_url, expected_url, created_at, expires_at, consumed_at)
+    VALUES (?, ?, 'owner-a', ?, 'meta', ?, ?, ?, ?, ?)`);
+  for (const [id, created, expires, consumed] of [
+    ['expired-recently', now - 2 * hour, now - hour, null],
+    ['too-old', now - 49 * hour, now - 48 * hour, null],
+    ['consumed', now, now + hour, now],
+    ['longer', now, now + 7 * 24 * hour, null]
+  ]) insert.run(id, project.id, id, registeredUrl, registeredUrl, created, expires, consumed);
+  const migration = readFileSync(new URL('../migrations/0005_verification_challenge_lifetime.sql', import.meta.url), 'utf8');
+  db.sqlite.exec(migration);
+  const expiry = id => db.sqlite.prepare('SELECT expires_at FROM verification_challenges WHERE id = ?').get(id).expires_at;
+  assert.equal(expiry(challenge.id), now + 48 * hour);
+  assert.equal(expiry('expired-recently'), now + 46 * hour);
+  assert.equal(expiry('too-old'), now - 48 * hour);
+  assert.equal(expiry('consumed'), now + hour);
+  assert.equal(expiry('longer'), now + 7 * 24 * hour);
+  assert.equal(db.sqlite.prepare('SELECT token_hash FROM verification_challenges WHERE id = ?').get(challenge.id).token_hash,
+    await hashClaimToken(challenge.token));
+  db.sqlite.exec(migration);
+  assert.equal(expiry(challenge.id), now + 48 * hour);
+  await verifyClaim(db, request(project, challenge), {
+    now: now + 47 * hour, verifyProof: async () => true
+  });
 });
 
 test('successful proof grants immediate ownership, consumes challenge, and cannot replay', async (t) => {

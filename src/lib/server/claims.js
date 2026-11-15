@@ -2,7 +2,8 @@ import { isHttpError } from '@sveltejs/kit';
 import { consumeRateLimit } from './db.js';
 import { PROOF_META_NAME, ProofError, validateTargetUrl, verifySiteProof } from './proof.js';
 
-export const CHALLENGE_LIFETIME_MS = 60 * 60 * 1000;
+export const CHALLENGE_LIFETIME_MS = 48 * 60 * 60 * 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 export const MAX_PROOF_ATTEMPTS = 10;
 const RETRY_INTERVAL_MS = 3000;
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
@@ -74,7 +75,7 @@ export async function startClaim(db, { project, userId, method, targetUrl }, opt
     if (error instanceof ProofError) throw new ClaimError(error.code, error.message);
     throw error;
   }
-  await rateLimit(db, `claim:start:user:${userId}`, 12, CHALLENGE_LIFETIME_MS);
+  await rateLimit(db, `claim:start:user:${userId}`, 12, RATE_LIMIT_WINDOW_MS);
   await rateLimit(db, `claim:start:project:${project.id}:${userId}`, 6, 10 * 60 * 1000);
   const token = randomToken();
   const now = options.now ?? Date.now();
@@ -122,7 +123,7 @@ export async function verifyClaim(db, { project, userId, challengeId, token }, o
   if (row.attempts >= MAX_PROOF_ATTEMPTS) {
     throw new ClaimError('attempts_exhausted', 'This verification has reached its attempt limit. Start a new verification.', 429);
   }
-  await rateLimit(db, `claim:verify:user:${userId}`, 30, CHALLENGE_LIFETIME_MS, challenge);
+  await rateLimit(db, `claim:verify:user:${userId}`, 30, RATE_LIMIT_WINDOW_MS, challenge);
   const attempt = await db.prepare(`
     UPDATE verification_challenges SET attempts = attempts + 1, last_checked_at = ?
     WHERE id = ? AND user_id = ? AND project_id = ? AND token_hash = ?

@@ -76,7 +76,7 @@
               <div class="project-field"><label for="meta-tag">{t.metaTitle}</label><textarea id="meta-tag" class="claim-code" readonly rows="4" value={challenge.metaTag} on:focus={(event) => event.currentTarget.select()}></textarea></div>
               <p class="project-help">{t.metaHintDetail}</p>
             {/if}
-            <div class="claim-expiry"><p>{t.oneHour}</p><span>{t.expires}: {expiry}</span></div>
+            <div class="claim-expiry"><p>{t.proofExpiry}</p><span>{t.expires}: {expiry}</span></div>
             <form method="POST" action={`?/verify&lang=${lang}`} use:enhance={submitState('verify')}>
               <input type="hidden" name="challengeId" value={challenge.id} />
               <input type="hidden" name="token" value={challenge.token} />
@@ -99,7 +99,7 @@
               <label class:chosen={method === 'meta'}><input type="radio" name="method" value="meta" bind:group={method} /><span><strong>{t.metaTitle}</strong><span>{t.metaHint}</span></span></label>
             </fieldset>
             <button class="project-btn" type="submit" disabled={!!pending}>{pending === 'start' ? t.starting : t.start}</button>
-            <p class="project-help">{t.oneHour}</p>
+            <p class="project-help">{t.proofExpiry}</p>
           </form>
         {/if}
       {/if}
