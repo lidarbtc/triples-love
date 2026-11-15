@@ -305,10 +305,21 @@ try {
   console.log('PASS owner URL re-verification -> verified URL update -> second versioned page save');
 
   const bannerUrl = projectUrls['flow-html'];
-  const featuredCards = html => elements(parse(html), node => node.tagName === 'a' && (attributes(node).class || '').split(' ').includes('featured-card'));
-  const emptyDirectory = await request('/en/');
-  assertPage(emptyDirectory, ['Featured', 'Sites that link back to triples.love', 'Your site here'], 'Directory before any banner');
-  assert.equal(featuredCards(emptyDirectory.html).filter(node => attributes(node)['data-umami-event-surface'] === 'featured').length, 0);
+  const classes = node => (attributes(node).class || '').split(/\s+/);
+  // Element children of the directory grid, in rendered order.
+  const directoryCards = html => {
+    const [grid] = elements(parse(html), node => node.tagName === 'div' && classes(node).includes('directory-grid'));
+    assert.ok(grid, 'Directory grid is rendered');
+    return grid.childNodes.filter(node => node.tagName);
+  };
+  const visitLink = card => elements(card, node => node.tagName === 'a' && attributes(node)['data-umami-event'] === 'project_click')[0];
+  // nodeText pads element boundaries, and owned names split their last word into a span.
+  const cardText = card => nodeText(card).replace(/\s+/g, ' ');
+  const emptyDirectory = directoryCards((await request('/en/')).html);
+  assert.ok(classes(emptyDirectory[0]).includes('card-invite'), 'Without featured projects, the open-spot card leads the list');
+  assert.equal(attributes(emptyDirectory[0]).href, '/badges/?lang=en');
+  assert.ok(cardText(emptyDirectory[0]).includes('Your site could be here'));
+  assert.ok(emptyDirectory.slice(1).every(card => !classes(card).includes('card-featured') && !classes(card).includes('card-invite')));
   const badgePath = '/badges/?lang=ko&type=listed&theme=light&project=flow-html';
   const badgePage = await request(badgePath);
   assertPage(badgePage, ['첫 화면에 소개되기', '아직 소개되지 않았어요.', bannerUrl], 'Korean banner check panel');
@@ -323,17 +334,25 @@ try {
   const stored = await db.prepare('SELECT state, detected_by, link_href, miss_count FROM project_backlinks WHERE project_id=?').bind('flow-html').first();
   assert.deepEqual(stored, { state: 'found', detected_by: 'html', link_href: 'https://triples.love/p/flow-html/?lang=ko&utm_source=badge', miss_count: 0 });
   const featuredDirectory = await request('/ko/');
-  assertPage(featuredDirectory, ['주목할 사이트', 'flow-html'], 'Korean directory with a featured project');
-  const [featuredCard] = featuredCards(featuredDirectory.html).filter(node => attributes(node)['data-umami-event-surface'] === 'featured');
-  assert.ok(featuredCard, 'Featured project links out with its own analytics surface');
-  assert.equal(attributes(featuredCard)['data-umami-event-project'], 'html-fixture.example.com');
-  assert.equal(attributes(featuredCard).href, `${bannerUrl}?utm_source=triples.love`);
-  assertPage(await request('/p/flow-html/edit/?lang=en'), ['Featured on the triples.love homepage.'], 'Owner editor featured status');
+  const [featuredCard, openSpot, ...neutralCards] = directoryCards(featuredDirectory.html);
+  assert.equal(featuredCard.tagName, 'details', 'A featured project keeps the regular directory card');
+  assert.ok(classes(featuredCard).includes('card-featured'), 'The featured project leads the default list');
+  assert.ok(cardText(featuredCard).includes('flow-html edited 1') && cardText(featuredCard).includes('Featured'));
+  assert.ok(classes(openSpot).includes('card-invite') && cardText(openSpot).includes('이 자리에 내 사이트를'),
+    'An open spot follows while featured slots remain');
+  assert.equal(attributes(openSpot).href, '/badges/?lang=ko');
+  assert.ok(neutralCards.length && neutralCards.every(card => !classes(card).includes('card-featured')), 'Other projects keep the neutral list');
+  assert.ok(!neutralCards.some(card => cardText(card).includes('flow-html edited')), 'A featured project is not listed twice');
+  const featuredVisit = visitLink(featuredCard);
+  assert.equal(attributes(featuredVisit)['data-umami-event-surface'], 'featured', 'Featured clicks have their own analytics surface');
+  assert.equal(attributes(featuredVisit)['data-umami-event-project'], 'html-fixture.example.com');
+  assert.equal(attributes(featuredVisit).href, `${bannerUrl}?utm_source=triples.love`);
+  assert.equal(attributes(visitLink(neutralCards[0]))['data-umami-event-surface'], 'directory');
+  assertPage(await request('/p/flow-html/edit/?lang=en'), ['Featured at the front of the triples.love directory.'], 'Owner editor featured status');
   bannerPages.set(bannerUrl, '<p>Banner removed</p>');
   await request(new URL(check.action, origin + badgePath).href, check.values);
   assert.equal((await db.prepare('SELECT miss_count FROM project_backlinks WHERE project_id=?').bind('flow-html').first()).miss_count, 1);
-  assert.equal(featuredCards((await request('/en/')).html).filter(node => attributes(node)['data-umami-event-surface'] === 'featured').length, 1,
-    'One missed check keeps the project featured');
+  assert.ok(classes(directoryCards((await request('/en/')).html)[0]).includes('card-featured'), 'One missed check keeps the project featured');
   assert.equal(bannerFetches, 3);
   console.log('PASS banner check -> D1 record -> featured directory card -> owner status -> one-miss grace');
 

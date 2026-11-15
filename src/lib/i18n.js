@@ -59,11 +59,11 @@ export const ui = {
       claim: 'Get your verified badge →'
     },
     featured: {
-      title: 'Featured',
-      subtitle: 'Sites that link back to triples.love',
-      cta: 'Get featured →',
-      emptyTitle: 'Your site here',
-      emptyBody: 'Add a triples.love banner to your listed site to be featured here.'
+      mark: 'Featured',
+      slot: 'open spot',
+      emptyTitle: 'Your site could be here',
+      emptyBody: 'Add a triples.love banner to your site to be featured right here, at the front of the directory.',
+      cta: 'Add the banner →'
     },
     about: {
       titleBefore: 'what is',
@@ -154,11 +154,11 @@ export const ui = {
       claim: '인증 배지 받기 →'
     },
     featured: {
-      title: '주목할 사이트',
-      subtitle: 'triples.love 배너를 단 사이트예요',
-      cta: '내 사이트 소개하기 →',
-      emptyTitle: '여기에 내 사이트를',
-      emptyBody: '등록된 사이트에 triples.love 배너를 달면 이곳에 소개돼요.'
+      mark: 'Featured',
+      slot: '빈자리',
+      emptyTitle: '이 자리에 내 사이트를',
+      emptyBody: '사이트에 triples.love 배너를 달면 목록 맨 앞, 바로 이 자리에 소개돼요.',
+      cta: '배너 달고 소개받기 →'
     },
     about: {
       titleBefore: '',

@@ -130,13 +130,15 @@ for Listed links in the chooser. Downloaded SVGs can also be self-hosted.
 
 ## Featured projects
 
-A project whose registered page links back to triples.love appears in the
-homepage's Featured section (`주목할 사이트` in Korean). Ownership verification
-is not required. The section shows at most four projects on the unfiltered
-directory, in an order that changes once per Korean calendar day; searches and
-category filters hide it so results stay neutral. When fewer than four projects
-qualify, the last card invites makers to `/badges/`. Featured cards link straight
-to the site and record `project_click` with `surface=featured`.
+A project whose registered page links back to triples.love is featured;
+ownership verification is not required. On the default directory view (all
+categories, no search, A–Z order), up to four featured projects lead the list
+as regular directory cards with a small Featured mark before the category, in
+an order that changes once per Korean calendar day. Searches, category filters
+and the other sort orders keep the neutral order without marks. While fewer
+than four projects qualify, an open-spot card in the same card frame follows
+them; it shows the Listed banner and links to `/badges/`. A featured card's visit
+button records `project_click` with `surface=featured`.
 
 A link counts when a real `<a href>` points to `https://triples.love/`, `/en/`,
 `/ko/` or the same project's `/p/<id>/` page. Text in comments, scripts,

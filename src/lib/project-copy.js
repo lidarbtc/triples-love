@@ -1,7 +1,7 @@
 export const projectCopy = {
   en: {
     back: 'All projects', signIn: 'Sign in with GitHub', signOut: 'Sign out', language: '한국어', badgeCode: 'Website banners',
-    featuredOn: 'Featured on the triples.love homepage.', featuredOff: 'Add a website banner to your site to be featured on the homepage.',
+    featuredOn: 'Featured at the front of the triples.love directory.', featuredOff: 'Add a website banner to your site to be featured at the front of the directory.',
     featuredManage: 'Banner settings', featuredGet: 'Get featured',
     fanProject: 'Project', visit: 'Visit site ↗', about: 'About', links: 'Links',
     archived: 'Archived', archivedNote: 'This project is preserved in the directory. Ownership claims are unavailable for archived projects.',
@@ -42,7 +42,7 @@ export const projectCopy = {
   },
   ko: {
     back: '모든 프로젝트', signIn: 'GitHub로 로그인', signOut: '로그아웃', language: 'English', badgeCode: '사이트용 배너',
-    featuredOn: '첫 화면의 ‘주목할 사이트’에 소개되고 있어요.', featuredOff: '사이트에 배너를 달면 첫 화면에 소개돼요.',
+    featuredOn: '첫 화면 목록 맨 앞에 Featured로 소개되고 있어요.', featuredOff: '사이트에 배너를 달면 첫 화면 목록 맨 앞에 소개돼요.',
     featuredManage: '배너 설정', featuredGet: '첫 화면에 소개되기',
     fanProject: '프로젝트', visit: '사이트 열기 ↗', about: '프로젝트 소개', links: '관련 링크',
     archived: '아카이브', archivedNote: '기록으로 보관 중인 프로젝트입니다. 아카이브된 프로젝트는 소유권을 인증할 수 없습니다.',

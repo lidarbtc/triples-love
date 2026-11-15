@@ -143,7 +143,12 @@
   $: featuredSites = (data.featuredIds || [])
     .map((id) => localizedSites.find((site) => site.id === id))
     .filter((site) => site && site.status !== 'archived');
-  $: showFeatured = active === 'all' && !query.trim();
+  // Featured projects lead only the default view; searches, filters and other sorts stay neutral.
+  $: showFeatured = active === 'all' && !query.trim() && sort === 'alpha';
+  $: pinnedSites = showFeatured ? featuredSites : [];
+  $: pinnedIds = new Set(pinnedSites.map((site) => site.id));
+  $: listSites = directorySites.filter((site) => !pinnedIds.has(site.id));
+  $: showInvite = showFeatured && pinnedSites.length < (data.featuredSlots ?? 4);
   $: archivedSites = filtered.filter((site) => site.status === 'archived');
   $: archivedCount = sites.filter((site) => site.status === 'archived').length;
   $: archiveOpen = Boolean(query.trim() && archivedSites.length);
@@ -247,9 +252,10 @@
   <meta name="twitter:image:alt" content={metaImageAlt} />
 </svelte:head>
 
-{#snippet projectCard(site)}
+{#snippet projectCard(site, featured = false)}
   <details
     class="card"
+    class:card-featured={featured}
     name="site-cards"
     open={expandedId === site.id}
     on:toggle={(event) => handleCardToggle(event, site.id)}
@@ -299,6 +305,7 @@
       </span>
 
       <span class="card-meta">
+        {#if featured}<span class="cat-name card-featured-mark">{t.featured.mark}</span>{/if}
         <span class="cat-name">{names[site.category]}</span>
         <span class="meta-spacer"></span>
         <span class="card-domain">{site.domain}</span>
@@ -358,7 +365,7 @@
           data-umami-event="project_click"
           data-umami-event-project={site.domain}
           data-umami-event-category={site.category}
-          data-umami-event-surface={query.trim() ? 'search' : 'directory'}
+          data-umami-event-surface={featured ? 'featured' : query.trim() ? 'search' : 'directory'}
         >
           {t.card.visit}
         </a>
@@ -404,6 +411,42 @@
       {/if}
     </div>
   </details>
+{/snippet}
+
+{#snippet featuredInvite()}
+  <a class="card card-invite" href={badgePageHref('', lang)}>
+    <span class="thumb">
+      <span class="thumb-fallback" aria-hidden="true">
+        <svg viewBox="0 0 400 240" preserveAspectRatio="none" width="100%" height="100%">
+          <defs>
+            <pattern id="stripes-featured-invite" patternUnits="userSpaceOnUse" width="14" height="14" patternTransform="rotate(12)">
+              <rect width="14" height="14" fill="#fbfbfd" />
+              <line x1="0" y1="0" x2="0" y2="14" stroke="#6f9bff" stroke-width="1" stroke-opacity="0.18" />
+            </pattern>
+          </defs>
+          <rect width="400" height="240" fill="url(#stripes-featured-invite)" />
+          <g opacity="0.42">
+            <rect x="20" y="20" width="360" height="22" rx="4" fill="#ffffff" stroke="#dfe1ea" />
+            <circle cx="32" cy="31" r="2.5" fill="#dfe1ea" />
+            <circle cx="42" cy="31" r="2.5" fill="#dfe1ea" />
+            <circle cx="52" cy="31" r="2.5" fill="#dfe1ea" />
+            <rect x="68" y="25" width="240" height="12" rx="2" fill="#f1f2f6" />
+          </g>
+        </svg>
+      </span>
+      <span class="card-invite-art">
+        <img src="/badges/listed-light.svg" alt="" width="216" height="32" loading="lazy" decoding="async" />
+      </span>
+    </span>
+    <span class="card-meta">
+      <span class="cat-name card-featured-mark">{t.featured.mark}</span>
+      <span class="meta-spacer"></span>
+      <span class="card-domain">{t.featured.slot}</span>
+    </span>
+    <span class="card-title">{t.featured.emptyTitle}</span>
+    <span class="card-tagline">{t.featured.emptyBody}</span>
+    <span class="card-invite-cta">{t.featured.cta}</span>
+  </a>
 {/snippet}
 
 <div id="top" class="app">
@@ -533,52 +576,6 @@
       </div>
     </div>
 
-    {#if showFeatured}
-      <section class="featured" aria-labelledby="featured-title">
-        <div class="featured-head">
-          <div>
-            <h2 class="featured-title" id="featured-title">{t.featured.title}</h2>
-            <p class="featured-sub">{t.featured.subtitle}</p>
-          </div>
-          {#if featuredSites.length >= 4}
-            <a class="featured-link" href={badgePageHref('', lang)}>{t.featured.cta}</a>
-          {/if}
-        </div>
-        <div class="featured-grid">
-          {#each featuredSites as site (site.id)}
-            <a
-              class="featured-card"
-              href={outboundHref(site.url)}
-              target="_blank"
-              rel="noopener"
-              data-umami-event="project_click"
-              data-umami-event-project={site.domain}
-              data-umami-event-category={site.category}
-              data-umami-event-surface="featured"
-            >
-              <span class="featured-thumb">
-                <img src={screenshotPath(site)} alt="" loading="lazy" decoding="async" on:error={hideBrokenImage} />
-              </span>
-              <span class="featured-body">
-                <span class="featured-meta">{names[site.category]} · {site.domain}</span>
-                <span class="featured-name">
-                  {site.name}{#if site.owner}<span class="featured-seal"><VerifiedSeal label={t.owner.verified} /></span>{/if}
-                </span>
-                <span class="featured-tagline">{site.tagline}</span>
-              </span>
-            </a>
-          {/each}
-          {#if featuredSites.length < 4}
-            <a class="featured-card featured-empty" href={badgePageHref('', lang)}>
-              <span class="featured-empty-title">{t.featured.emptyTitle}</span>
-              <span class="featured-empty-body">{t.featured.emptyBody}</span>
-              <span class="featured-empty-cta">{t.featured.cta}</span>
-            </a>
-          {/if}
-        </div>
-      </section>
-    {/if}
-
     {#if filtered.length === 0}
       <div class="empty">
         <p>
@@ -591,7 +588,13 @@
       </div>
     {:else if directorySites.length}
       <div class="grid directory-grid">
-        {#each directorySites as site (site.id)}
+        {#each pinnedSites as site (site.id)}
+          {@render projectCard(site, true)}
+        {/each}
+        {#if showInvite}
+          {@render featuredInvite()}
+        {/if}
+        {#each listSites as site (site.id)}
           {@render projectCard(site)}
         {/each}
       </div>
