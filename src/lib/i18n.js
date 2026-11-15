@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'September 14, 2026',
+      date: 'September 15, 2026',
       updateTitle: 'Updated weekly',
       updateBody:
         'Tools, trackers, and resources made by tripleS and COSMO fans. We keep adding sites as we find them.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'September 14, 2026',
+      statusValue: 'September 15, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -86,13 +86,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 9월 14일',
+      date: '2026년 9월 15일',
       updateTitle: '매주 업데이트',
       updateBody:
         '트리플에스(tripleS)와 COSMO 팬들이 만든 도구와 트래커, 자료를 모았습니다. 새로 찾은 사이트도 계속 추가합니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 9월 14일',
+      statusValue: '2026년 9월 15일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -355,6 +355,12 @@ export const siteCopy = {
       description:
         'tripleS 정하연의 사진과 영상을 모아둔 팬 아카이브입니다. 프롬·COSMO Talk 메시지의 한국어 원문과 영어 번역, 프로필도 볼 수 있습니다.',
       badges: ['사진·영상', '메시지 번역']
+    },
+    sssflix: {
+      tagline: 'tripleS 영상 아카이브',
+      description:
+        'SIGNAL과 예능, 라이브 등 tripleS 영상을 모아둔 아카이브입니다. 멤버나 활동 시기별로 찾아보거나 영어 자막이 있는 영상만 골라볼 수 있습니다.',
+      badges: ['영상', '영어 자막']
     }
   }
 };
@@ -371,7 +377,8 @@ export const siteSearchAliases = {
   'objekts-trading-platform': ['trade', 'want/have', '교환'],
   joojoo: ['itsjoo', 'archive', '아카이브', 'LOONA', '이달의 소녀'],
   'triple-s-game': ['認人遊戲', 'Wordle', '워들', '멤버 맞히기', '수박게임'],
-  hayeonarchive: ['하연 아카이브', '하연아카이브', '코스모톡', 'S19']
+  hayeonarchive: ['하연 아카이브', '하연아카이브', '코스모톡', 'S19'],
+  sssflix: ['sss flix', '시그널', 'SIGNAL', '배지전쟁', 'Badge War', '코스모 라이브']
 };
 
 export function isSupportedLang(value) {

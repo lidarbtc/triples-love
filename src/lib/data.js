@@ -325,6 +325,18 @@ export const sites = [
     badges: ["photos & videos", "chat translations"],
     accent: "blue",
   },
+  {
+    id: "sssflix",
+    name: "sssflix",
+    domain: "sssflix.vercel.app",
+    url: "https://sssflix.vercel.app/",
+    category: "hub",
+    addedAt: "2026-09-15T10:38:36+09:00",
+    tagline: "tripleS video archive",
+    description: "Browse tripleS videos, from SIGNAL episodes to variety shows and livestreams. Filter by member or era, or find videos with English subtitles.",
+    badges: ["videos", "English subs"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [
