@@ -172,6 +172,12 @@
     return `/site-screenshots/${site.id}.jpg`;
   }
 
+  function outboundHref(href) {
+    const url = new URL(href);
+    url.searchParams.set('utm_source', 'triples.love');
+    return url.href;
+  }
+
   function hideBrokenThumbnail(event) {
     event.currentTarget.hidden = true;
   }
@@ -394,7 +400,7 @@
                 {/each}
               </div>
               <div class="card-actions">
-                <a class="btn btn-primary" href={site.url} target="_blank" rel="noopener">
+                <a class="btn btn-primary" href={outboundHref(site.url)} target="_blank" rel="noopener">
                   {t.card.visit}
                 </a>
                 {#if interactive}
