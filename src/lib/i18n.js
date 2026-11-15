@@ -15,9 +15,9 @@ export const ui = {
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
       date: 'October 17, 2026',
-      updateTitle: 'WAVTV and ObjectX added',
+      updateTitle: 'tripleS fans and tripleS WAV added',
       updateBody:
-        'Watch tripleS videos on WAVTV’s round-the-clock channels, or find Objekt trade matches and manage your collection on ObjectX.',
+        'Explore member and music guides on tripleS fans, or find official websites, social accounts, and streaming links on tripleS WAV.',
       today: 'today',
       status: 'last updated',
       statusValue: 'October 17, 2026',
@@ -99,9 +99,9 @@ export const ui = {
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
       date: '2026년 10월 17일',
-      updateTitle: 'WAVTV·ObjectX 추가',
+      updateTitle: 'tripleS fans·tripleS WAV 추가',
       updateBody:
-        'tripleS 영상을 24시간 편성해 보여주는 WAVTV와 오브젝트 교환 상대 찾기·컬렉션 관리를 지원하는 ObjectX를 추가했습니다.',
+        '멤버·음악·활동 정보를 정리한 tripleS fans와 공식 사이트·SNS·음원 서비스 링크를 모은 tripleS WAV를 추가했습니다.',
       today: '오늘',
       status: '최근 업데이트',
       statusValue: '2026년 10월 17일',
@@ -415,6 +415,18 @@ export const siteCopy = {
       description:
         '디지털·오프라인 행사에서 tripleS 오브젝트를 교환할 상대를 자동으로 찾아줍니다. 컬렉션 관리와 발매 소식, 일정 캘린더, 팬 커뮤니티도 이용할 수 있습니다.',
       badges: ['거래', '매칭', '컬렉션']
+    },
+    triplesfans: {
+      tagline: 'tripleS 팬 가이드',
+      description:
+        '팬이 정리한 tripleS 멤버·디멘션·음악 소개와 SIGNAL·배지전쟁 안내입니다. 그래비티 결과와 활동 연표, 콘서트 정보도 찾아볼 수 있습니다.',
+      badges: ['멤버 안내', '음악', '활동 연표']
+    },
+    'triples-wav': {
+      tagline: 'tripleS 공식 링크 모음',
+      description:
+        'tripleS 공식 사이트와 SNS, 디스코드, 음원 서비스 링크를 모은 팬사이트입니다. 일본 공식 팬클럽과 COSMO 쇼핑몰로도 이동할 수 있습니다.',
+      badges: ['공식 링크', 'SNS', '음악']
     }
   }
 };
@@ -437,7 +449,9 @@ export const siteSearchAliases = {
   'wav-archive': ['웨이브 아카이브', '웨이브아카이브', 'bbangshion', 'DIMENSION', '디멘션', '입덕 가이드'],
   wavbase: ['wav base', '웨이브베이스', '웨이브 베이스', 'dearseoah', '가격표', '시세표', 'pricing'],
   wavtv: ['wav tv', '웨이브티비', '웨이브 티비', '웨이브TV', '시그널', 'SIGNAL', '편성표'],
-  objectx: ['object x', '오브젝트엑스', '오브젝트 엑스', '트레이딩', '자동 매칭']
+  objectx: ['object x', '오브젝트엑스', '오브젝트 엑스', '트레이딩', '자동 매칭'],
+  triplesfans: ['tripleSfans', 'tripleS fans', '트리플에스 팬스', '트리플에스팬스', 'DIMENSION', '디멘션', '입덕 가이드', 'Badge War', '배지전쟁'],
+  'triples-wav': ['tripleS WAV', '트리플에스 웨이브', '트리플에스웨이브', '공식 링크', '링크 모음', 'link hub']
 };
 
 export function isSupportedLang(value) {

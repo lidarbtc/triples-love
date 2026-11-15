@@ -400,6 +400,30 @@ export const sites = [
     badges: ["trading", "matches", "collection"],
     accent: "amber",
   },
+  {
+    id: "triplesfans",
+    name: "tripleS fans",
+    domain: "triplesfans.com",
+    url: "https://triplesfans.com/",
+    category: "wiki",
+    addedAt: "2026-10-17T21:30:08+09:00",
+    tagline: "tripleS fan guide",
+    description: "Explore fan-written guides to tripleS members, DIMENSIONs, music, SIGNAL, and Badge War. Browse Gravity results, the group's timeline, and concert information.",
+    badges: ["member guide", "music", "timeline"],
+    accent: "amber",
+  },
+  {
+    id: "triples-wav",
+    name: "tripleS WAV",
+    domain: "triples-wav.com",
+    url: "https://triples-wav.com/",
+    category: "hub",
+    addedAt: "2026-10-17T21:30:08+09:00",
+    tagline: "Official tripleS links in one place",
+    description: "A fan-made link hub for tripleS official websites, social accounts, Discord, and music streaming services. It also links to the Japanese fan club and COSMO shop.",
+    badges: ["official links", "social media", "music"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [
