@@ -7,9 +7,9 @@ const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 export const MAX_PROOF_ATTEMPTS = 10;
 const RETRY_INTERVAL_MS = 3000;
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
-// Failures caused by the network or the site being briefly unavailable say
-// nothing about the proof, so they do not use up the challenge's checks.
-const TRANSIENT_PROOF_ERRORS = new Set(['timeout', 'fetch_failed', 'dns_failed', 'http_failed']);
+// Failures caused by the network, an outage or bot protection say nothing
+// about the proof, so they do not use up the challenge's checks.
+const TRANSIENT_PROOF_ERRORS = new Set(['timeout', 'fetch_failed', 'dns_failed', 'http_failed', 'blocked']);
 
 export class ClaimError extends Error {
   constructor(code, message, status = 400, challenge = null) {

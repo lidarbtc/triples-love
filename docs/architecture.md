@@ -107,6 +107,10 @@ HTML checks allow public HTTPS hostnames, validate A and AAAA records, follow on
 same-origin redirects and impose time/body limits. Proof inside script, comment,
 template or body content does not count. An HTML check may fail on an oversized
 page, a bot challenge or a redirect to another hostname; DNS is the alternative.
+A 403/429 response or a Cloudflare challenge is reported as `blocked`: the claim
+page offers DNS verification, it does not use up a check, and a banner check
+records it as unreachable rather than as a missing banner. Site owners can allow
+requests whose User-Agent contains `triples.love`.
 DNS checks are a preflight, not IP pinning; outbound network isolation also relies
 on the Cloudflare Worker runtime.
 

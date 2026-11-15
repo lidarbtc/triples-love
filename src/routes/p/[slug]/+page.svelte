@@ -7,7 +7,7 @@
   import { badgePageHref } from '$lib/embed-badges.js';
 
   export let data;
-  $: ({ project, user, lang } = data);
+  $: ({ project, user, lang, featured } = data);
   $: t = projectCopy[lang] || projectCopy.en;
   $: copy = localizedProject(project, lang);
   $: isOwner = Boolean(user && project.owner?.id === user.id);
@@ -87,8 +87,8 @@
       </div>
     </div>
   </article>
-  <aside class="project-ownership" class:project-ownership-verified={project.owner} class:project-ownership-unclaimed={!project.owner && !archived}>
-    {#if project.owner}
+  {#if project.owner}
+    <aside class="project-ownership project-ownership-verified">
       <div class="project-owner">
         {#if project.owner.avatarUrl}
           <img class="project-owner-avatar" src={project.owner.avatarUrl} alt="" width="40" height="40" referrerpolicy="no-referrer" on:error={(event) => event.currentTarget.hidden = true} />
@@ -99,15 +99,33 @@
         </div>
       </div>
       {#if isOwner && !archived}<a class="project-btn project-btn-secondary" href={projectHref(project.id, lang, 'edit')}>{t.edit}</a>{/if}
-    {:else if !archived}
-      <div class="project-claim-copy">
-        <h2>{t.unclaimed}</h2><p>{t.claimIntro}</p>
-        <div class="project-claim-preview"><VerificationPreview name={project.name} {lang} /></div>
+    </aside>
+  {/if}
+  {#if !archived && (!project.owner || isOwner)}
+    <section class="project-operator" aria-labelledby="operator-title">
+      <div class="project-operator-heading">
+        <h2 id="operator-title">{project.owner ? t.operatorOwner : t.unclaimed}</h2>
+        {#if !project.owner}<p>{t.operatorNote}</p>{/if}
       </div>
-      <a class="project-btn" href={projectHref(project.id, lang, 'claim')}>{t.claim}</a>
-    {/if}
-  </aside>
-  <p class="project-badge-link"><a href={badgePageHref(project.id, lang)}>{t.badgeCode} →</a></p>
+      <div class="project-operator-grid" class:single={project.owner}>
+        {#if !project.owner}
+          <div class="operator-card">
+            <h3>{t.operatorVerifyTitle}</h3>
+            <p>{t.claimIntro}</p>
+            <div class="operator-preview"><VerificationPreview name={project.name} {lang} /></div>
+            <a class="project-btn" href={projectHref(project.id, lang, 'claim')}>{t.claim}</a>
+          </div>
+        {/if}
+        <div class="operator-card">
+          <h3>{t.featuredGet}{#if featured}<span class="operator-on">{t.featuredNow}</span>{/if}</h3>
+          <p>{featured ? t.featuredOn : t.featuredOff}</p>
+          <a class="project-btn project-btn-secondary" href={badgePageHref(project.id, lang)}>{featured ? t.featuredManage : t.bannerCta}</a>
+        </div>
+      </div>
+    </section>
+  {:else if !archived}
+    <p class="project-badge-link"><a href={badgePageHref(project.id, lang)}>{t.badgeCode} →</a></p>
+  {/if}
 </ProjectShell>
 
 <style>
@@ -137,10 +155,21 @@
   .project-ownership p { margin: 7px 0 0; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
   .project-ownership .project-btn { flex-shrink: 0; }
   .project-ownership-verified { margin-top: 22px; padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
-  .project-ownership-unclaimed { margin-top: 22px; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
-  .project-claim-copy { min-width: 0; }
-  .project-claim-copy p { max-width: 58ch; line-height: 1.7; }
-  .project-claim-preview { margin-top: 18px; }
+  .project-operator { margin-top: 22px; }
+  .project-operator-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 4px 12px; }
+  .project-operator-heading h2 { margin: 0; font-size: 14px; font-weight: 600; }
+  .project-operator-heading p { margin: 0; font-size: 12px; color: var(--ink-2); }
+  .project-operator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .project-operator-grid.single { grid-template-columns: 1fr; }
+  .operator-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; padding: 22px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
+  .operator-card h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .operator-card p { margin: 0; font-size: 12.5px; line-height: 1.7; color: var(--ink-2); }
+  .operator-card .project-btn { margin-top: auto; }
+  .operator-preview { margin: 4px 0 8px; }
+  .operator-on { padding: 2px 8px; border-radius: 999px; background: #edf5f0; color: #2c6b4a; font-size: 11px; font-weight: 500; }
+  .project-operator-grid.single .operator-card { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 22px; padding: 18px 20px; }
+  .project-operator-grid.single .operator-card h3 { flex-basis: 100%; }
+  .project-operator-grid.single .operator-card .project-btn { margin-top: 0; }
   .project-title-end { display: inline-block; }
   .project-title-end :global(.verified-seal) { width: .6em; height: .6em; margin-left: .18em; vertical-align: .06em; }
   .project-badge-link { margin: 20px 4px 0; font-size: 13px; color: var(--ink-2); }
@@ -152,6 +181,6 @@
     .project-source-url { text-align: left; }
     .project-detail-grid:has(.project-extra-links) { grid-template-columns: 1fr; gap: 25px; }
     .project-ownership { align-items: flex-start; flex-direction: column; }
-    .project-ownership-unclaimed { align-items: stretch; }
+    .project-operator-grid { grid-template-columns: 1fr; }
   }
 </style>

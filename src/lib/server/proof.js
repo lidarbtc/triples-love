@@ -230,7 +230,13 @@ async function readPublicHtml(target, { resolve, fetcher, signal, userAgent, tru
       continue;
     }
     if (!response.ok) {
+      // Bot protection (for example a Cloudflare challenge) answers automated
+      // requests with 403/429. Report it separately: retrying will not help.
+      const blocked = response.headers.get('cf-mitigated') || response.status === 403 || response.status === 429;
       await response.body?.cancel();
+      if (blocked) {
+        throw new ProofError('blocked', 'Your site’s bot protection blocked our check. Use DNS verification, or allow requests whose User-Agent contains “triples.love”, then check again.');
+      }
       throw new ProofError('http_failed', 'The website did not return a successful page. Try again or use DNS verification.');
     }
     const type = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();

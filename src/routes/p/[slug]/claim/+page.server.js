@@ -51,6 +51,7 @@ const koreanErrors = {
   timeout: '인증 시간이 초과되었습니다. 다시 시도해 주세요.',
   redirect: '페이지가 다른 호스트나 확인할 수 없는 주소로 이동합니다. DNS 인증을 이용해 주세요.',
   http_failed: '사이트에서 정상적인 페이지를 받지 못했습니다. 다시 시도하거나 DNS 인증을 이용해 주세요.',
+  blocked: '사이트의 봇 차단(예: Cloudflare 챌린지)이 triples.love의 확인 요청을 막았습니다. DNS 인증을 이용하거나, User-Agent에 “triples.love”가 들어간 요청을 허용한 뒤 다시 확인해 주세요.',
   not_html: '사이트가 HTML 페이지를 반환하지 않습니다. DNS 인증을 이용해 주세요.',
   fetch_failed: '사이트에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.'
 };
@@ -59,7 +60,7 @@ function claimFailure(caught, lang, event, operation) {
   if (!(caught instanceof ClaimError)) throw caught;
   recordResult(event, operation, caught.status, caught.code, { method: caught.challenge?.method });
   const message = lang === 'ko' ? (koreanErrors[caught.code] || caught.message) : caught.message;
-  return fail(caught.status, { message, challenge: caught.challenge });
+  return fail(caught.status, { message, code: caught.code, challenge: caught.challenge });
 }
 
 export const actions = {

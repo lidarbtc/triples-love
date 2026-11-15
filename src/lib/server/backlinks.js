@@ -84,6 +84,9 @@ export async function checkBacklink(project, { fetcher, resolve, render = null, 
   if (finalUrl.origin !== target.origin) return { state: 'unreachable', code: 'redirect', rendered: true };
   const href = findBacklinkInLinks(page.hrefs, finalUrl.href, project.id);
   if (href) return { state: 'found', detectedBy: 'rendered', href, rendered: true };
+  // A browser sent to a bot-protected site may only see the challenge page,
+  // so no link there is not evidence that the banner was removed.
+  if (rawError === 'blocked') return { state: 'unreachable', code: 'blocked', rendered: true };
   return { state: 'missing', code: 'not_found', rendered: true };
 }
 

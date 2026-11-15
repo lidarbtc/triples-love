@@ -6,9 +6,11 @@
 
   export let data;
   export let form = null;
-  let method = 'dns';
+  // Most listed sites live on a shared host where only the page can be edited.
+  let method = 'meta';
   let targetUrl = data.project.url;
   let pending = '';
+  let copied = '';
   $: ({ project, user, lang } = data);
   $: t = projectCopy[lang] || projectCopy.en;
   $: isOwner = Boolean(user && project.owner?.id === user.id);
@@ -18,7 +20,21 @@
   $: introDescription = archived ? t.archivedNote : ownedBySomeoneElse ? t.takenHint : isOwner ? t.changeDescription : t.claimDescription;
   $: challenge = form?.challenge ?? data.activeChallenge;
   $: signInUrl = `/auth/github?returnTo=${encodeURIComponent(projectHref(project.id, lang, 'claim'))}`;
-  $: expiry = challenge ? new Date(challenge.expiresAt).toLocaleString(lang === 'ko' ? 'ko-KR' : 'en-GB', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }) : '';
+  $: expiry = challenge ? new Date(challenge.expiresAt).toLocaleString(lang === 'ko' ? 'ko-KR' : 'en-GB', { timeZone: lang === 'ko' ? 'Asia/Seoul' : 'UTC', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }) : '';
+  $: restartHref = `${projectHref(project.id, lang, 'claim')}&restart=1`;
+  // Problems a site owner cannot fix by retrying an HTML check.
+  $: suggestDns = challenge?.method === 'meta' && ['blocked', 'redirect', 'not_html'].includes(form?.code);
+
+  async function copyValue(key, value, event) {
+    try {
+      await navigator.clipboard.writeText(value);
+      copied = key;
+    } catch {
+      const field = event.currentTarget.closest('.project-field')?.querySelector('input, textarea');
+      field?.focus();
+      field?.select();
+    }
+  }
 
   function submitState(label) {
     return () => {
@@ -54,7 +70,12 @@
       {/if}
     </div>
     <div class="claim-content">
-      {#if form?.message}<div class="project-message project-message-error" role="alert">{form.message}</div>{/if}
+      {#if form?.message}
+        <div class="project-message project-message-error" role="alert">
+          {form.message}
+          {#if suggestDns}<a class="claim-alert-action" href={restartHref} data-sveltekit-reload>{t.switchToDns} →</a>{/if}
+        </div>
+      {/if}
       {#if archived}
         <section class="project-panel"><h2>{t.archived}</h2><p>{t.archivedNote}</p></section>
       {:else if ownedBySomeoneElse}
@@ -66,26 +87,27 @@
         {#if challenge}
           <section class="project-panel claim-proof">
             <div class="claim-panel-heading"><span class="claim-number">02</span><h2>{t.proofTitle}</h2></div>
-            <p>{challenge.method === 'dns' ? t.dnsInstructions : t.metaInstructions}</p>
             <div class="claim-proof-url"><span>{t.verifying}</span><code>{challenge.targetUrl}</code></div>
+            <ol class="claim-howto">
+              {#each challenge.method === 'dns' ? t.dnsSteps : t.metaSteps as step}<li>{step}</li>{/each}
+            </ol>
             {#if challenge.method === 'dns'}
-              <div class="project-field"><label for="dns-host">{t.dnsName}</label><input id="dns-host" class="claim-code" readonly value={challenge.dnsName} on:focus={(event) => event.currentTarget.select()} /></div>
-              <div class="project-field"><label for="dns-value">{t.dnsValue}</label><textarea id="dns-value" class="claim-code" readonly rows="3" value={challenge.dnsValue} on:focus={(event) => event.currentTarget.select()}></textarea></div>
+              <div class="project-field"><div class="claim-field-head"><label for="dns-host">{t.dnsName}</label><button type="button" class="claim-copy" on:click={(event) => copyValue('host', challenge.dnsName, event)}>{copied === 'host' ? t.copied : t.copy}</button></div><input id="dns-host" class="claim-code" readonly value={challenge.dnsName} on:focus={(event) => event.currentTarget.select()} /></div>
+              <div class="project-field"><div class="claim-field-head"><label for="dns-value">{t.dnsValue}</label><button type="button" class="claim-copy" on:click={(event) => copyValue('value', challenge.dnsValue, event)}>{copied === 'value' ? t.copied : t.copy}</button></div><textarea id="dns-value" class="claim-code" readonly rows="3" value={challenge.dnsValue} on:focus={(event) => event.currentTarget.select()}></textarea></div>
               <p class="project-help">{t.dnsHostHint}</p>
             {:else}
-              <div class="project-field"><label for="meta-tag">{t.metaTitle}</label><textarea id="meta-tag" class="claim-code" readonly rows="4" value={challenge.metaTag} on:focus={(event) => event.currentTarget.select()}></textarea></div>
+              <div class="project-field"><div class="claim-field-head"><label for="meta-tag">{t.metaTitle}</label><button type="button" class="claim-copy" on:click={(event) => copyValue('meta', challenge.metaTag, event)}>{copied === 'meta' ? t.copied : t.copy}</button></div><textarea id="meta-tag" class="claim-code" readonly rows="3" value={challenge.metaTag} on:focus={(event) => event.currentTarget.select()}></textarea></div>
               <p class="project-help">{t.metaHintDetail}</p>
             {/if}
-            <div class="claim-expiry"><p>{t.proofExpiry}</p><span>{t.expires}: {expiry}</span></div>
-            <p class="project-help">{t.resumeHint}</p>
-            <form method="POST" action={`?/verify&lang=${lang}`} use:enhance={submitState('verify')}>
+            <form class="claim-verify" method="POST" action={`?/verify&lang=${lang}`} use:enhance={submitState('verify')}>
               <input type="hidden" name="challengeId" value={challenge.id} />
               <input type="hidden" name="token" value={challenge.token} />
               <button class="project-btn" type="submit" disabled={!!pending}>{pending === 'verify' ? t.checking : t.verify}</button>
-              <p class="project-help">{t.retryHint}</p>
+              <p class="project-help">{challenge.method === 'dns' ? t.retryHint : t.retryHintMeta}</p>
             </form>
+            <p class="claim-keep">{t.proofKeep.replace('{expiry}', expiry)}</p>
           </section>
-          <a class="claim-restart" href={`${projectHref(project.id, lang, 'claim')}&restart=1`} data-sveltekit-reload>{t.differentMethod} ↻</a>
+          <a class="claim-restart" href={restartHref} data-sveltekit-reload>{t.differentMethod} ↻</a>
         {:else}
           <form class="project-panel claim-method-form" method="POST" action={`?/start&lang=${lang}`} use:enhance={submitState('start')}>
             <h2>{t.chooseMethod}</h2>
@@ -96,11 +118,11 @@
             {/if}
             <fieldset class="claim-methods">
               <legend class="sr-only">{t.chooseMethod}</legend>
-              <label class:chosen={method === 'dns'}><input type="radio" name="method" value="dns" bind:group={method} /><span><strong>{t.dnsTitle}</strong><span>{t.dnsHint}</span></span></label>
               <label class:chosen={method === 'meta'}><input type="radio" name="method" value="meta" bind:group={method} /><span><strong>{t.metaTitle}</strong><span>{t.metaHint}</span></span></label>
+              <label class:chosen={method === 'dns'}><input type="radio" name="method" value="dns" bind:group={method} /><span><strong>{t.dnsTitle}</strong><span>{t.dnsHint}</span></span></label>
             </fieldset>
             <button class="project-btn" type="submit" disabled={!!pending}>{pending === 'start' ? t.starting : t.start}</button>
-            <p class="project-help">{t.proofExpiry}</p>
+            <p class="project-help">{t.methodNote}</p>
           </form>
         {/if}
       {/if}
@@ -140,9 +162,16 @@
   .claim-methods label > span > span { font-size: 12px; color: var(--ink-2); line-height: 1.5; }
   .claim-method-form > .project-btn, .claim-proof form > .project-btn { width: 100%; }
   .project-field .claim-code { font: 11px/1.8 var(--mono); background: var(--bg); }
-  .claim-expiry { padding: 16px 0 20px; margin-top: 12px; border-top: 1px solid var(--line); }
-  .claim-expiry p { margin: 0 0 5px; font-size: 12px; }
-  .claim-expiry span { color: var(--ink-3); font-size: 11px; }
+  .claim-howto { margin: 0 0 22px; padding: 0; list-style: none; counter-reset: howto; display: grid; gap: 9px; font-size: 13px; line-height: 1.6; }
+  .claim-howto li { counter-increment: howto; display: grid; grid-template-columns: 20px 1fr; gap: 8px; overflow-wrap: anywhere; }
+  .claim-howto li::before { content: counter(howto); width: 20px; height: 20px; margin-top: 1px; display: grid; place-items: center; border-radius: 50%; background: var(--bg-soft); color: var(--ink-2); font: 10px var(--mono); }
+  .claim-field-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .claim-copy { border: 1px solid var(--line-mid); border-radius: 5px; background: #fff; color: var(--ink); padding: 4px 9px; font: inherit; font-size: 11px; cursor: pointer; }
+  .claim-copy:hover { background: var(--bg-soft); }
+  .claim-verify { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .claim-keep { margin: 14px 0 0; font-size: 11.5px !important; line-height: 1.6; color: var(--ink-3) !important; }
+  .claim-alert-action { display: inline-block; margin-top: 8px; font-weight: 600; color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .project-message .claim-alert-action { display: block; }
   .claim-restart { display: block; margin-top: 18px; color: var(--ink-2); font-size: 12px; text-align: center; text-decoration: underline; text-underline-offset: 3px; }
   .claim-signin-panel > h2 { margin-top: 12px; }
   .claim-signin-panel .project-btn { margin-top: 13px; }

@@ -73,7 +73,12 @@ test('failures do not count as a removed banner and private targets are never re
 
   const blocked = async () => new Response('challenge', { status: 403 });
   assert.deepEqual(await checkBacklink(project, { resolve: publicDns, fetcher: blocked }),
-    { state: 'unreachable', code: 'http_failed', rendered: false });
+    { state: 'unreachable', code: 'blocked', rendered: false });
+  assert.deepEqual(await checkBacklink(project, { resolve: publicDns, fetcher: blocked, render: async () => ({ url: page, hrefs: [] }) }),
+    { state: 'unreachable', code: 'blocked', rendered: true }, 'A challenge page without links is not a removed banner');
+  assert.equal((await checkBacklink(project, {
+    resolve: publicDns, fetcher: async () => new Response('down', { status: 500 })
+  })).code, 'http_failed');
   assert.equal((await checkBacklink(project, {
     resolve: publicDns, fetcher: blocked, render: async () => ({ url: page, hrefs: ['https://triples.love/'] })
   })).detectedBy, 'rendered', 'A bot-challenged raw fetch can still be confirmed by a browser');

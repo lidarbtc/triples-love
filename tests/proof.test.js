@@ -162,6 +162,8 @@ test('private resolution on a later redirect is rejected before fetching', async
 test('HTML response must be successful and HTML', async () => {
   for (const [response, code] of [
     [new Response('error', { status: 500 }), 'http_failed'],
+    [new Response('Just a moment...', { status: 403, headers: { 'cf-mitigated': 'challenge', 'content-type': 'text/html' } }), 'blocked'],
+    [new Response('slow down', { status: 429 }), 'blocked'],
     [new Response(`<head>${meta}</head>`, { headers: { 'content-type': 'text/plain' } }), 'not_html']
   ]) {
     await assert.rejects(verifySiteProof({ method: 'meta', targetUrl, token }, {
