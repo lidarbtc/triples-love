@@ -313,6 +313,18 @@ export const sites = [
     badges: ["mini-games", "member quiz", "multilingual"],
     accent: "violet",
   },
+  {
+    id: "hayeonarchive",
+    name: "Hayeon Archive",
+    domain: "hayeonarchive.com",
+    url: "https://hayeonarchive.com/",
+    category: "hub",
+    addedAt: "2026-09-14T22:34:37+09:00",
+    tagline: "Jeong Hayeon fan archive",
+    description: "A fan archive of tripleS member Jeong Hayeon's photos and videos. Read her Fromm and COSMO Talk messages in Korean and English, or browse her profile.",
+    badges: ["photos & videos", "chat translations"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [

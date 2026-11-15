@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'August 30, 2026',
+      date: 'September 14, 2026',
       updateTitle: 'Updated weekly',
       updateBody:
         'Tools, trackers, and resources made by tripleS and COSMO fans. We keep adding sites as we find them.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'August 30, 2026',
+      statusValue: 'September 14, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -86,13 +86,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 8월 30일',
+      date: '2026년 9월 14일',
       updateTitle: '매주 업데이트',
       updateBody:
         '트리플에스(tripleS)와 COSMO 팬들이 만든 도구와 트래커, 자료를 모았습니다. 새로 찾은 사이트도 계속 추가합니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 8월 30일',
+      statusValue: '2026년 9월 14일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -349,6 +349,12 @@ export const siteCopy = {
       description:
         '일일 멤버 워들과 사진·목소리·노래·MV 퀴즈를 즐길 수 있습니다. 학습 모드, 오브젝트 월드컵, HAUS 수박게임도 있으며 여러 언어를 지원합니다.',
       badges: ['미니게임', '멤버 퀴즈', '다국어']
+    },
+    hayeonarchive: {
+      tagline: '정하연 팬 아카이브',
+      description:
+        'tripleS 정하연의 사진과 영상을 모아둔 팬 아카이브입니다. 프롬·COSMO Talk 메시지의 한국어 원문과 영어 번역, 프로필도 볼 수 있습니다.',
+      badges: ['사진·영상', '메시지 번역']
     }
   }
 };
@@ -364,7 +370,8 @@ export const siteSearchAliases = {
   'objekt-link': ['games', '게임'],
   'objekts-trading-platform': ['trade', 'want/have', '교환'],
   joojoo: ['itsjoo', 'archive', '아카이브', 'LOONA', '이달의 소녀'],
-  'triple-s-game': ['認人遊戲', 'Wordle', '워들', '멤버 맞히기', '수박게임']
+  'triple-s-game': ['認人遊戲', 'Wordle', '워들', '멤버 맞히기', '수박게임'],
+  hayeonarchive: ['하연 아카이브', '하연아카이브', '코스모톡', 'S19']
 };
 
 export function isSupportedLang(value) {
