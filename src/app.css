@@ -53,9 +53,9 @@
   }
 
   .hero-row { display: flex; align-items: center; justify-content: space-between; }
-  .hero-row-top { padding-bottom: 68px; }
+  .hero-row-top { flex-wrap: wrap; gap: 16px 24px; padding-bottom: 68px; }
 
-  .brand { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500; flex-shrink: 0; white-space: nowrap; }
   .brand-mark {
     display: inline-flex; align-items: center; justify-content: center;
     width: 26px; height: 26px; border-radius: 7px;
@@ -75,7 +75,12 @@
   .brand-name { letter-spacing: -0.01em; }
   .brand-dot { color: var(--accent); }
 
-  .hero-nav { display: flex; align-items: center; gap: 20px; font-size: 13.5px; color: var(--ink-2); }
+  .hero-nav { display: flex; align-items: center; gap: 20px; max-width: 100%; min-width: 0; font-size: 13.5px; color: var(--ink-2); }
+  .hero-nav > a { flex-shrink: 0; white-space: nowrap; }
+  .hero-nav form { margin: 0; min-width: 0; }
+  .hero-signout { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; white-space: nowrap; }
+  .hero-account { min-width: 0; max-width: 18ch; overflow: hidden; text-overflow: ellipsis; }
+  .hero-signout-label { flex-shrink: 0; }
   .hero-nav a:hover {
     color: var(--ink);
     text-decoration: underline;
@@ -547,8 +552,16 @@
     .card[open] { grid-column: span 1; }
   }
   @media (max-width: 600px) {
+    .hero-nav { width: 100%; gap: 12px; }
+    .hero-nav > a, .hero-signout { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; }
+    .hero-nav form { flex: 1; }
+    .hero-nav .lang-toggle { min-width: 44px; margin-left: auto; }
     .about-grid { grid-template-columns: 1fr; }
     .about-card-tint { grid-column: span 1; }
+  }
+  @media (max-width: 360px) {
+    .hero-nav { flex-wrap: wrap; }
+    .hero-nav form { flex-basis: 100%; order: 1; }
   }
 
   @media (prefers-reduced-motion: reduce) {

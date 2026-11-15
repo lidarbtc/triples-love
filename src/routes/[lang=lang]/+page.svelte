@@ -361,11 +361,14 @@
           </span>
           <span class="brand-name">triples<span class="brand-dot">.</span>love</span>
         </div>
-        <nav class="hero-nav">
+        <nav class="hero-nav" aria-label={lang === 'ko' ? '사이트 제보, 계정과 언어' : 'Submit a site, account and language'}>
           <a href="mailto:hello@triples.love">{t.nav.submit}</a>
           {#if data.user}
             <form method="POST" action="/auth/logout">
-              <button class="btn btn-ghost" type="submit">@{data.user.handle} · {lang === 'ko' ? '로그아웃' : 'Sign out'}</button>
+              <button class="btn btn-ghost hero-signout" type="submit" title={`@${data.user.handle} · ${lang === 'ko' ? '로그아웃' : 'Sign out'}`}>
+                <span class="hero-account">@{data.user.handle}</span>
+                <span class="hero-signout-label">· {lang === 'ko' ? '로그아웃' : 'Sign out'}</span>
+              </button>
             </form>
           {:else}
             <a href={`/auth/github?returnTo=${encodeURIComponent(`/${lang}/`)}`} data-sveltekit-reload>
