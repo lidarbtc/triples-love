@@ -1,3 +1,5 @@
+import { truncate } from './seo.js';
+
 export const projectCopy = {
   en: {
     back: 'All projects', signIn: 'Sign in with GitHub', signOut: 'Sign out', language: '한국어', badgeCode: 'Website banners',
@@ -39,6 +41,8 @@ export const projectCopy = {
     appearance: 'Appearance', accent: 'Accent', blue: 'Blue', amber: 'Amber', violet: 'Violet', theme: 'Page theme',
     light: 'Light', dark: 'Dark', auto: 'Match device', english: 'English', korean: 'Korean',
     tagline: 'Short description', description: 'About the project', badges: 'Tags', commaHint: 'Separate with commas.',
+    taglineLimit: 'The directory and your page show the first {max} characters.',
+    taglineOver: 'This is {count} characters. Visitors see only the first {max}, ending in “…”. The preview shows how it will look.',
     discovery: 'Search & links', aliases: 'Search aliases', aliasesHint: 'Other names people might search for, separated with commas.',
     extraLinks: 'Additional links', linksHint: 'One link per line: label | https://example.com',
     save: 'Save changes', saving: 'Saving…', view: 'View page', preview: 'Page preview', previewHint: '',
@@ -85,6 +89,8 @@ export const projectCopy = {
     appearance: '페이지 스타일', accent: '포인트 색상', blue: '파랑', amber: '노랑', violet: '보라', theme: '페이지 테마',
     light: '라이트', dark: '다크', auto: '기기 설정에 맞춤', english: 'English', korean: '한국어',
     tagline: '짧은 소개', description: '프로젝트 설명', badges: '태그', commaHint: '쉼표로 구분해 주세요.',
+    taglineLimit: '목록과 프로젝트 페이지에는 앞에서부터 {max}자까지 표시됩니다.',
+    taglineOver: '지금 {count}자입니다. 방문자에게는 앞 {max}자만 보이고 뒤는 “…”로 줄어듭니다. 미리보기에서 실제 모습을 확인하세요.',
     discovery: '검색과 링크', aliases: '검색 별칭', aliasesHint: '다른 이름이나 검색어를 쉼표로 구분해 주세요.',
     extraLinks: '추가 링크', linksHint: '한 줄에 하나씩 입력하세요: 이름 | https://example.com',
     save: '변경 사항 저장', saving: '저장 중…', view: '페이지 보기', preview: '페이지 미리보기', previewHint: '',
@@ -95,6 +101,13 @@ export const projectCopy = {
 
 export function projectHref(id, lang = 'en', suffix = '') {
   return `/p/${encodeURIComponent(id)}/${suffix}${suffix ? '/' : ''}?lang=${lang === 'ko' ? 'ko' : 'en'}`;
+}
+
+// Short descriptions are stored as written and shortened only where they are shown.
+export const TAGLINE_DISPLAY_MAX = 60;
+
+export function displayTagline(text) {
+  return truncate(text, TAGLINE_DISPLAY_MAX);
 }
 
 // Splits off the last word so a verified seal wraps together with it.

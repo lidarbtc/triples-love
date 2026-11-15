@@ -6,7 +6,7 @@
   import { categories } from '$lib/data.js';
   import { badgePageHref } from '$lib/embed-badges.js';
   import { categoryLabels, categoryNames, ui } from '$lib/i18n.js';
-  import { projectHref, splitLastWord } from '$lib/project-copy.js';
+  import { displayTagline, projectHref, splitLastWord } from '$lib/project-copy.js';
   import { ROBOTS_CONTENT, jsonLdScript, siteJsonLd } from '$lib/seo.js';
 
   export let data;
@@ -369,7 +369,7 @@
           <span class="archive-badge">{t.archive.badge}</span>
         {/if}
       </h3>
-      <span class="card-tagline">{site.tagline}</span>
+      <span class="card-tagline">{displayTagline(site.tagline)}</span>
     </summary>
 
     <div class="card-expand">

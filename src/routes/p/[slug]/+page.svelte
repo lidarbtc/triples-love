@@ -3,7 +3,7 @@
   import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
   import VerificationPreview from '$lib/components/VerificationPreview.svelte';
   import { categoryNames } from '$lib/i18n.js';
-  import { localizedProject, projectCopy, projectHref, splitLastWord } from '$lib/project-copy.js';
+  import { displayTagline, localizedProject, projectCopy, projectHref, splitLastWord } from '$lib/project-copy.js';
   import { badgePageHref } from '$lib/embed-badges.js';
   import { ROBOTS_CONTENT, jsonLdScript, projectJsonLd, projectMeta, projectUrl } from '$lib/seo.js';
 
@@ -71,7 +71,7 @@
               {project.name}
             {/if}
           </h1>
-          <p class="project-tagline">{copy.tagline}</p>
+          <p class="project-tagline">{displayTagline(copy.tagline)}</p>
         </div>
         <div class="project-profile-visit">
           {#if archived}

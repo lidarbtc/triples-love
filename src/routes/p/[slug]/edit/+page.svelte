@@ -4,7 +4,7 @@
   import ProjectShell from '$lib/components/ProjectShell.svelte';
   import { categories } from '$lib/data.js';
   import { categoryNames } from '$lib/i18n.js';
-  import { projectCopy, projectHref } from '$lib/project-copy.js';
+  import { TAGLINE_DISPLAY_MAX, displayTagline, projectCopy, projectHref } from '$lib/project-copy.js';
   import { badgePageHref } from '$lib/embed-badges.js';
 
   export let data;
@@ -23,6 +23,16 @@
   $: previewTagline = draft[`tagline_${previewLang}`] || draft.tagline_en;
   $: previewDescription = draft[`description_${previewLang}`] || draft.description_en;
   $: previewBadges = String(draft[`badges_${previewLang}`] || draft.badges_en).split(',').map((tag) => tag.trim()).filter(Boolean);
+
+  // Tells the owner when a short description is longer than what visitors see.
+  function taglineNote(value, copy) {
+    const count = String(value || '').trim().length;
+    const over = count > TAGLINE_DISPLAY_MAX;
+    const text = (over ? copy.taglineOver : copy.taglineLimit).replace('{count}', count).replace('{max}', TAGLINE_DISPLAY_MAX);
+    return { over, text, count };
+  }
+  $: taglineNoteEn = taglineNote(draft.tagline_en, t);
+  $: taglineNoteKo = taglineNote(draft.tagline_ko, t);
 
   function initialDraft(project, values) {
     return {
@@ -72,14 +82,14 @@
       <section class="project-panel" lang="en">
         <div class="editor-section-heading"><h2>{t.english}</h2><span>EN</span></div>
         <p class="editor-language-hint">{t.englishHint}</p>
-        <div class="project-field"><label for="tagline-en">{t.tagline}</label><input id="tagline-en" name="tagline_en" bind:value={draft.tagline_en} maxlength="160" required /></div>
+        <div class="project-field"><label for="tagline-en">{t.tagline}</label><input id="tagline-en" name="tagline_en" bind:value={draft.tagline_en} maxlength="160" required aria-describedby="tagline-en-note" /><p id="tagline-en-note" class="project-help tagline-note" class:over={taglineNoteEn.over} aria-live="polite"><span>{taglineNoteEn.text}</span><span class="tagline-count">{taglineNoteEn.count}/{TAGLINE_DISPLAY_MAX}</span></p></div>
         <div class="project-field"><label for="description-en">{t.description}</label><textarea id="description-en" name="description_en" bind:value={draft.description_en} maxlength="3000" rows="5" required></textarea></div>
         <div class="project-field"><label for="badges-en">{t.badges}</label><input id="badges-en" name="badges_en" bind:value={draft.badges_en} maxlength="500" /><p class="project-help">{t.commaHint}</p></div>
       </section>
       <section class="project-panel" lang="ko">
         <div class="editor-section-heading"><h2>{t.korean}</h2><span>KO</span></div>
         <p class="editor-language-hint">{t.koreanHint}</p>
-        <div class="project-field"><label for="tagline-ko">{t.tagline}</label><input id="tagline-ko" name="tagline_ko" bind:value={draft.tagline_ko} maxlength="160" /></div>
+        <div class="project-field"><label for="tagline-ko">{t.tagline}</label><input id="tagline-ko" name="tagline_ko" bind:value={draft.tagline_ko} maxlength="160" aria-describedby="tagline-ko-note" /><p id="tagline-ko-note" class="project-help tagline-note" class:over={taglineNoteKo.over} aria-live="polite"><span>{taglineNoteKo.text}</span><span class="tagline-count">{taglineNoteKo.count}/{TAGLINE_DISPLAY_MAX}</span></p></div>
         <div class="project-field"><label for="description-ko">{t.description}</label><textarea id="description-ko" name="description_ko" bind:value={draft.description_ko} maxlength="3000" rows="5"></textarea></div>
         <div class="project-field"><label for="badges-ko">{t.badges}</label><input id="badges-ko" name="badges_ko" bind:value={draft.badges_ko} maxlength="500" /><p class="project-help">{t.commaHint}</p></div>
       </section>
@@ -94,7 +104,7 @@
       <div class="editor-preview-heading"><span class="project-eyebrow">{t.preview}</span><div class="editor-preview-languages" aria-label={lang === 'ko' ? '미리보기 언어' : 'Preview language'}><button type="button" class:active={previewLang === 'en'} aria-pressed={previewLang === 'en'} on:click={() => previewLang = 'en'}>EN</button><button type="button" class:active={previewLang === 'ko'} aria-pressed={previewLang === 'ko'} on:click={() => previewLang = 'ko'}>KO</button></div></div>
       <div class="editor-preview-card project-theme" data-theme={draft.theme} data-accent={draft.accent}>
         <div class="editor-preview-stripe"><span>{project.domain}</span></div>
-        <div class="editor-preview-content"><span class="editor-preview-category">{categoryNames[previewLang]?.[draft.category]}</span><h2>{draft.name || project.name}</h2><p class="editor-preview-tagline">{previewTagline || t.previewEmpty}</p>{#if previewBadges.length}<div class="project-tag-list">{#each previewBadges as badge}<span class="project-tag">{badge}</span>{/each}</div>{/if}<div class="editor-preview-divider"></div><p class="editor-preview-description">{previewDescription || t.previewEmpty}</p><span class="editor-preview-visit">{projectCopy[previewLang].visit}</span></div>
+        <div class="editor-preview-content"><span class="editor-preview-category">{categoryNames[previewLang]?.[draft.category]}</span><h2>{draft.name || project.name}</h2><p class="editor-preview-tagline">{displayTagline(previewTagline) || t.previewEmpty}</p>{#if previewBadges.length}<div class="project-tag-list">{#each previewBadges as badge}<span class="project-tag">{badge}</span>{/each}</div>{/if}<div class="editor-preview-divider"></div><p class="editor-preview-description">{previewDescription || t.previewEmpty}</p><span class="editor-preview-visit">{projectCopy[previewLang].visit}</span></div>
       </div>
     </aside>
   </div>
@@ -115,6 +125,9 @@
   .editor-save { display: flex; justify-content: flex-end; gap: 20px; align-items: center; padding: 6px 0; }
   .editor-save .project-btn { flex-shrink: 0; }
   .editor-preview { position: sticky; top: 24px; min-width: 0; }
+  .tagline-note { display: flex; justify-content: space-between; gap: 12px; }
+  .tagline-count { flex: none; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .tagline-note.over { color: #a4420b; }
   .editor-preview-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .editor-preview-languages { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 7px; }
   .editor-preview-languages button { border: 0; border-radius: 4px; background: transparent; color: var(--ink-2); cursor: pointer; padding: 4px 7px; font: 10px var(--mono); }
