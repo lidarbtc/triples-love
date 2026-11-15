@@ -11,6 +11,7 @@ collection trackers to schedules, video archives, and games.
 - Browse by category and sort alphabetically or by recent additions.
 - Preview each site with screenshots and localized descriptions.
 - Sign in with GitHub, verify a project's website, and edit its page.
+- Copy HTML or Markdown badges to link back from your own website.
 
 Built with SvelteKit and Svelte, with Cloudflare Workers and D1.
 

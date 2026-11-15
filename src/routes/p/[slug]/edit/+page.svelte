@@ -5,6 +5,7 @@
   import { categories } from '$lib/data.js';
   import { categoryNames } from '$lib/i18n.js';
   import { projectCopy, projectHref } from '$lib/project-copy.js';
+  import { badgePageHref } from '$lib/embed-badges.js';
 
   export let data;
   export let form = null;
@@ -48,7 +49,7 @@
 
 <ProjectShell {lang} {user}>
   <a class="project-back" href={projectHref(project.id, lang)}>← {project.name}</a>
-  <div class="editor-heading"><div><span class="project-eyebrow">{t.edit}</span><h1 class="project-flow-title">{t.editTitle}</h1><p class="project-intro">{t.editIntro}</p></div><a class="project-btn project-btn-secondary" href={projectHref(project.id, lang)}>{t.view} ↗</a></div>
+  <div class="editor-heading"><div><span class="project-eyebrow">{t.edit}</span><h1 class="project-flow-title">{t.editTitle}</h1><p class="project-intro">{t.editIntro}</p></div><div class="editor-actions"><a class="btn btn-ghost" href={badgePageHref(project.id, lang)}>{t.badgeCode}</a><a class="project-btn project-btn-secondary" href={projectHref(project.id, lang)}>{t.view} ↗</a></div></div>
   {#if form?.message}<div class="project-message project-message-error" role="alert">{form.message}</div>{/if}
   {#if form?.saved}<div class="project-message" role="status">{t.saved}</div>{:else if $page.url.searchParams.get('claimed') === '1'}<div class="project-message" role="status">{t.claimedSuccess}</div>{/if}
   <div class="editor-layout">
@@ -101,7 +102,7 @@
 <style>
   .editor-heading { display: flex; justify-content: space-between; gap: 22px; align-items: center; margin-bottom: 30px; }
   .editor-heading .project-intro { font-size: 13px; max-width: 620px; }
-  .editor-heading > .project-btn { flex-shrink: 0; }
+  .editor-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
   .editor-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, .9fr); gap: 30px; align-items: start; }
   .editor-form { display: grid; gap: 18px; min-width: 0; }
   .editor-site-address { padding-top: 18px; border-top: 1px solid var(--line); display: grid; gap: 10px; }

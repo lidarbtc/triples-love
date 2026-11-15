@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="44" viewBox="0 0 240 44" role="img" aria-labelledby="badge-title badge-description">
+  <title id="badge-title">Discover more fan projects on triples.love</title>
+  <desc id="badge-description">Browse the triples.love fan project directory.</desc>
+  <rect x="0.5" y="0.5" width="239" height="43" rx="7.5" fill="#ffffff" stroke="#dddde4" />
+  <svg x="8" y="8" width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+    <rect width="64" height="64" rx="16" fill="#18171f" />
+    <g fill="none" stroke="#ffffff" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16.5 20.5c3.7-5.9 10.7-8.6 17.3-6.7 6.9 1.9 11.7 7.5 12.8 14.1" />
+      <path d="M48.3 42.1c-3.5 6.1-10.7 9-17.6 7.4-6.9-1.6-12.2-6.9-13.6-13.6" />
+      <path d="M17.1 35.7c-5.1-4.8-6.1-12.5-2.4-18.4 3.7-5.9 10.7-8.8 17.3-6.9" />
+    </g>
+    <g fill="#ffffff">
+      <circle cx="47.2" cy="28.5" r="5.3" />
+      <circle cx="16.8" cy="35.2" r="5.3" />
+      <circle cx="32.5" cy="12.5" r="5.3" />
+    </g>
+  </svg>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="45" y="18" fill="#595967" font-size="11.5">Discover more fan projects</text>
+    <text x="45" y="32" fill="#1a1a21" font-size="13" font-weight="700">triples.love</text>
+  </g>
+  <path d="M220 27l7-7m-7 0h7v7" fill="none" stroke="#595967" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

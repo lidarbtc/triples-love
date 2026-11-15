@@ -2,6 +2,7 @@
   import ProjectShell from '$lib/components/ProjectShell.svelte';
   import { categoryNames } from '$lib/i18n.js';
   import { localizedProject, projectCopy, projectHref } from '$lib/project-copy.js';
+  import { badgePageHref } from '$lib/embed-badges.js';
 
   export let data;
   $: ({ project, user, lang } = data);
@@ -91,6 +92,7 @@
       <a class="project-btn project-btn-secondary" href={projectHref(project.id, lang, 'claim')}>{t.claim}</a>
     {/if}
   </aside>
+  <p class="project-badge-link"><a href={badgePageHref(project.id, lang)}>{t.badgeCode} →</a></p>
 </ProjectShell>
 
 <style>
@@ -119,6 +121,8 @@
   .project-ownership h2 { font-size: 13px; margin: 0 0 7px; font-weight: 500; }
   .project-ownership p { margin: 7px 0 0; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
   .project-ownership .project-btn { flex-shrink: 0; }
+  .project-badge-link { margin: 20px 4px 0; font-size: 13px; color: var(--ink-2); }
+  .project-badge-link a { text-decoration: underline; text-underline-offset: 3px; }
   @media (max-width: 680px) {
     .project-profile-body { padding: 25px 22px; }
     .project-profile-heading { grid-template-columns: 1fr; gap: 24px; }

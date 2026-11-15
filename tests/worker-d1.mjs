@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { Miniflare } from 'miniflare';
 import { startClaim, verifyClaim } from '../src/lib/server/claims.js';
-import { getProject, saveProject } from '../src/lib/server/projects.js';
+import { getProject, listProjects, saveProject } from '../src/lib/server/projects.js';
+import { sites } from '../src/lib/data.js';
+import { siteCopy, siteSearchAliases } from '../src/lib/i18n.js';
 
 const worker = new Miniflare({
   modules: true,
@@ -64,12 +66,82 @@ async function prove(db, fixture, challenge, userId = fixture.ownerA, options = 
 try {
   console.log('Starting isolated workerd D1 binding...');
   const db = await worker.getD1Database('DB');
-  console.log('D1 binding ready; applying checked-in migration...');
-  const migration = await readFile(new URL('../migrations/0001_claim.sql', import.meta.url), 'utf8');
-  // The checked-in migration has plain SQL statements and no semicolons inside
-  // strings/triggers. Splitting keeps multiline CREATE statements intact for D1.
-  await db.batch(migration.split(';').map(sql => sql.trim()).filter(Boolean).map(sql => db.prepare(sql)));
-  console.log('Migration applied; testing D1 transaction behavior...');
+  console.log('D1 binding ready; applying both checked-in migrations...');
+  for (const name of ['0001_claim.sql', '0002_unclaimed_light_theme.sql']) {
+    const migration = await readFile(new URL(`../migrations/${name}`, import.meta.url), 'utf8');
+    // These migrations have no quoted semicolons or triggers. Remove full-line
+    // comments first: migration 0002's comment itself contains a semicolon.
+    const statements = migration.replace(/^\s*--[^\n]*$/gm, '').split(';').map(sql => sql.trim()).filter(Boolean);
+    await db.batch(statements.map(sql => db.prepare(sql)));
+  }
+  const generatedSeed = await readFile(new URL('../.wrangler/seed-projects.sql', import.meta.url), 'utf8');
+  // The generator emits one INSERT per line; splitting on semicolons would
+  // incorrectly split semicolons inside quoted project descriptions.
+  const seedStatements = generatedSeed.split(/\r?\n/).map(sql => sql.trim()).filter(sql => sql && !sql.startsWith('--'));
+  assert.ok(seedStatements.every(sql => /^INSERT OR IGNORE INTO /.test(sql) && sql.endsWith(';')),
+    'Generated seed must contain one complete INSERT per line');
+  const importSeed = () => db.batch(seedStatements.map(sql => db.prepare(sql)));
+  console.log('Migrations applied; testing D1 seed and transaction behavior...');
+
+  await check('actual generated seed imports every project, both locales, aliases and archive fields', async () => {
+    await importSeed();
+    const projects = await listProjects(db);
+    assert.equal(projects.length, sites.length);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS count FROM project_translations').first()).count, sites.length * 2);
+    for (const site of sites) {
+      const project = projects.find(project => project.id === site.id);
+      assert.ok(project, `Missing project ${site.id}`);
+      assert.equal(project.name, site.name);
+      assert.equal(project.url, site.url);
+      assert.equal(project.domain, site.domain);
+      assert.equal(project.status, site.status || 'active');
+      assert.equal(project.archivedAt, site.archivedAt ?? null);
+      assert.equal(project.archiveReason, site.archiveReason ?? null);
+      assert.equal(project.archiveUrl, site.archiveUrl ?? null);
+      assert.deepEqual(project.aliases, siteSearchAliases[site.id] || []);
+      for (const lang of ['en', 'ko']) {
+        assert.deepEqual(project.locales[lang], {
+          tagline: site.tagline, description: site.description, badges: site.badges,
+          ...siteCopy[lang]?.[site.id]
+        });
+      }
+    }
+    console.log(`Imported ${projects.length} projects and ${sites.length * 2} translations into isolated D1.`);
+  });
+
+  await check('reimporting the seed preserves owned content, both edited locales and verification', async () => {
+    const userId = 'seed-owner';
+    await db.prepare('INSERT INTO users (id,github_id,handle,display_name,avatar_url,created_at) VALUES (?,?,?,?,?,?)')
+      .bind(userId, userId, userId, 'Seed owner', '', Date.now()).run();
+    const project = await getProject(db, 'apollo');
+    const challenge = await startClaim(db, { project, userId, method: 'meta' });
+    await verifyClaim(db, claimRequest(project, challenge, userId), { verifyProof: async () => true });
+    const owned = await getProject(db, project.id);
+    await saveProject(db, project.id, userId, {
+      ...owned, name: 'Owner-edited Apollo', theme: 'dark', aliases: ['owner alias'],
+      links: [{ label: 'Guide', url: 'https://apollo.cafe/guide' }],
+      locales: {
+        en: { tagline: 'Owner tagline', description: 'Owner description', badges: ['owner'] },
+        ko: { tagline: '소유자 소개', description: '소유자 설명', badges: ['소유자'] }
+      }
+    });
+    const before = await getProject(db, project.id);
+    await importSeed();
+    assert.deepEqual(await getProject(db, project.id), before);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS count FROM projects').first()).count, sites.length);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS count FROM project_translations').first()).count, sites.length * 2);
+  });
+
+  await check('D1.batch rolls back preceding writes when a later CHECK constraint fails', async () => {
+    const before = await getProject(db, 'apollo');
+    await assert.rejects(db.batch([
+      db.prepare('UPDATE projects SET name=?, version=version+1 WHERE id=?').bind('Must roll back', before.id),
+      db.prepare(`INSERT INTO projects (id,name,url,domain,category,added_at,updated_at)
+        VALUES ('invalid-batch-project','Invalid','https://fans.example.com/','fans.example.com','invalid','2026-10-10',0)`)
+    ]), /CHECK constraint failed/i);
+    assert.deepEqual(await getProject(db, before.id), before);
+    assert.equal(await getProject(db, 'invalid-batch-project'), null);
+  });
 
   await check('D1.batch preserves changes() across successful and zero-row writes', async () => {
     const fixture = await seed(db, 'batch');

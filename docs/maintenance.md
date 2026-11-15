@@ -136,9 +136,16 @@ responses; they do not prove that an external OAuth app's configuration is valid
 
 Run `npm test` for OAuth state/session handling, DNS/HTML proof restrictions,
 expiration/replay/concurrent claims, owner permissions, version conflicts, and
-bilingual seed/edit behavior. `npm run test:worker` repeats transaction and race
-checks against an isolated, temporary workerd D1 instance, with no production
-data or external requests. If a system proxy intercepts localhost, exempt
+bilingual seed/edit behavior. `npm run test:worker` checks migrations, all imported
+listing data, reimport preservation, rollback on SQL failure, ownership races and
+OAuth requests against isolated workerd/D1 instances. `npm run test:flow` builds
+the app and tests its actual HTTP routes end to end: login, DNS and HTML proofs,
+editing and public pages, a new site address, a second save, and logout. These
+tests use real application code and local D1, but GitHub, DNS and project website
+responses are fixtures; they do not complete real OAuth consent or verify a real
+operator's domain. Browser interaction is checked separately.
+
+These tests never write to production. If a system proxy intercepts localhost, exempt
 `localhost,127.0.0.1,::1` or temporarily unset HTTP(S)/ALL proxy variables for
 this local-only test.
 

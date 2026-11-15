@@ -5,7 +5,7 @@ import { getUser } from '$lib/server/auth.js';
 export async function handle({ event, resolve }) {
   const lang = isSupportedLang(event.params.lang)
     ? event.params.lang
-    : event.url.pathname.startsWith('/p/') && event.url.searchParams.get('lang') === 'ko' ? 'ko' : 'en';
+    : (event.url.pathname.startsWith('/p/') || ['/badges', '/badges/'].includes(event.url.pathname)) && event.url.searchParams.get('lang') === 'ko' ? 'ko' : 'en';
   event.locals.user = await getUser(event);
 
   const response = await resolve(event, {

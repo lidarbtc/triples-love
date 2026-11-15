@@ -1,6 +1,6 @@
 export const projectCopy = {
   en: {
-    back: 'All projects', signIn: 'Sign in with GitHub', signOut: 'Sign out', language: '한국어',
+    back: 'All projects', signIn: 'Sign in with GitHub', signOut: 'Sign out', language: '한국어', badgeCode: 'Get badge code',
     fanProject: 'Project', visit: 'Visit site ↗', about: 'About', links: 'Links',
     archived: 'Archived', archivedNote: 'This project is preserved in the directory. Ownership claims are unavailable for archived projects.',
     savedScreenshot: 'View saved screenshot ↗', claimed: 'Claimed by', unclaimed: 'Manage this project',
@@ -37,7 +37,7 @@ export const projectCopy = {
     footer: '',
   },
   ko: {
-    back: '모든 프로젝트', signIn: 'GitHub로 로그인', signOut: '로그아웃', language: 'English',
+    back: '모든 프로젝트', signIn: 'GitHub로 로그인', signOut: '로그아웃', language: 'English', badgeCode: '배지 코드',
     fanProject: '프로젝트', visit: '사이트 열기 ↗', about: '프로젝트 소개', links: '관련 링크',
     archived: '아카이브', archivedNote: '기록으로 보관 중인 프로젝트입니다. 아카이브된 프로젝트는 소유권을 인증할 수 없습니다.',
     savedScreenshot: '저장된 스크린샷 보기 ↗', claimed: '소유권 인증', unclaimed: '프로젝트 관리',

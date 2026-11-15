@@ -100,3 +100,18 @@ maintainer-managed. Archived projects cannot be claimed or edited.
 D1 is the source of truth after import. Seed scripts insert missing records and
 never overwrite existing owner edits. R2 uploads, maker profiles, shared ownership
 and ownership transfer/recovery are outside this first release.
+
+## Embeddable badges
+
+`/badges/?project=<slug>&lang=ko` opens the badge chooser with a listing selected.
+The public project and owner editor link to it; `/badges/` also works without a
+project or sign-in. A Listed badge points to the selected project's page, while
+a Discover badge points to the language-selecting directory homepage. Both add
+`utm_source=badge` to the destination link.
+
+`src/lib/embed-badges.js` generates absolute, escaped HTML and Markdown links.
+The embed is only an anchor and image, with alt text and intrinsic dimensions;
+it includes no JavaScript, iframe or ownership-verification claim. The four
+self-contained light/dark SVGs in `static/badges/` are served as static assets
+with a one-day public cache. Only existing directory records can be selected
+for Listed links in the chooser. Downloaded SVGs can also be self-hosted.
