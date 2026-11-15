@@ -48,3 +48,15 @@ A push or successful build alone does not add its card. Complete the
 inventory check and verification on both live language routes.
 
 Unofficial fan project. Not affiliated with MODHAUS or tripleS.
+
+## License
+
+Copyright 2026 Hyunjae Chung.
+
+The original source code and documentation in this repository are licensed under
+the [Apache License, Version 2.0](LICENSE).
+
+Third-party website screenshots, logos, trademarks, and other third-party content
+remain the property of their respective owners and are not covered by this
+license. Dependencies and any third-party code retain their own licenses and
+notices, including code preserved in Git history.
