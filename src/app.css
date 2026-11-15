@@ -757,8 +757,6 @@
     .hero-nav .lang-toggle { min-width: 44px; margin-left: auto; }
     .about-grid { grid-template-columns: 1fr; }
     .about-card-tint { grid-column: span 1; }
-    .about-card { min-height: 0; }
-    .about-card-stat { padding-top: 36px; }
   }
   @media (max-width: 360px) {
     .hero-nav { flex-wrap: wrap; }
