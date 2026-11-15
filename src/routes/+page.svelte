@@ -1,16 +1,8 @@
 <script>
+  import { browser } from '$app/environment';
   import { onMount } from 'svelte';
   import { categories, sites } from '$lib/data.js';
-
-  const catLabel = {
-    objekts: 'objekts',
-    stats: 'stats',
-    schedule: 'schedule',
-    market: 'market',
-    tools: 'tools',
-    wiki: 'wiki',
-    hub: 'hub'
-  };
+  import { categoryLabels, categoryNames, isSupportedLang, siteCopy, ui } from '$lib/i18n.js';
 
   const catDots = {
     objekts: '#3b6dff',
@@ -22,6 +14,9 @@
     hub: '#5b7eee'
   };
 
+  const languageStorageKey = 'triples-love.lang';
+
+  let lang = 'en';
   let active = 'all';
   let query = '';
   let expandedId = null;
@@ -36,6 +31,16 @@
   let todayTime = '00:00:00';
 
   onMount(() => {
+    const queryLang = new URLSearchParams(window.location.search).get('lang');
+    const savedLang = window.localStorage.getItem(languageStorageKey);
+    const initialLang = isSupportedLang(queryLang)
+      ? queryLang
+      : isSupportedLang(savedLang)
+        ? savedLang
+        : 'en';
+
+    setLang(initialLang, { updateUrl: false });
+
     const updateClock = () => {
       const now = new Date();
       todayTime = now.toLocaleTimeString('en-GB', {
@@ -54,6 +59,18 @@
     return () => clearInterval(id);
   });
 
+  $: t = ui[lang];
+  $: labels = categoryLabels[lang];
+  $: names = categoryNames[lang];
+  $: localizedSites = sites.map((site) => ({
+    ...site,
+    ...(siteCopy[lang]?.[site.id] || {})
+  }));
+
+  $: if (browser) {
+    document.documentElement.lang = lang;
+  }
+
   $: counts = sites.reduce(
     (acc, site) => {
       acc[site.category] = (acc[site.category] || 0) + 1;
@@ -63,7 +80,7 @@
   );
 
   $: filtered = (() => {
-    let out = sites;
+    let out = localizedSites;
 
     if (active !== 'all') out = out.filter((site) => site.category === active);
 
@@ -74,6 +91,7 @@
           site.name.toLowerCase().includes(q) ||
           site.domain.toLowerCase().includes(q) ||
           site.tagline.toLowerCase().includes(q) ||
+          site.description.toLowerCase().includes(q) ||
           (site.badges || []).some((badge) => badge.toLowerCase().includes(q))
       );
     }
@@ -88,6 +106,27 @@
 
     return out;
   })();
+
+  function setLang(nextLang, { updateUrl = true } = {}) {
+    if (!isSupportedLang(nextLang)) return;
+    lang = nextLang;
+
+    if (!browser) return;
+
+    window.localStorage.setItem(languageStorageKey, nextLang);
+    document.documentElement.lang = nextLang;
+
+    if (!updateUrl) return;
+
+    const url = new URL(window.location.href);
+    if (nextLang === 'en') url.searchParams.delete('lang');
+    else url.searchParams.set('lang', nextLang);
+    window.history.replaceState({}, '', url);
+  }
+
+  function toggleLang() {
+    setLang(lang === 'en' ? 'ko' : 'en');
+  }
 
   function setActiveTab(id) {
     active = id;
@@ -131,7 +170,7 @@
 </script>
 
 <svelte:head>
-  <title>triples.love — fan-made tripleS sites directory</title>
+  <title>{t.metaTitle}</title>
 </svelte:head>
 
 <div
@@ -157,23 +196,27 @@
           <span class="brand-name">triples<span class="brand-dot">.</span>love</span>
         </div>
         <nav class="hero-nav">
-          <a href="mailto:hello@triples.love">submit a site</a>
-          <a href="#top" class="hero-pill">en</a>
+          <a href="mailto:hello@triples.love">{t.nav.submit}</a>
+          <button
+            class="hero-pill lang-toggle"
+            type="button"
+            aria-label={t.languageToggleLabel}
+            on:click={toggleLang}
+          >
+            {t.languagePill}
+          </button>
         </nav>
       </div>
 
       <div class="hero-headline-wrap">
         <h1 class="hero-headline">
-          a directory of <em>fan-made</em><br />
-          tripleS sites
+          {#if t.hero.titleBefore}{t.hero.titleBefore}{' '}{/if}<em>{t.hero.titleEm}</em><br />
+          {t.hero.titleAfter}
         </h1>
         <aside class="hero-aside">
-          <div class="hero-aside-date">May 10, 2026</div>
-          <div class="hero-aside-title">Updated weekly</div>
-          <div class="hero-aside-body">
-            An ever-growing index of community-built tools, trackers, and resources around tripleS &amp;
-            COSMO.
-          </div>
+          <div class="hero-aside-date">{t.hero.date}</div>
+          <div class="hero-aside-title">{t.hero.updateTitle}</div>
+          <div class="hero-aside-body">{t.hero.updateBody}</div>
         </aside>
       </div>
 
@@ -181,22 +224,22 @@
         <div class="hero-stat">
           <span class="stat-icon" aria-hidden="true">◷</span>
           <div>
-            <div class="stat-label">today</div>
+            <div class="stat-label">{t.hero.today}</div>
             <div class="stat-val">{todayDate}, {todayTime}</div>
           </div>
         </div>
         <div class="hero-stat">
           <span class="stat-icon" aria-hidden="true">◉</span>
           <div>
-            <div class="stat-label">status</div>
-            <div class="stat-val">all sites linked</div>
+            <div class="stat-label">{t.hero.status}</div>
+            <div class="stat-val">{t.hero.statusValue}</div>
           </div>
         </div>
         <div class="hero-stat">
           <span class="stat-icon" aria-hidden="true">▦</span>
           <div>
             <div class="stat-label">{sites.length}</div>
-            <div class="stat-val">sites in directory</div>
+            <div class="stat-val">{t.hero.directoryCount}</div>
           </div>
         </div>
       </div>
@@ -213,7 +256,7 @@
             type="button"
             on:click={() => setActiveTab(category.id)}
           >
-            <span>{category.label}</span>
+            <span>{labels[category.id] ?? category.label}</span>
             <span class="tab-count">{counts[category.id] ?? 0}</span>
           </button>
         {/each}
@@ -225,13 +268,13 @@
           <input
             value={query}
             on:input={(event) => updateQuery(event.currentTarget.value)}
-            placeholder="search by name, domain, or tag…"
+            placeholder={t.toolbar.searchPlaceholder}
           />
           {#if query}
             <button
               class="search-clear"
               type="button"
-              aria-label="clear"
+              aria-label={t.toolbar.clear}
               on:click={() => updateQuery('')}
             >
               ×
@@ -240,11 +283,11 @@
         </div>
 
         <div class="sort">
-          <label for="site-sort">sort</label>
+          <label for="site-sort">{t.toolbar.sort}</label>
           <select id="site-sort" bind:value={sort}>
-            <option value="alpha">a → z</option>
-            <option value="category">by category</option>
-            <option value="recent">recent additions</option>
+            <option value="alpha">{t.toolbar.sortAlpha}</option>
+            <option value="category">{t.toolbar.sortCategory}</option>
+            <option value="recent">{t.toolbar.sortRecent}</option>
           </select>
         </div>
       </div>
@@ -253,10 +296,10 @@
     {#if filtered.length === 0}
       <div class="empty">
         <p>
-          no sites match <strong>"{query}"</strong> in
-          <em>{active === 'all' ? 'everything' : catLabel[active]}</em>.
+          {t.empty.before} <strong>"{query}"</strong> · {t.empty.middle}
+          <em>{active === 'all' ? names.all : names[active]}</em>
         </p>
-        <button class="btn btn-ghost" type="button" on:click={resetFilters}>reset</button>
+        <button class="btn btn-ghost" type="button" on:click={resetFilters}>{t.empty.reset}</button>
       </div>
     {:else}
       <div class="grid" class:grid-no-thumbs={!showThumbnails}>
@@ -306,7 +349,7 @@
             <div class="card-body">
               <div class="card-meta">
                 <span class="cat-dot" style:background={catDots[site.category] || '#999'}></span>
-                <span class="cat-name">{catLabel[site.category]}</span>
+                <span class="cat-name">{names[site.category]}</span>
                 <span class="meta-spacer"></span>
                 <span class="card-domain">{site.domain}</span>
               </div>
@@ -324,10 +367,10 @@
                 </div>
                 <div class="card-actions">
                   <a class="btn btn-primary" href={site.url} target="_blank" rel="noopener">
-                    visit ↗
+                    {t.card.visit}
                   </a>
                   <button class="btn btn-ghost" type="button" on:click={() => (expandedId = null)}>
-                    close
+                    {t.card.close}
                   </button>
                 </div>
               </div>
@@ -339,34 +382,29 @@
 
     <section class="about" id="about">
       <div class="about-head">
-        <h2 class="about-h">what is <em>triples.love</em>?</h2>
+        <h2 class="about-h">
+          {#if t.about.titleBefore}{t.about.titleBefore}{' '}{/if}<em>triples.love</em>{t.about.titleAfter}
+        </h2>
         <p class="about-sub">
-          a community-curated index of fan-made sites built around tripleS &amp; COSMO.<br />
-          everything here is unofficial — made by fans, for fans.
+          {t.about.subtitle}<br />
+          {t.about.subtitle2}
         </p>
       </div>
 
       <div class="about-grid">
         <div class="about-card about-card-tint">
-          <div class="about-card-eyebrow">about</div>
-          <h3 class="about-card-h">a single index for every fan project</h3>
-          <p class="about-card-p">
-            scattered across personal domains, github pages, and vercel deploys — we collect them in
-            one place so you can find the right tool for the moment, whether you're tracking a
-            livestream, planning a trade, or just looking up an Objekt.
-          </p>
+          <div class="about-card-eyebrow">{t.about.eyebrow}</div>
+          <h3 class="about-card-h">{t.about.indexTitle}</h3>
+          <p class="about-card-p">{t.about.indexBody}</p>
           <div class="about-card-stat">
             <span class="about-stat-num">{sites.length}</span>
-            <span class="about-stat-lbl">sites indexed &amp; growing</span>
+            <span class="about-stat-lbl">{t.about.statLabel}</span>
           </div>
         </div>
 
         <div class="about-card">
-          <h4>community-curated</h4>
-          <p>
-            every site is submitted, reviewed, and categorized by fans. no algorithms, no SEO games —
-            just a clean directory.
-          </p>
+          <h4>{t.about.curatedTitle}</h4>
+          <p>{t.about.curatedBody}</p>
           <div class="about-viz viz-network" aria-hidden="true">
             <svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet">
               <g stroke="var(--accent)" stroke-width="0.8" opacity="0.55" fill="none">
@@ -394,34 +432,33 @@
         </div>
 
         <div class="about-card">
-          <h4>the long memory</h4>
-          <p>
-            fan projects come and go. when a site retires, we keep its entry with a snapshot link —
-            so the work isn't lost when a domain expires.
-          </p>
+          <h4>{t.about.memoryTitle}</h4>
+          <p>{t.about.memoryBody}</p>
           <div class="about-viz viz-archive" aria-hidden="true">
             <div class="archive-row">
               <span class="archive-tag">'24</span>
               <span class="archive-name">orbitobjekts.example</span>
-              <span class="archive-status archive-ok">snapshot</span>
+              <span class="archive-status archive-ok">{t.about.snapshot}</span>
             </div>
             <div class="archive-row">
               <span class="archive-tag">'25</span>
               <span class="archive-name">wav-archive.example</span>
-              <span class="archive-status archive-ok">snapshot</span>
+              <span class="archive-status archive-ok">{t.about.snapshot}</span>
             </div>
             <div class="archive-row archive-live">
               <span class="archive-tag">'26</span>
               <span class="archive-name">cosmo-ledger.example</span>
-              <span class="archive-status archive-now"><span class="dot live"></span>live</span>
+              <span class="archive-status archive-now"><span class="dot live"></span>{t.about.live}</span>
             </div>
           </div>
         </div>
 
         <div class="about-card about-card-cta" id="submit">
-          <h4>built something?</h4>
-          <p>made a tool, tracker, or wiki for tripleS? we'd love to add it to the directory.</p>
-          <a class="btn btn-primary about-cta-btn" href="mailto:hello@triples.love">submit a site ↗</a>
+          <h4>{t.about.submitTitle}</h4>
+          <p>{t.about.submitBody}</p>
+          <a class="btn btn-primary about-cta-btn" href="mailto:hello@triples.love">
+            {t.about.submitButton}
+          </a>
           <div class="about-viz viz-flow" aria-hidden="true">
             <svg viewBox="0 0 200 60" preserveAspectRatio="xMidYMid meet">
               <g fill="none" stroke="rgba(255,255,255,.4)" stroke-width="0.8">
@@ -437,9 +474,9 @@
                 font-size="6.5"
                 text-anchor="middle"
               >
-                <text x="24" y="33">submit</text>
-                <text x="100" y="33">review</text>
-                <text x="176" y="33">listed</text>
+                <text x="24" y="33">{t.about.flowSubmit}</text>
+                <text x="100" y="33">{t.about.flowReview}</text>
+                <text x="176" y="33">{t.about.flowListed}</text>
               </g>
             </svg>
           </div>
@@ -451,11 +488,11 @@
       <div class="foot-row">
         <span>© 2026 triples.love</span>
         <span class="foot-sep">·</span>
-        <span>not affiliated with MODHAUS or tripleS</span>
+        <span>{t.footer.unofficial}</span>
         <span class="foot-sep">·</span>
-        <a href="mailto:hello@triples.love">submit a site</a>
+        <a href="mailto:hello@triples.love">{t.footer.submit}</a>
       </div>
-      <div class="foot-meta">built by fans, for fans · {sites.length} sites indexed</div>
+      <div class="foot-meta">{t.footer.meta.replace('{count}', sites.length)}</div>
     </footer>
   </main>
 </div>

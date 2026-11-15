@@ -78,8 +78,9 @@
   .brand-dot { color: var(--accent); }
 
   .hero-nav { display: flex; align-items: center; gap: 22px; font-size: 13.5px; color: var(--ink-2); }
-  .hero-nav a:hover { color: var(--ink); }
+  .hero-nav a:hover, .hero-nav button:hover { color: var(--ink); }
   .hero-pill {
+    appearance: none; font-family: inherit; color: inherit; cursor: pointer;
     padding: 4px 10px; border: 1px solid rgba(0,0,0,.12);
     border-radius: 999px; background: rgba(255,255,255,.5);
     font-size: 12px;

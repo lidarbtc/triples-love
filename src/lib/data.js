@@ -29,7 +29,7 @@ export const sites = [
     url: "https://wav.haus/",
     category: "hub",
     tagline: "Fan project subdomains",
-    description: "Subdomain provider for fan-made tripleS projects hosted under wav.haus, including older links that later moved to standalone domains.",
+    description: "Subdomain provider for fan-made tripleS projects hosted under wav.haus.",
     badges: ["subdomains", "hosting"],
     accent: "blue",
   },
