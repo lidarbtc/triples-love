@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="%lang%">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f1f2f9" />
     <meta name="apple-mobile-web-app-title" content="triples.love" />
+    %sveltekit.head%
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,7 +22,6 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <script defer src="/image-slot.js"></script>
-    %sveltekit.head%
   </head>
   <body>
     <div style="display: contents">%sveltekit.body%</div>

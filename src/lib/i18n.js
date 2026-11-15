@@ -3,6 +3,8 @@ export const supportedLangs = ['en', 'ko'];
 export const ui = {
   en: {
     metaTitle: 'triples.love — fan-made tripleS projects',
+    metaDescription:
+      'A curated directory of fan-made tripleS & COSMO sites, tools, trackers, and resources.',
     languagePill: 'ko',
     languageToggleLabel: 'View in Korean',
     nav: {
@@ -73,6 +75,7 @@ export const ui = {
   },
   ko: {
     metaTitle: 'triples.love — tripleS 팬 프로젝트 모음',
+    metaDescription: 'tripleS와 COSMO 팬들이 만든 사이트, 도구, 트래커, 자료를 한곳에 모아 소개합니다.',
     languagePill: 'en',
     languageToggleLabel: '영어로 보기',
     nav: {
