@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'October 5, 2026',
-      updateTitle: 'New: WAVbase',
+      date: 'October 10, 2026',
+      updateTitle: 'WAVbase, preserved',
       updateBody:
-        'WAVbase connects Objekt buyers, sellers, and traders, with reference prices curated by its team.',
+        'WAVbase is currently unavailable. Its listing and saved screenshot are now in the archive.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'October 5, 2026',
+      statusValue: 'October 10, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -41,6 +41,18 @@ export const ui = {
       visit: 'visit site ↗',
       close: 'close'
     },
+    archive: {
+      title: 'archive',
+      subtitle: 'Past projects, kept here to revisit.',
+      badge: 'archived',
+      count: '{count} archived',
+      savedOn: 'archived on',
+      screenshot: 'view saved screenshot ↗',
+      snapshot: 'view archived site ↗',
+      reasons: {
+        unavailable: 'This site is currently unavailable. We have kept its listing and saved screenshot.'
+      }
+    },
     about: {
       titleBefore: 'what is',
       titleAfter: '?',
@@ -55,9 +67,9 @@ export const ui = {
       curatedTitle: 'how sites get listed',
       curatedBody:
         'We check what each submitted site does before choosing its category and writing a description.',
-      memoryTitle: 'sites that have closed',
+      memoryTitle: 'keeping a record',
       memoryBody:
-        'When a site closes, we keep its listing and a snapshot link so you can still see it after the domain expires.',
+        'When a site becomes unavailable, we keep its listing and saved screenshot in the archive. Web archive links are included when available.',
       snapshot: 'snapshot',
       live: 'live',
       submitTitle: 'add your site',
@@ -86,13 +98,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 10월 5일',
-      updateTitle: 'WAVbase 추가',
+      date: '2026년 10월 10일',
+      updateTitle: 'WAVbase 기록 보관',
       updateBody:
-        '운영진이 정리한 오브젝트 시세를 참고해 거래 상대를 찾을 수 있는 WAVbase를 추가했습니다.',
+        '현재 접속할 수 없는 WAVbase의 소개와 당시 화면을 아카이브에 남겼습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 10월 5일',
+      statusValue: '2026년 10월 10일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -113,6 +125,18 @@ export const ui = {
       visit: '사이트 열기 ↗',
       close: '닫기'
     },
+    archive: {
+      title: '아카이브',
+      subtitle: '다시 돌아볼 수 있도록 남겨둔 프로젝트입니다.',
+      badge: '보관됨',
+      count: '보관 {count}',
+      savedOn: '보관일',
+      screenshot: '당시 화면 보기 ↗',
+      snapshot: '보관본 보기 ↗',
+      reasons: {
+        unavailable: '현재 접속할 수 없어 소개와 당시 화면을 보관합니다.'
+      }
+    },
     about: {
       titleBefore: '',
       titleAfter: '는 어떤 곳인가요?',
@@ -126,9 +150,9 @@ export const ui = {
       curatedTitle: '등록 전 확인',
       curatedBody:
         '제보받은 사이트에 직접 들어가 기능을 살펴봅니다. 그에 맞게 분류하고 설명을 씁니다.',
-      memoryTitle: '운영이 끝난 사이트',
+      memoryTitle: '프로젝트의 기록',
       memoryBody:
-        '사이트 운영이 끝나도 목록과 스냅샷 링크를 남깁니다. 도메인이 만료된 뒤에도 당시 모습을 볼 수 있습니다.',
+        '접속할 수 없게 된 사이트도 소개와 당시 화면을 아카이브에 남깁니다. 웹 보관본이 있으면 함께 연결합니다.',
       snapshot: '스냅샷',
       live: '운영 중',
       submitTitle: '내 사이트 제보하기',

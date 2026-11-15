@@ -21,6 +21,7 @@
   let expandedId = null;
   let sort = 'alpha';
   let interactive = false;
+  let archiveOpen = false;
 
   let now = null;
   $: locale = lang === 'ko' ? 'ko-KR' : 'en-GB';
@@ -131,6 +132,11 @@
     return out;
   })();
 
+  $: directorySites = filtered.filter((site) => site.status !== 'archived');
+  $: archivedSites = filtered.filter((site) => site.status === 'archived');
+  $: archivedCount = sites.filter((site) => site.status === 'archived').length;
+  $: archiveOpen = Boolean(query.trim() && archivedSites.length);
+
   function setActiveTab(id) {
     active = id;
     expandedId = null;
@@ -172,6 +178,12 @@
     return `/site-screenshots/${site.id}.jpg`;
   }
 
+  function formatArchiveDate(date) {
+    return new Date(`${date}T00:00:00Z`).toLocaleDateString(locale, {
+      year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
+    });
+  }
+
   function outboundHref(href) {
     const url = new URL(href);
     url.searchParams.set('utm_source', 'triples.love');
@@ -209,6 +221,114 @@
   <meta name="twitter:image" content={metaImage} />
   <meta name="twitter:image:alt" content={metaImageAlt} />
 </svelte:head>
+
+{#snippet projectCard(site)}
+  <details
+    class="card"
+    name="site-cards"
+    open={expandedId === site.id}
+    on:toggle={(event) => handleCardToggle(event, site.id)}
+  >
+    <summary class="card-summary">
+      <span class="thumb">
+        <span class="thumb-fallback" aria-hidden="true">
+          <svg viewBox="0 0 400 240" preserveAspectRatio="none" width="100%" height="100%">
+            <defs>
+              <pattern
+                id={`stripes-${site.id}`}
+                patternUnits="userSpaceOnUse"
+                width="14"
+                height="14"
+                patternTransform={`rotate(${stripeAngle(site)})`}
+              >
+                <rect width="14" height="14" fill="#fbfbfd" />
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="14"
+                  stroke={stripeColor(site.accent)}
+                  stroke-width="1"
+                  stroke-opacity="0.18"
+                />
+              </pattern>
+            </defs>
+            <rect width="400" height="240" fill={`url(#stripes-${site.id})`} />
+            <g opacity="0.42">
+              <rect x="20" y="20" width="360" height="22" rx="4" fill="#ffffff" stroke="#dfe1ea" />
+              <circle cx="32" cy="31" r="2.5" fill="#dfe1ea" />
+              <circle cx="42" cy="31" r="2.5" fill="#dfe1ea" />
+              <circle cx="52" cy="31" r="2.5" fill="#dfe1ea" />
+              <rect x="68" y="25" width="240" height="12" rx="2" fill="#f1f2f6" />
+            </g>
+          </svg>
+        </span>
+        <img
+          class="thumb-image"
+          src={screenshotPath(site)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          on:error={hideBrokenThumbnail}
+        />
+      </span>
+
+      <span class="card-meta">
+        <span class="cat-name">{names[site.category]}</span>
+        <span class="meta-spacer"></span>
+        <span class="card-domain">{site.domain}</span>
+      </span>
+      <h3 class="card-title">
+        {site.name}
+        {#if site.status === 'archived'}
+          <span class="archive-badge">{t.archive.badge}</span>
+        {/if}
+      </h3>
+      <span class="card-tagline">{site.tagline}</span>
+    </summary>
+
+    <div class="card-expand">
+      {#if site.status === 'archived'}
+        <div class="archive-notice">
+          <p>{t.archive.reasons[site.archiveReason]}</p>
+          <span>{t.archive.savedOn} <time datetime={site.archivedAt}>{formatArchiveDate(site.archivedAt)}</time></span>
+        </div>
+      {/if}
+      <p class="card-desc">{site.description}</p>
+      <div class="card-badges">
+        {#each site.badges as badge}
+          <span class="badge">{badge}</span>
+        {/each}
+      </div>
+      <div class="card-actions">
+        {#if site.status === 'archived'}
+          <a class="btn btn-primary" href={screenshotPath(site)} target="_blank" rel="noopener">
+            {t.archive.screenshot}
+          </a>
+          {#if site.archiveUrl}
+            <a class="btn btn-ghost" href={site.archiveUrl} target="_blank" rel="noopener">
+              {t.archive.snapshot}
+            </a>
+          {/if}
+        {:else}
+        <a
+          class="btn btn-primary"
+          href={outboundHref(site.url)}
+          target="_blank"
+          rel="noopener"
+        >
+          {t.card.visit}
+        </a>
+        {/if}
+        {#if interactive}
+          <button class="btn btn-ghost" type="button" on:click={closeCard}>
+            {t.card.close}
+          </button>
+        {/if}
+      </div>
+    </div>
+  </details>
+{/snippet}
 
 <div id="top" class="app">
   <header class="hero">
@@ -263,8 +383,13 @@
           <div class="stat-val">{t.hero.statusValue}</div>
         </div>
         <div class="hero-stat">
-          <div class="stat-label">{sites.length}</div>
-          <div class="stat-val">{t.hero.directoryCount}</div>
+          <div class="stat-label">{t.hero.directoryCount}</div>
+          <div class="stat-val">
+            {sites.length}
+            {#if archivedCount}
+              <span class="stat-archive">· {t.archive.count.replace('{count}', archivedCount)}</span>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
@@ -330,89 +455,27 @@
         </p>
         <button class="btn btn-ghost" type="button" on:click={resetFilters}>{t.empty.reset}</button>
       </div>
-    {:else}
-      <div class="grid">
-        {#each filtered as site (site.id)}
-          <details
-            class="card"
-            name="site-cards"
-            open={expandedId === site.id}
-            on:toggle={(event) => handleCardToggle(event, site.id)}
-          >
-            <summary class="card-summary">
-              <span class="thumb">
-                <span class="thumb-fallback" aria-hidden="true">
-                  <svg viewBox="0 0 400 240" preserveAspectRatio="none" width="100%" height="100%">
-                    <defs>
-                      <pattern
-                        id={`stripes-${site.id}`}
-                        patternUnits="userSpaceOnUse"
-                        width="14"
-                        height="14"
-                        patternTransform={`rotate(${stripeAngle(site)})`}
-                      >
-                        <rect width="14" height="14" fill="#fbfbfd" />
-                        <line
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="14"
-                          stroke={stripeColor(site.accent)}
-                          stroke-width="1"
-                          stroke-opacity="0.18"
-                        />
-                      </pattern>
-                    </defs>
-                    <rect width="400" height="240" fill={`url(#stripes-${site.id})`} />
-                    <g opacity="0.42">
-                      <rect x="20" y="20" width="360" height="22" rx="4" fill="#ffffff" stroke="#dfe1ea" />
-                      <circle cx="32" cy="31" r="2.5" fill="#dfe1ea" />
-                      <circle cx="42" cy="31" r="2.5" fill="#dfe1ea" />
-                      <circle cx="52" cy="31" r="2.5" fill="#dfe1ea" />
-                      <rect x="68" y="25" width="240" height="12" rx="2" fill="#f1f2f6" />
-                    </g>
-                  </svg>
-                </span>
-                <img
-                  class="thumb-image"
-                  src={screenshotPath(site)}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  on:error={hideBrokenThumbnail}
-                />
-              </span>
-
-              <span class="card-meta">
-                <span class="cat-name">{names[site.category]}</span>
-                <span class="meta-spacer"></span>
-                <span class="card-domain">{site.domain}</span>
-              </span>
-              <h3 class="card-title">{site.name}</h3>
-              <span class="card-tagline">{site.tagline}</span>
-            </summary>
-
-            <div class="card-expand">
-              <p class="card-desc">{site.description}</p>
-              <div class="card-badges">
-                {#each site.badges as badge}
-                  <span class="badge">{badge}</span>
-                {/each}
-              </div>
-              <div class="card-actions">
-                <a class="btn btn-primary" href={outboundHref(site.url)} target="_blank" rel="noopener">
-                  {t.card.visit}
-                </a>
-                {#if interactive}
-                  <button class="btn btn-ghost" type="button" on:click={closeCard}>
-                    {t.card.close}
-                  </button>
-                {/if}
-              </div>
-            </div>
-          </details>
+    {:else if directorySites.length}
+      <div class="grid directory-grid">
+        {#each directorySites as site (site.id)}
+          {@render projectCard(site)}
         {/each}
       </div>
+    {/if}
+
+    {#if archivedSites.length}
+      <details class="project-archive" id="archive" bind:open={archiveOpen}>
+        <summary class="project-archive-summary">
+          <span class="project-archive-heading">{t.archive.title} <span class="archive-count">{archivedSites.length}</span></span>
+          <span class="project-archive-subtitle">{t.archive.subtitle}</span>
+          <span class="archive-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="grid archive-grid">
+          {#each archivedSites as site (site.id)}
+            {@render projectCard(site)}
+          {/each}
+        </div>
+      </details>
     {/if}
 
     <section class="about" id="about">

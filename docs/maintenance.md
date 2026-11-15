@@ -33,6 +33,30 @@
    instructions below, then check the new cards, news, images, and outbound links
    on both language routes of the live site.
 
+## Archive or restore a listing
+
+Keep an unavailable project's listing in the directory. Set `status: 'archived'`,
+`archivedAt` to the date it was moved into the archive (`YYYY-MM-DD`), and
+`archiveReason: 'unavailable'` when access has stopped without a confirmed closure.
+The archive date is not a service closure date; do not describe a site as closed
+solely because it is unavailable.
+
+Retain its `id`, original category, `addedAt`, URL, search aliases, and existing
+`static/site-screenshots/<id>.jpg`. Update the English and Korean descriptions to
+describe the preserved project, and update both languages of the hero news and
+content dates. Add an optional `archiveUrl` only after verifying that it opens a
+usable web archive. A screenshot alone should be labeled as a saved screen, not
+a working archived website.
+
+Check `/en/` and `/ko/` for the archive badge, saved-screen or archive link,
+search results, category filters, and counts. Confirm the archived listing no
+longer presents the unavailable website as its primary action.
+
+If the project returns, verify its identity and functionality before removing
+`status`, `archivedAt`, and `archiveReason` and restoring current descriptions and
+news. Preserve the original listing date; capture a new screenshot only after it
+has returned to the active directory.
+
 ## Capture screenshots
 
 Install Playwright's Chromium browser before the first capture:
@@ -41,7 +65,7 @@ Install Playwright's Chromium browser before the first capture:
 npx playwright install chromium
 ```
 
-Capture every site in `src/lib/data.js`:
+Capture every active site in `src/lib/data.js`:
 
 ```sh
 npm run screenshots
@@ -54,7 +78,11 @@ npm run screenshots -- --site apollo
 ```
 
 Images are saved to `static/site-screenshots/{site.id}.jpg`. Capture runs use a
-fresh browser context for each site. Always review the output before committing.
+fresh browser context for each site. Archived listings are skipped by default;
+explicitly selecting an archived id or domain with `--site` fails before the
+browser launches. HTTP error responses (400 or higher) fail without overwriting
+an existing screenshot. Always review successful output before committing,
+since an error or loading screen can also return HTTP 200.
 Run `npm run screenshots -- --help` for viewport, format, and timeout options.
 
 ## Deploy to Cloudflare Workers

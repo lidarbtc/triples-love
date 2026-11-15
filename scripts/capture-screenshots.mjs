@@ -87,6 +87,10 @@ async function captureSite(browser, site) {
       waitUntil: 'domcontentloaded',
       timeout: options.timeout
     });
+    const status = response?.status();
+    if (status >= 400) {
+      throw new Error(`HTTP ${status}; preserving the existing screenshot.`);
+    }
 
     await page.waitForLoadState('networkidle', { timeout: options.settleTimeout }).catch(() => {});
     await page.waitForTimeout(options.delay);
@@ -104,7 +108,6 @@ async function captureSite(browser, site) {
 
     await page.screenshot(screenshotOptions);
 
-    const status = response?.status();
     const statusText = status ? `HTTP ${status}` : 'no HTTP status';
     console.log(`Saved ${relative(filePath)} (${statusText})`);
 
@@ -120,7 +123,7 @@ async function captureSite(browser, site) {
 
 function getTargets(siteIds) {
   if (siteIds.length === 0) {
-    return sites;
+    return sites.filter((site) => site.status !== 'archived');
   }
 
   const wanted = new Set(siteIds);
@@ -130,6 +133,13 @@ function getTargets(siteIds) {
 
   if (missing.length > 0) {
     throw new Error(`Unknown site id/domain: ${missing.join(', ')}`);
+  }
+
+  const archived = matched.filter((site) => site.status === 'archived');
+  if (archived.length > 0) {
+    throw new Error(
+      `Cannot capture archived sites: ${archived.map((site) => site.id).join(', ')}. Their existing screenshots are preserved.`
+    );
   }
 
   return matched;
@@ -286,6 +296,7 @@ function printHelp() {
 
 Captures the fan sites listed in src/lib/data.js and writes deployable images to
 static/site-screenshots/{site.id}.jpg by default.
+Archived sites are skipped by default and cannot be selected with --site.
 
 Options:
   --site <id>          Capture one or more ids/domains. Repeat or comma-separate.
