@@ -56,6 +56,17 @@ export const sites = [
     accent: "blue",
   },
   {
+    id: "objektmy",
+    name: "objekt.my",
+    domain: "objekt.my",
+    url: "https://objekt.my/",
+    category: "objekts",
+    tagline: "Objekt collector toolkit",
+    description: "All-in-one COSMO collector toolkit for auto-matched trades with Discord alerts, shareable have/want lists, collection tracking, custom card and proofshot creation, and spin simulations.",
+    badges: ["trading", "collection", "card maker"],
+    accent: "blue",
+  },
+  {
     id: "objekttop",
     name: "Objekt.top",
     domain: "objekt.top",

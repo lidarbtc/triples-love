@@ -12,13 +12,13 @@ export const ui = {
       titleBefore: 'a collection of',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'May 10, 2026',
+      date: 'August 1, 2026',
       updateTitle: 'Updated weekly',
       updateBody:
         'An ever-growing index of community-built tools, trackers, and resources around tripleS & COSMO.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'May 10, 2026',
+      statusValue: 'August 1, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -81,13 +81,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 5월 10일',
+      date: '2026년 8월 1일',
       updateTitle: '매주 업데이트',
       updateBody:
         'tripleS와 COSMO 주변에서 팬들이 만든 도구, 트래커, 자료를 계속 모아두는 인덱스입니다.',
       today: '오늘',
       status: '마지막 업데이트',
-      statusValue: '2026년 5월 10일',
+      statusValue: '2026년 8월 1일',
       directoryCount: '등록된 사이트'
     },
     toolbar: {
@@ -217,6 +217,12 @@ export const siteCopy = {
       description:
         'COSMO wallet 컬렉션을 가져와 보유 오브젝트를 추적하고, 거래용 want/have lists를 관리하는 도구입니다.',
       badges: ['컬렉션', 'want/have']
+    },
+    objektmy: {
+      tagline: '오브젝트 컬렉터 툴킷',
+      description:
+        'Discord 알림을 제공하는 거래 자동 매칭, have/want 목록 공유, 컬렉션 추적, 커스텀 카드·인증샷 제작, spin 시뮬레이션을 한곳에 모은 COSMO 컬렉터 툴킷입니다.',
+      badges: ['거래', '컬렉션', '카드 제작']
     },
     objekttop: {
       tagline: 'COSMO 오브젝트 탐색',
