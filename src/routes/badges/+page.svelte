@@ -26,20 +26,20 @@
 
   const copy = {
     ko: {
-      title: '사이트에 배지 달기', intro: '배지를 고르고 HTML 코드를 사이트의 푸터나 소개 페이지에 붙여 넣으세요.',
-      message: '문구', project: '등록된 프로젝트', choose: '프로젝트를 선택하세요', color: '배지 색상', light: '밝게', dark: '어둡게',
-      listedHint: '프로젝트 페이지로 연결됩니다.', discoverHint: '전체 프로젝트 목록으로 연결됩니다.',
+      title: '사이트에 배너 달기', intro: '내 사이트에서 triples.love로 연결하는 배너예요. 소유권 인증 없이 사용할 수 있습니다.',
+      message: '문구', project: '등록된 프로젝트', choose: '프로젝트를 선택하세요', color: '배너 색상', light: '밝게', dark: '어둡게',
+      listedHint: '등록된 사이트임을 알리고, 내 프로젝트 페이지로 연결합니다.', discoverHint: '다른 팬 프로젝트를 찾아볼 수 있는 전체 목록으로 연결합니다.',
       preview: '미리보기', destination: '연결 주소', code: '삽입 코드', copyHtml: 'HTML 복사', copyMarkdown: 'Markdown 복사',
       copied: '복사했습니다.', manual: '코드를 선택했습니다. Ctrl+C 또는 ⌘C로 복사하세요.',
-      help: 'HTML은 웹사이트에, Markdown은 GitHub README 등에 사용할 수 있습니다.', download: 'SVG 다운로드', apply: '배지 보기'
+      help: 'HTML은 사이트의 푸터나 소개 페이지에, Markdown은 GitHub README 등에 붙여 넣으세요.', download: 'SVG 다운로드', apply: '배너 보기'
     },
     en: {
-      title: 'Add a badge to your site', intro: 'Choose a badge and paste the HTML into your footer or about page.',
-      message: 'Text', project: 'Listed project', choose: 'Choose a project', color: 'Badge color', light: 'Light', dark: 'Dark',
-      listedHint: 'Links to your project page.', discoverHint: 'Links to the full project directory.',
+      title: 'Add a banner to your site', intro: 'Link to triples.love from your own site. These banners can be used without verifying site ownership.',
+      message: 'Text', project: 'Listed project', choose: 'Choose a project', color: 'Banner color', light: 'Light', dark: 'Dark',
+      listedHint: 'Show that your site is listed and link to its project page.', discoverHint: 'Help visitors discover other fan projects in the directory.',
       preview: 'Preview', destination: 'Link destination', code: 'Embed code', copyHtml: 'Copy HTML', copyMarkdown: 'Copy Markdown',
       copied: 'Copied.', manual: 'Code selected. Press Ctrl+C or ⌘C to copy it.',
-      help: 'Use HTML on your website or Markdown in a GitHub README.', download: 'Download SVG', apply: 'Show badge'
+      help: 'Paste the HTML into your footer or about page, or use Markdown in a GitHub README.', download: 'Download SVG', apply: 'Show banner'
     }
   };
 

@@ -260,5 +260,13 @@ verified. Neither a fresh claim nor a successful proof from another account
 transfers ownership. Contact the maintainer for ownership recovery or transfer;
 there is no self-service transfer interface in this release.
 
+For an explicitly authorized maintainer approval, use `verification_method =
+'manual'` and an audit reference prefixed with `manual:` in `challenge_id`.
+Confirm the existing GitHub user ID, exact project ID and registered URL before
+inserting the ownership record. Guard the insert against an existing owner and
+an archived or changed project, then verify the remote row and live page. Manual
+approval does not create a DNS/HTML proof or expose a self-service verification
+method.
+
 Keep deployment credentials outside the repository. Local `.env` files and
 Wrangler state are ignored by Git.

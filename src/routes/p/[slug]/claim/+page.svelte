@@ -1,6 +1,7 @@
 <script>
   import { enhance } from '$app/forms';
   import ProjectShell from '$lib/components/ProjectShell.svelte';
+  import VerificationPreview from '$lib/components/VerificationPreview.svelte';
   import { projectCopy, projectHref } from '$lib/project-copy.js';
 
   export let data;
@@ -12,6 +13,9 @@
   $: t = projectCopy[lang] || projectCopy.en;
   $: isOwner = Boolean(user && project.owner?.id === user.id);
   $: ownedBySomeoneElse = Boolean(project.owner && !isOwner);
+  $: archived = project.status === 'archived';
+  $: introTitle = archived ? t.archived : ownedBySomeoneElse ? t.taken : isOwner ? t.changeTitle : t.claimTitle;
+  $: introDescription = archived ? t.archivedNote : ownedBySomeoneElse ? t.takenHint : isOwner ? t.changeDescription : t.claimDescription;
   $: challenge = form?.challenge;
   $: signInUrl = `/auth/github?returnTo=${encodeURIComponent(projectHref(project.id, lang, 'claim'))}`;
   $: expiry = challenge ? new Date(challenge.expiresAt).toLocaleString(lang === 'ko' ? 'ko-KR' : 'en-GB', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }) : '';
@@ -27,7 +31,7 @@
 </script>
 
 <svelte:head>
-  <title>{isOwner ? t.changeTitle : t.claim} · {project.name} · triples.love</title>
+  <title>{introTitle} · {project.name} · triples.love</title>
   <meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -36,22 +40,27 @@
   <div class="claim-layout">
     <div class="claim-intro">
       <span class="project-eyebrow">{project.name} · {project.domain}</span>
-      <h1 class="project-flow-title">{isOwner ? t.changeTitle : t.claimTitle}</h1>
-      <p class="project-intro">{isOwner ? t.changeDescription : t.claimDescription}</p>
-      <ol class="claim-steps">
-        <li class:complete={!!user}><span>{user ? '✓' : '01'}</span>{t.stepSignIn}</li>
-        <li class:active={!!user}><span>02</span>{t.stepVerify}</li>
-        <li><span>03</span>{t.stepEdit}</li>
-      </ol>
+      <h1 class="project-flow-title">{introTitle}</h1>
+      <p class="project-intro">{introDescription}</p>
+      {#if !project.owner && !archived}
+        <div class="claim-preview"><VerificationPreview name={project.name} {lang} /></div>
+      {/if}
+      {#if !archived && !ownedBySomeoneElse}
+        <ol class="claim-steps">
+          <li class:complete={!!user}><span>{user ? '✓' : '01'}</span>{t.stepSignIn}</li>
+          <li class:active={!!user}><span>02</span>{t.stepVerify}</li>
+          <li><span>03</span>{isOwner ? t.stepEdit : t.stepBadge}</li>
+        </ol>
+      {/if}
     </div>
     <div class="claim-content">
       {#if form?.message}<div class="project-message project-message-error" role="alert">{form.message}</div>{/if}
-      {#if project.status === 'archived'}
+      {#if archived}
         <section class="project-panel"><h2>{t.archived}</h2><p>{t.archivedNote}</p></section>
       {:else if ownedBySomeoneElse}
         <section class="project-panel"><h2>{t.taken}</h2><p>{t.takenHint}</p></section>
       {:else if !user}
-        <section class="project-panel claim-signin-panel"><span class="claim-number">01</span><h2>{t.stepSignIn}</h2><p>{t.claimIntro}</p><a class="project-btn" href={signInUrl} data-sveltekit-reload>{t.signIn}</a></section>
+        <section class="project-panel claim-signin-panel"><span class="claim-number">01</span><h2>{t.stepSignIn}</h2><p>{t.claimSignInHint}</p><a class="project-btn" href={signInUrl} data-sveltekit-reload>{t.signIn}</a></section>
       {:else}
         <div class="claim-account"><span class="project-owner-check" aria-hidden="true">✓</span><span>{t.signedIn} <strong>@{user.handle}</strong></span></div>
         {#if challenge}
@@ -103,6 +112,7 @@
   .claim-intro { padding-top: 9px; }
   .claim-intro .project-flow-title { max-width: 440px; }
   .claim-intro .project-intro { font-size: 14px; }
+  .claim-preview { margin-top: 26px; padding: 18px 0; border-block: 1px solid var(--line); }
   .claim-steps { padding: 0; margin: 38px 0 0; list-style: none; display: grid; gap: 22px; color: var(--ink-3); font-size: 13px; }
   .claim-steps li { display: flex; gap: 13px; align-items: center; }
   .claim-steps li > span { width: 29px; height: 29px; border: 1px solid var(--line-mid); border-radius: 50%; display: grid; place-items: center; font: 10px var(--mono); }

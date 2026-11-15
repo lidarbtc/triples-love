@@ -66,7 +66,7 @@ async function prove(db, fixture, challenge, userId = fixture.ownerA, options = 
 try {
   console.log('Starting isolated workerd D1 binding...');
   const db = await worker.getD1Database('DB');
-  console.log('D1 binding ready; applying both checked-in migrations...');
+  console.log('D1 binding ready; applying initial migrations before the ownership upgrade...');
   for (const name of ['0001_claim.sql', '0002_unclaimed_light_theme.sql']) {
     const migration = await readFile(new URL(`../migrations/${name}`, import.meta.url), 'utf8');
     // These migrations have no quoted semicolons or triggers. Remove full-line
@@ -74,6 +74,39 @@ try {
     const statements = migration.replace(/^\s*--[^\n]*$/gm, '').split(';').map(sql => sql.trim()).filter(Boolean);
     await db.batch(statements.map(sql => db.prepare(sql)));
   }
+  await check('manual approval migration preserves owners and keeps self-service proof requirements', async () => {
+    const existing = await seed(db, 'migration-existing');
+    await prove(db, existing, await start(db, existing));
+    const before = await db.prepare('SELECT * FROM project_owners ORDER BY project_id').all();
+    const projectBefore = await getProject(db, existing.project.id);
+    const migration = await readFile(new URL('../migrations/0003_manual_ownership_verification.sql', import.meta.url), 'utf8');
+    const statements = migration.replace(/^\s*--[^\n]*$/gm, '').split(';').map(sql => sql.trim()).filter(Boolean);
+    await db.batch(statements.map(sql => db.prepare(sql)));
+    assert.deepEqual((await db.prepare('SELECT * FROM project_owners ORDER BY project_id').all()).results, before.results);
+    assert.deepEqual(await getProject(db, existing.project.id), projectBefore);
+    assert.equal((await db.prepare("SELECT COUNT(*) AS count FROM sqlite_master WHERE type='index' AND name='owners_user'").first()).count, 1);
+
+    const manual = await seed(db, 'migration-manual');
+    await assert.rejects(start(db, manual, manual.ownerA, { method: 'manual' }), { code: 'invalid_method' });
+    await db.prepare(`INSERT INTO project_owners
+      (project_id,user_id,verified_at,verification_method,verified_url,challenge_id)
+      VALUES (?,?,?,'manual',?,'manual:test-approval')
+    `).bind(manual.project.id, manual.ownerA, manual.now, manual.project.url).run();
+    const owned = await getProject(db, manual.project.id);
+    assert.equal(owned.owner.id, manual.ownerA);
+    await assert.rejects(startClaim(db, { project: owned, userId: manual.ownerB, method: 'meta' }), { code: 'already_claimed' });
+    await saveProject(db, owned.id, manual.ownerA, { ...owned, name: 'Manually verified owner edit' });
+    assert.equal((await getProject(db, owned.id)).name, 'Manually verified owner edit');
+    await assert.rejects(db.prepare("UPDATE project_owners SET verification_method='unsupported' WHERE project_id=?")
+      .bind(owned.id).run(), /CHECK constraint failed/i);
+    assert.deepEqual((await db.prepare('PRAGMA foreign_key_check').all()).results, []);
+
+    for (const fixture of [existing, manual]) {
+      await db.prepare('DELETE FROM projects WHERE id=?').bind(fixture.project.id).run();
+      assert.equal(await db.prepare('SELECT project_id FROM project_owners WHERE project_id=?').bind(fixture.project.id).first(), null);
+      await db.prepare('DELETE FROM users WHERE id IN (?,?)').bind(fixture.ownerA, fixture.ownerB).run();
+    }
+  });
   const generatedSeed = await readFile(new URL('../.wrangler/seed-projects.sql', import.meta.url), 'utf8');
   // The generator emits one INSERT per line; splitting on semicolons would
   // incorrectly split semicolons inside quoted project descriptions.

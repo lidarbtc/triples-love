@@ -5,7 +5,7 @@
   import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
   import { categories } from '$lib/data.js';
   import { categoryLabels, categoryNames, ui } from '$lib/i18n.js';
-  import { splitLastWord } from '$lib/project-copy.js';
+  import { projectHref, splitLastWord } from '$lib/project-copy.js';
 
   export let data;
 
@@ -390,6 +390,11 @@
             {/if}
             <span>@{site.owner.handle}</span>
           </a>
+        </div>
+      {:else if site.status !== 'archived'}
+        <div class="card-claim">
+          <span>{t.owner.claimHint}</span>
+          <a href={projectHref(site.id, lang, 'claim')}>{t.owner.claim}</a>
         </div>
       {/if}
     </div>

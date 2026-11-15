@@ -105,12 +105,16 @@ D1 is the source of truth after import. Seed scripts insert missing records and
 never overwrite existing owner edits. R2 uploads, maker profiles, shared ownership
 and ownership transfer/recovery are outside this first release.
 
-## Embeddable badges
+## Website banners
 
-`/badges/?project=<slug>&lang=ko` opens the badge chooser with a listing selected.
+The UI calls embedded link images **banners**, and reserves **verified badge**
+for the blue ownership seal displayed beside a site's name on triples.love.
+Banners can be used without verifying ownership.
+
+`/badges/?project=<slug>&lang=ko` opens the banner chooser with a listing selected.
 The public project and owner editor link to it; `/badges/` also works without a
-project or sign-in. A Listed badge points to the selected project's page, while
-a Discover badge points to the language-selecting directory homepage. Both add
+project or sign-in. A Listed banner points to the selected project's page, while
+a Discover banner points to the language-selecting directory homepage. Both add
 `utm_source=badge` to the destination link.
 
 `src/lib/embed-badges.js` generates absolute, escaped HTML and Markdown links.

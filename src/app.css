@@ -387,6 +387,8 @@
     border-radius: 999px; background: var(--bg-soft);
   }
   .card-owner-avatar[hidden] { display: none; }
+  .card-claim { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 12px; line-height: 1.5; }
+  .card-claim a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 
   /* Archived projects keep the same readable cards and saved previews. */
   .stat-archive { color: var(--ink-2); }

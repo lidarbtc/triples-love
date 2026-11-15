@@ -1,6 +1,7 @@
 <script>
   import ProjectShell from '$lib/components/ProjectShell.svelte';
   import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
+  import VerificationPreview from '$lib/components/VerificationPreview.svelte';
   import { categoryNames } from '$lib/i18n.js';
   import { localizedProject, projectCopy, projectHref, splitLastWord } from '$lib/project-copy.js';
   import { badgePageHref } from '$lib/embed-badges.js';
@@ -86,7 +87,7 @@
       </div>
     </div>
   </article>
-  <aside class="project-ownership" class:project-ownership-verified={project.owner}>
+  <aside class="project-ownership" class:project-ownership-verified={project.owner} class:project-ownership-unclaimed={!project.owner && !archived}>
     {#if project.owner}
       <div class="project-owner">
         {#if project.owner.avatarUrl}
@@ -99,8 +100,11 @@
       </div>
       {#if isOwner && !archived}<a class="project-btn project-btn-secondary" href={projectHref(project.id, lang, 'edit')}>{t.edit}</a>{/if}
     {:else if !archived}
-      <div><h2>{t.unclaimed}</h2><p>{t.claimIntro}</p></div>
-      <a class="project-btn project-btn-secondary" href={projectHref(project.id, lang, 'claim')}>{t.claim}</a>
+      <div class="project-claim-copy">
+        <h2>{t.unclaimed}</h2><p>{t.claimIntro}</p>
+        <div class="project-claim-preview"><VerificationPreview name={project.name} {lang} /></div>
+      </div>
+      <a class="project-btn" href={projectHref(project.id, lang, 'claim')}>{t.claim}</a>
     {/if}
   </aside>
   <p class="project-badge-link"><a href={badgePageHref(project.id, lang)}>{t.badgeCode} →</a></p>
@@ -133,6 +137,10 @@
   .project-ownership p { margin: 7px 0 0; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
   .project-ownership .project-btn { flex-shrink: 0; }
   .project-ownership-verified { margin-top: 22px; padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
+  .project-ownership-unclaimed { margin-top: 22px; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
+  .project-claim-copy { min-width: 0; }
+  .project-claim-copy p { max-width: 58ch; line-height: 1.7; }
+  .project-claim-preview { margin-top: 18px; }
   .project-title-end { display: inline-block; }
   .project-title-end :global(.verified-seal) { width: .6em; height: .6em; margin-left: .18em; vertical-align: .06em; }
   .project-badge-link { margin: 20px 4px 0; font-size: 13px; color: var(--ink-2); }
@@ -144,5 +152,6 @@
     .project-source-url { text-align: left; }
     .project-detail-grid:has(.project-extra-links) { grid-template-columns: 1fr; gap: 25px; }
     .project-ownership { align-items: flex-start; flex-direction: column; }
+    .project-ownership-unclaimed { align-items: stretch; }
   }
 </style>

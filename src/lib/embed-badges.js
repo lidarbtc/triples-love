@@ -18,10 +18,10 @@ function escapeAttribute(value) {
 }
 
 export function createBadgeEmbed({ type = 'discover', theme = 'light', projectId = '', lang = 'en' } = {}) {
-  if (type !== 'listed' && type !== 'discover') throw new Error('Choose a valid badge type.');
-  if (theme !== 'light' && theme !== 'dark') throw new Error('Choose a valid badge theme.');
+  if (type !== 'listed' && type !== 'discover') throw new Error('Choose a valid banner type.');
+  if (theme !== 'light' && theme !== 'dark') throw new Error('Choose a valid banner theme.');
   validateProjectId(projectId);
-  if (type === 'listed' && !projectId) throw new Error('Choose a project for the listed badge.');
+  if (type === 'listed' && !projectId) throw new Error('Choose a project for the listed banner.');
 
   const target = new URL(type === 'listed' ? `/p/${encodeURIComponent(projectId)}/` : '/', ORIGIN);
   if (type === 'listed') target.searchParams.set('lang', lang === 'ko' ? 'ko' : 'en');

@@ -54,7 +54,9 @@ export const ui = {
       }
     },
     owner: {
-      verified: 'Ownership verified'
+      verified: 'Ownership verified',
+      claimHint: 'Is this your site?',
+      claim: 'Get your verified badge →'
     },
     about: {
       titleBefore: 'what is',
@@ -141,7 +143,9 @@ export const ui = {
       }
     },
     owner: {
-      verified: '소유권 인증됨'
+      verified: '소유권 인증됨',
+      claimHint: '운영하는 사이트인가요?',
+      claim: '인증 배지 받기 →'
     },
     about: {
       titleBefore: '',
