@@ -2,8 +2,8 @@
   import { browser } from '$app/environment';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
-  import { categories, sites } from '$lib/data.js';
-  import { categoryLabels, categoryNames, siteCopy, siteSearchAliases, ui } from '$lib/i18n.js';
+  import { categories } from '$lib/data.js';
+  import { categoryLabels, categoryNames, ui } from '$lib/i18n.js';
 
   export let data;
 
@@ -13,6 +13,7 @@
     'triples.love directory preview showing fan-made tripleS project cards and site screenshots.';
 
   $: lang = data.lang;
+  $: sites = data.sites;
   $: nextLang = lang === 'ko' ? 'en' : 'ko';
   $: languageHref = getLanguageHref(nextLang, browser ? $page.url : null);
   $: canonicalUrl = `https://triples.love/${lang}/`;
@@ -59,12 +60,15 @@
   $: labels = categoryLabels[lang];
   $: names = categoryNames[lang];
   $: localizedSites = sites.map((site) => {
-    const localizedCopy = siteCopy[lang]?.[site.id] || {};
-    const koreanCopy = siteCopy.ko?.[site.id] || {};
+    const localizedCopy = site.locales[lang] || {};
+    const koreanCopy = site.locales.ko || {};
 
     return {
       ...site,
       ...localizedCopy,
+      tagline: localizedCopy.tagline || site.tagline,
+      description: localizedCopy.description || site.description,
+      badges: localizedCopy.badges?.length ? localizedCopy.badges : site.badges,
       searchText: [
         site.name,
         site.domain,
@@ -79,7 +83,7 @@
         categoryLabels.ko[site.category],
         categoryNames.en[site.category],
         categoryNames.ko[site.category],
-        ...(siteSearchAliases[site.id] || [])
+        ...(site.aliases || [])
       ]
         .filter(Boolean)
         .join('\n')
@@ -301,6 +305,9 @@
         {/each}
       </div>
       <div class="card-actions">
+        <a class="btn btn-ghost" href={`/p/${site.id}/?lang=${lang}`}>
+          {lang === 'ko' ? '프로젝트 페이지' : 'Project page'}
+        </a>
         {#if site.status === 'archived'}
           <a class="btn btn-primary" href={screenshotPath(site)} target="_blank" rel="noopener">
             {t.archive.screenshot}
@@ -330,6 +337,9 @@
           </button>
         {/if}
       </div>
+      {#if site.owner}
+        <p class="card-owner">{lang === 'ko' ? '소유권 인증' : 'Claimed by'} @{site.owner.handle}</p>
+      {/if}
     </div>
   </details>
 {/snippet}
@@ -353,6 +363,15 @@
         </div>
         <nav class="hero-nav">
           <a href="mailto:hello@triples.love">{t.nav.submit}</a>
+          {#if data.user}
+            <form method="POST" action="/auth/logout">
+              <button class="btn btn-ghost" type="submit">@{data.user.handle} · {lang === 'ko' ? '로그아웃' : 'Sign out'}</button>
+            </form>
+          {:else}
+            <a href={`/auth/github?returnTo=${encodeURIComponent(`/${lang}/`)}`} data-sveltekit-reload>
+              {lang === 'ko' ? 'GitHub 로그인' : 'Sign in'}
+            </a>
+          {/if}
           <a
             class="hero-pill lang-toggle"
             href={languageHref}

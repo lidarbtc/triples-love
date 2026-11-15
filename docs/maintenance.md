@@ -25,7 +25,12 @@
    - Set `statusValue` to the last content update date. Update both dates when
      adding a site. For a description edit without news changes, update only
      `statusValue`. Documentation-only changes do not change the displayed dates.
-6. Run `npm run build`, then use `npm run preview` to check `/en/` and `/ko/`.
+6. For a new listing, run `npm run db:seed:local`. D1 is the live data source:
+   the seed inserts missing listings/translations but never overwrites existing
+   records. Editing a source entry alone does not update an existing D1 record.
+   Owners use their project editor; maintainer corrections or archive changes
+   require a reviewed D1 migration with an explicit project ID.
+   Run `npm test` and `npm run build`, then `npm run cf:dev` to check `/en/` and `/ko/`.
    Verify the new card's image, copy, and outbound link; name and alias search;
    category filters; recent-addition sorting; and news wrapping on mobile.
    Review `git diff --check` and `git diff` for omissions or unintended changes.
@@ -91,12 +96,60 @@ Authenticate Wrangler with the Cloudflare account that owns the deployment:
 
 ```sh
 npx wrangler login
+npm run db:migrate:remote
+npm run db:seed:remote
 npm run deploy
 ```
 
-`npm run deploy` builds the static site and deploys `build/` using
-`wrangler.jsonc`. For a local preview of the Workers configuration, run
-`npm run build` followed by `npm run cf:dev`.
+The D1 instance is `triples-love-db`, bound as `DB` in `wrangler.jsonc`.
+The Wrangler account is pinned to the existing `lidarbtc` deployment, so signing
+in to an account with multiple memberships does not change the target.
+`npm run deploy` builds and deploys `.svelte-kit/cloudflare/`, including the Worker.
+Apply pending schema migrations before deploying code that needs them. Seeding is
+safe to repeat, but changes to an existing listing must use the editor or a
+targeted migration. Do not modify an already-applied migration file.
+
+For local work, run `npm run db:migrate:local`, `npm run db:seed:local`, then
+`npm run dev`. To check the built Worker, run `npm run build` and
+`npm run cf:dev`. Local D1 state is separate from production. OAuth deliberately
+uses the canonical HTTPS origin, so sign-in from a local/preview URL moves to the
+production site; it does not create a local signed-in session.
+
+## GitHub sign-in setup
+
+The OAuth app homepage is `https://triples.love` and its callback is
+`https://triples.love/auth/github/callback` (no language prefix or trailing slash).
+Device flow is not needed. Only public GitHub account identity is used, with no
+repository or email scope. Register these Worker secrets once:
+
+```sh
+npx wrangler secret put GITHUB_CLIENT_ID
+npx wrangler secret put GITHUB_CLIENT_SECRET
+```
+
+`APP_ORIGIN` is a public Wrangler variable. The client secret belongs in Wrangler
+secrets, never a Git commit. After rotating a secret, check a real GitHub sign-in
+through to the return page. The OAuth tests mock GitHub's token and profile
+responses; they do not prove that an external OAuth app's configuration is valid.
+
+## Claim and edit checks
+
+Run `npm test` for OAuth state/session handling, DNS/HTML proof restrictions,
+expiration/replay/concurrent claims, owner permissions, version conflicts, and
+bilingual seed/edit behavior. `npm run test:worker` repeats transaction and race
+checks against an isolated, temporary workerd D1 instance, with no production
+data or external requests. If a system proxy intercepts localhost, exempt
+`localhost,127.0.0.1,::1` or temporarily unset HTTP(S)/ALL proxy variables for
+this local-only test.
+
+A successful claim should redirect immediately to
+the editor; save and check both the project page and the directory. Do not test
+claims against production projects using synthetic users or bypassed proofs.
+
+The editor keeps a site's existing address until a newly requested address is
+verified. Neither a fresh claim nor a successful proof from another account
+transfers ownership. Contact the maintainer for ownership recovery or transfer;
+there is no self-service transfer interface in this release.
 
 Keep deployment credentials outside the repository. Local `.env` files and
 Wrangler state are ignored by Git.

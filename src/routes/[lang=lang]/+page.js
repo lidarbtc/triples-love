@@ -4,6 +4,6 @@ export function entries() {
   return supportedLangs.map((lang) => ({ lang }));
 }
 
-export function load({ params }) {
-  return { lang: params.lang };
+export function load({ params, data }) {
+  return { ...data, lang: params.lang };
 }

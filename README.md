@@ -10,9 +10,9 @@ collection trackers to schedules, video archives, and games.
 - Search by name, domain, tags, and English or Korean aliases.
 - Browse by category and sort alphabetically or by recent additions.
 - Preview each site with screenshots and localized descriptions.
+- Sign in with GitHub, verify a project's website, and edit its page.
 
-Built with SvelteKit and Svelte, prerendered as a static site, and hosted on
-Cloudflare Workers.
+Built with SvelteKit and Svelte, with Cloudflare Workers and D1.
 
 ## Development
 
@@ -20,6 +20,8 @@ Use Node.js 22.12+ (or a newer supported LTS release) and npm.
 
 ```sh
 npm ci
+npm run db:migrate:local
+npm run db:seed:local
 npm run dev
 ```
 
@@ -27,7 +29,7 @@ To build and preview the production site:
 
 ```sh
 npm run build
-npm run preview
+npm run cf:dev
 ```
 
 ## Contributing
