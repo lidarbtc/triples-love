@@ -171,7 +171,7 @@ export const sites = [
     domain: "triplesstream.com",
     url: "https://www.triplesstream.com/",
     category: "tools",
-    tagline: "Korean streaming support",
+    tagline: "Streaming campaign guide",
     description: "Korean tripleS streaming team site with guides, voting, group orders, events, live chart/ranking checks, and one-click streaming links.",
     badges: ["streaming", "voting", "charts"],
     accent: "violet",

@@ -279,7 +279,7 @@ export const siteCopy = {
       badges: ['자막 검색', '채널']
     },
     triplesstream: {
-      tagline: '한국어 스트리밍 지원',
+      tagline: '음원 스트리밍 총공 안내',
       description:
         '가이드, 투표, 공동구매, 이벤트, 실시간 차트/ranking 확인, one-click 스트리밍 링크를 제공하는 한국어 tripleS 총공팀 사이트입니다.',
       badges: ['스트리밍', '투표', '차트']
