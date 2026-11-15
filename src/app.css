@@ -15,12 +15,16 @@
     --radius: 18px;
     --radius-sm: 10px;
     --sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    --sans-ko: "Pretendard", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
     --serif: "Instrument Serif", "Times New Roman", serif;
     --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
+  html[lang="ko"] {
+    --sans: var(--sans-ko);
+  }
   body {
     font-family: var(--sans);
     background: var(--bg);
