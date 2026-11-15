@@ -67,7 +67,7 @@ try {
   console.log('Starting isolated workerd D1 binding...');
   const db = await worker.getD1Database('DB');
   console.log('D1 binding ready; applying initial migrations before the ownership upgrade...');
-  for (const name of ['0001_claim.sql', '0002_unclaimed_light_theme.sql']) {
+  for (const name of ['0001_claim.sql', '0002_unclaimed_light_theme.sql', '0007_resumable_verification_tokens.sql']) {
     const migration = await readFile(new URL(`../migrations/${name}`, import.meta.url), 'utf8');
     // These migrations have no quoted semicolons or triggers. Remove full-line
     // comments first: migration 0002's comment itself contains a semicolon.
@@ -205,7 +205,9 @@ try {
     assert.equal(owned.owner.id, fixture.ownerA);
     assert.equal(owned.version, 1);
     assert.equal(proof.consumed_at, verifiedAt);
-    assert.ok(!JSON.stringify(proof).includes(challenge.token));
+    // The token is kept so an unfinished proof can be resumed; lookups still use its hash.
+    assert.equal(proof.token, challenge.token);
+    assert.notEqual(proof.token_hash, challenge.token);
     await assert.rejects(
       verifyClaim(db, claimRequest(owned, challenge, fixture.ownerA), {
         now: verifiedAt,

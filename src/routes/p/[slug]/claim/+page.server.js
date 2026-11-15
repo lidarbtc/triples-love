@@ -1,7 +1,7 @@
 import { recordResult } from '$lib/server/observability.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { requireUser } from '$lib/server/auth.js';
-import { ClaimError, startClaim, verifyClaim } from '$lib/server/claims.js';
+import { ClaimError, findActiveChallenge, startClaim, verifyClaim } from '$lib/server/claims.js';
 import { getDb } from '$lib/server/db.js';
 import { getProject } from '$lib/server/projects.js';
 
@@ -23,7 +23,13 @@ async function projectFor(event) {
 
 export async function load(event) {
   noStore(event);
-  return { project: await projectFor(event), user: event.locals.user ?? null, lang: language(event) };
+  const project = await projectFor(event);
+  const user = event.locals.user ?? null;
+  // ?restart=1 shows the method form; starting again for the same address keeps the token.
+  const activeChallenge = user && event.url.searchParams.get('restart') !== '1'
+    ? await findActiveChallenge(getDb(event), { project, userId: user.id })
+    : null;
+  return { project, user, lang: language(event), activeChallenge };
 }
 
 const koreanErrors = {
@@ -34,7 +40,7 @@ const koreanErrors = {
   invalid_url: '사용자 정보나 별도 포트가 없는 공개 HTTPS 사이트 주소를 입력해 주세요.',
   changed: '인증 중에 프로젝트 정보나 소유권이 변경되었습니다. 새로고침 후 다시 인증해 주세요.',
   invalid_challenge: '유효하지 않거나 만료된 인증입니다. 새 인증을 시작해 주세요.',
-  attempts_exhausted: '이 인증의 확인 횟수를 초과했습니다. 새 인증을 시작해 주세요.',
+  attempts_exhausted: '이 인증의 확인 횟수를 모두 사용했습니다. “다시 시작하기”를 누르세요. 이미 올린 인증 정보는 그대로 쓸 수 있습니다.',
   rate_limited: '확인 요청이 너무 많습니다. 잠시 기다린 뒤 다시 시도해 주세요.',
   retry_later: '몇 초 기다린 뒤 다시 확인해 주세요.',
   not_verified: '아직 인증 토큰을 찾지 못했습니다. 변경 사항을 확인한 뒤 다시 시도해 주세요.',

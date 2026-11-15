@@ -6,6 +6,7 @@ export function createTestDb() {
   const sqlite = new DatabaseSync(':memory:');
   sqlite.exec('PRAGMA foreign_keys = ON');
   sqlite.exec(readFileSync(new URL('../../migrations/0001_claim.sql', import.meta.url), 'utf8'));
+  sqlite.exec(readFileSync(new URL('../../migrations/0007_resumable_verification_tokens.sql', import.meta.url), 'utf8'));
 
   class Statement {
     constructor(sql, parameters = []) {

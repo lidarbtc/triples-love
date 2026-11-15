@@ -16,7 +16,7 @@
   $: archived = project.status === 'archived';
   $: introTitle = archived ? t.archived : ownedBySomeoneElse ? t.taken : isOwner ? t.changeTitle : t.claimTitle;
   $: introDescription = archived ? t.archivedNote : ownedBySomeoneElse ? t.takenHint : isOwner ? t.changeDescription : t.claimDescription;
-  $: challenge = form?.challenge;
+  $: challenge = form?.challenge ?? data.activeChallenge;
   $: signInUrl = `/auth/github?returnTo=${encodeURIComponent(projectHref(project.id, lang, 'claim'))}`;
   $: expiry = challenge ? new Date(challenge.expiresAt).toLocaleString(lang === 'ko' ? 'ko-KR' : 'en-GB', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }) : '';
 
@@ -77,6 +77,7 @@
               <p class="project-help">{t.metaHintDetail}</p>
             {/if}
             <div class="claim-expiry"><p>{t.proofExpiry}</p><span>{t.expires}: {expiry}</span></div>
+            <p class="project-help">{t.resumeHint}</p>
             <form method="POST" action={`?/verify&lang=${lang}`} use:enhance={submitState('verify')}>
               <input type="hidden" name="challengeId" value={challenge.id} />
               <input type="hidden" name="token" value={challenge.token} />
@@ -84,7 +85,7 @@
               <p class="project-help">{t.retryHint}</p>
             </form>
           </section>
-          <a class="claim-restart" href={projectHref(project.id, lang, 'claim')} data-sveltekit-reload>{t.differentMethod} ↻</a>
+          <a class="claim-restart" href={`${projectHref(project.id, lang, 'claim')}&restart=1`} data-sveltekit-reload>{t.differentMethod} ↻</a>
         {:else}
           <form class="project-panel claim-method-form" method="POST" action={`?/start&lang=${lang}`} use:enhance={submitState('start')}>
             <h2>{t.chooseMethod}</h2>

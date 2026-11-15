@@ -193,11 +193,23 @@ async function claim(id, method, targetUrl) {
   if (targetUrl) start.values.set('targetUrl', targetUrl);
   const challengePage = await request(new URL(start.action, `${origin}${path}`).href, start.values);
   assert.equal(challengePage.status, 200, `${method} challenge generation succeeds`);
-  const proof = findForm(challengePage.html, attrs => attrs.action?.startsWith('?/verify'));
+  let proof = findForm(challengePage.html, attrs => attrs.action?.startsWith('?/verify'));
   assert.ok(proof.values.get('challengeId'));
   const token = proof.values.get('token');
   assert.match(token, /^[A-Za-z0-9_-]{43}$/);
   privateValues.add(token);
+  // Reopening the page shows the unfinished proof; starting again keeps its token.
+  const resumed = findForm((await request(path)).html, attrs => attrs.action?.startsWith('?/verify'));
+  assert.equal(resumed.values.get('challengeId'), proof.values.get('challengeId'), `${method} proof resumes after reload`);
+  assert.equal(resumed.values.get('token'), token);
+  const restart = findForm((await request(`${path}&restart=1`)).html, attrs => attrs.action?.startsWith('?/start'));
+  restart.values.set('method', method);
+  if (targetUrl) restart.values.set('targetUrl', targetUrl);
+  const restartedPage = await request(new URL(restart.action, `${origin}${path}`).href, restart.values);
+  assert.equal(restartedPage.status, 200, `${method} restart succeeds`);
+  proof = findForm(restartedPage.html, attrs => attrs.action?.startsWith('?/verify'));
+  assert.notEqual(proof.values.get('challengeId'), resumed.values.get('challengeId'));
+  assert.equal(proof.values.get('token'), token, `${method} restart keeps the published token`);
   if (method === 'dns') {
     const notVerified = await request(new URL(proof.action, `${origin}${path}`).href, proof.values);
     assert.equal(notVerified.status, 400);

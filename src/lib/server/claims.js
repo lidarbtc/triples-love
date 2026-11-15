@@ -7,6 +7,9 @@ const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 export const MAX_PROOF_ATTEMPTS = 10;
 const RETRY_INTERVAL_MS = 3000;
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+// Failures caused by the network or the site being briefly unavailable say
+// nothing about the proof, so they do not use up the challenge's checks.
+const TRANSIENT_PROOF_ERRORS = new Set(['timeout', 'fetch_failed', 'dns_failed', 'http_failed']);
 
 export class ClaimError extends Error {
   constructor(code, message, status = 400, challenge = null) {
@@ -50,6 +53,20 @@ export function displayChallenge(row, token) {
   };
 }
 
+/** The signed-in user's unfinished proof for the project's current address, if any. */
+export async function findActiveChallenge(db, { project, userId }, options = {}) {
+  if (!project || !userId) return null;
+  const now = options.now ?? Date.now();
+  const row = await db.prepare(`
+    SELECT * FROM verification_challenges
+    WHERE project_id = ? AND user_id = ? AND expected_url = ?
+      AND consumed_at IS NULL AND expires_at > ? AND token IS NOT NULL
+    ORDER BY created_at DESC LIMIT 1
+  `).bind(project.id, userId, project.url, now).first();
+  if (!row || !TOKEN_PATTERN.test(row.token)) return null;
+  return displayChallenge(row, row.token);
+}
+
 async function rateLimit(db, key, limit, windowMs, challenge = null) {
   try {
     await consumeRateLimit(db, key, limit, windowMs);
@@ -77,8 +94,17 @@ export async function startClaim(db, { project, userId, method, targetUrl }, opt
   }
   await rateLimit(db, `claim:start:user:${userId}`, 12, RATE_LIMIT_WINDOW_MS);
   await rateLimit(db, `claim:start:project:${project.id}:${userId}`, 6, 10 * 60 * 1000);
-  const token = randomToken();
   const now = options.now ?? Date.now();
+  // Restarting for the same address (for example to switch method or after
+  // using every check) keeps the token, so details already published on the
+  // site or in DNS stay valid. A different address always gets a new token.
+  const previous = await db.prepare(`
+    SELECT token FROM verification_challenges
+    WHERE project_id = ? AND user_id = ? AND target_url = ? AND expected_url = ?
+      AND consumed_at IS NULL AND expires_at > ? AND token IS NOT NULL
+    ORDER BY created_at DESC LIMIT 1
+  `).bind(project.id, userId, target, project.url, now).first();
+  const token = TOKEN_PATTERN.test(previous?.token || '') ? previous.token : randomToken();
   const row = {
     id: crypto.randomUUID(), project_id: project.id, user_id: userId,
     token_hash: await hashClaimToken(token), method, target_url: target,
@@ -90,11 +116,11 @@ export async function startClaim(db, { project, userId, method, targetUrl }, opt
       .bind(project.id, userId),
     db.prepare(`
       INSERT INTO verification_challenges
-        (id, project_id, user_id, token_hash, method, target_url, expected_url, expires_at, created_at)
-      SELECT ?, p.id, ?, ?, ?, ?, p.url, ?, ? FROM projects p
+        (id, project_id, user_id, token_hash, token, method, target_url, expected_url, expires_at, created_at)
+      SELECT ?, p.id, ?, ?, ?, ?, ?, p.url, ?, ? FROM projects p
       WHERE p.id = ? AND p.url = ? AND p.status = 'active'
         AND NOT EXISTS (SELECT 1 FROM project_owners o WHERE o.project_id = p.id AND o.user_id <> ?)
-    `).bind(row.id, userId, row.token_hash, method, target, row.expires_at, now, project.id, project.url, userId)
+    `).bind(row.id, userId, row.token_hash, token, method, target, row.expires_at, now, project.id, project.url, userId)
   ]);
   if (result[2].meta.changes !== 1) {
     throw new ClaimError('changed', 'This project changed while you were starting verification. Reload and try again.', 409);
@@ -121,7 +147,7 @@ export async function verifyClaim(db, { project, userId, challengeId, token }, o
   }
   const challenge = displayChallenge(row, token);
   if (row.attempts >= MAX_PROOF_ATTEMPTS) {
-    throw new ClaimError('attempts_exhausted', 'This verification has reached its attempt limit. Start a new verification.', 429);
+    throw new ClaimError('attempts_exhausted', 'This verification has used all of its checks. Choose “Start again”; the details you already published stay valid.', 429);
   }
   await rateLimit(db, `claim:verify:user:${userId}`, 30, RATE_LIMIT_WINDOW_MS, challenge);
   const attempt = await db.prepare(`
@@ -140,7 +166,14 @@ export async function verifyClaim(db, { project, userId, challengeId, token }, o
       method: row.method, targetUrl: row.target_url, token
     });
   } catch (error) {
-    if (error instanceof ProofError) throw new ClaimError(error.code, error.message, 400, challenge);
+    if (error instanceof ProofError) {
+      if (TRANSIENT_PROOF_ERRORS.has(error.code)) {
+        // Keep last_checked_at so the retry cooldown and hourly limit still apply.
+        await db.prepare('UPDATE verification_challenges SET attempts = attempts - 1 WHERE id = ? AND attempts > 0')
+          .bind(row.id).run();
+      }
+      throw new ClaimError(error.code, error.message, 400, challenge);
+    }
     throw error;
   }
   if (!verified) {

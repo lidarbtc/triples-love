@@ -81,17 +81,23 @@ POST. Dynamic responses are private and not cached.
 An unclaimed active project can be claimed by verifying either a TXT record at
 `_triples-love.<registered hostname>` or a real `<meta>` tag in the HTML head at the
 registered URL, including its path. A random token is tied to one account,
-project, method, target URL and 48-hour attempt. Only its hash is stored. Starting
-a new attempt invalidates that user's previous unused attempt for the project.
+project, target URL and 48-hour attempt. D1 stores the token and its hash so the
+signed-in claimant can return to an unfinished proof; the token is public once
+published and works only for its own account. Starting again for the same address
+(to switch method or after using every check) replaces the attempt but keeps its
+token, so published details stay valid. A different address, another account or a
+consumed proof always gets a new token. Rows created before migration 0007 have
+no stored token and cannot be resumed.
 Checks are manual and rate-limited. Tokens are consumed in the same D1 transaction
 as the unique project ownership record. Another account cannot replace an owner.
+Each attempt allows 10 checks. Timeouts, connection and DNS failures and non-2xx
+responses do not count, but the 3-second cooldown and hourly limits still apply.
 
 Apply `migrations/0005_verification_challenge_lifetime.sql` before deploying this
 expiry change. It extends retained, unused challenges to 48 hours from creation
 without changing their tokens, attempt limits, or ownership. It does not shorten
 longer expiry times or revive consumed proofs. Deleted challenges cannot be
-restored by this migration. Starting a new challenge still invalidates the old
-token, so keep an already deployed proof while waiting for IPNS caches to update.
+restored by this migration.
 The 12 starts and 30 checks per user remain limited to a one-hour window.
 
 Verified projects show a seal after their name in the directory and on the project

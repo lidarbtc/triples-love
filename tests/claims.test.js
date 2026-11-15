@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createTestDb } from './helpers/d1.js';
 import { getProject } from '../src/lib/server/projects.js';
-import { CHALLENGE_LIFETIME_MS, MAX_PROOF_ATTEMPTS, hashClaimToken, startClaim, verifyClaim } from '../src/lib/server/claims.js';
+import {
+  CHALLENGE_LIFETIME_MS, MAX_PROOF_ATTEMPTS, findActiveChallenge, hashClaimToken, startClaim, verifyClaim
+} from '../src/lib/server/claims.js';
 import { ProofError } from '../src/lib/server/proof.js';
 
 const registeredUrl = 'https://fans.example.com/wav-archive';
@@ -27,7 +29,7 @@ async function begin(db, project, now, extras = {}) {
   return startClaim(db, { project, userId: 'owner-a', method: 'meta', ...extras }, { now });
 }
 
-test('initial claim ignores attacker-supplied URL, stores only a hash and binds user/project/path', async (t) => {
+test('initial claim ignores attacker-supplied URL, stores the token with its hash and binds user/project/path', async (t) => {
   const { db, project, now } = await fixture(t);
   const challenge = await begin(db, project, now, { targetUrl: 'https://attacker.example.com/' });
   assert.equal(challenge.targetUrl, registeredUrl);
@@ -38,16 +40,51 @@ test('initial claim ignores attacker-supplied URL, stores only a hash and binds 
   assert.equal(stored.user_id, 'owner-a');
   assert.equal(stored.expected_url, registeredUrl);
   assert.equal(stored.token_hash, await hashClaimToken(challenge.token));
-  assert.equal(JSON.stringify(stored).includes(challenge.token), false);
+  assert.equal(stored.token, challenge.token);
 });
 
-test('starting a replacement challenge invalidates previous unconsumed token', async (t) => {
+test('starting again for the same address keeps the published token', async (t) => {
   const { db, project, now } = await fixture(t);
   const old = await begin(db, project, now);
+  db.sqlite.prepare('UPDATE verification_challenges SET attempts = ?').run(MAX_PROOF_ATTEMPTS);
   const fresh = await begin(db, project, now + 1, { method: 'dns' });
-  assert.notEqual(old.token, fresh.token);
+  assert.equal(fresh.token, old.token);
+  assert.notEqual(fresh.id, old.id);
+  assert.equal(fresh.dnsValue, `triples-love-verification=${old.token}`);
   assert.equal(db.sqlite.prepare('SELECT COUNT(*) AS count FROM verification_challenges').get().count, 1);
+  assert.equal(db.sqlite.prepare('SELECT attempts FROM verification_challenges').get().attempts, 0);
   await assert.rejects(verifyClaim(db, request(project, old), { now: now + 2, verifyProof: async () => true }), { code: 'invalid_challenge' });
+  await verifyClaim(db, request(project, fresh), { now: now + 3, verifyProof: async () => true });
+  assert.equal((await getProject(db, project.id)).owner.id, 'owner-a');
+});
+
+test('a new address, another account or a used token never reuses a token', async (t) => {
+  const { db, project, now } = await fixture(t);
+  const first = await begin(db, project, now);
+  const other = await startClaim(db, { project, userId: 'owner-b', method: 'meta' }, { now: now + 1 });
+  assert.notEqual(other.token, first.token);
+  await verifyClaim(db, request(project, first), { now: now + 2, verifyProof: async () => true });
+  const owned = await getProject(db, project.id);
+  const again = await begin(db, owned, now + 3);
+  assert.notEqual(again.token, first.token);
+  const moved = await begin(db, owned, now + 4, { targetUrl: 'https://new-fans.example.com/' });
+  assert.notEqual(moved.token, again.token);
+});
+
+test('an unfinished proof can be shown again only to its account and only while usable', async (t) => {
+  const { db, project, now } = await fixture(t);
+  assert.equal(await findActiveChallenge(db, { project, userId: 'owner-a' }, { now }), null);
+  const challenge = await begin(db, project, now);
+  assert.deepEqual(await findActiveChallenge(db, { project, userId: 'owner-a' }, { now: now + 1 }), challenge);
+  assert.equal(await findActiveChallenge(db, { project, userId: 'owner-b' }, { now: now + 1 }), null);
+  assert.equal(await findActiveChallenge(db, { project, userId: 'owner-a' }, { now: challenge.expiresAt }), null);
+  assert.equal(await findActiveChallenge(db, { project: { ...project, url: 'https://moved.example.com/' }, userId: 'owner-a' }, { now: now + 1 }), null);
+  db.sqlite.prepare('UPDATE verification_challenges SET token = NULL').run();
+  assert.equal(await findActiveChallenge(db, { project, userId: 'owner-a' }, { now: now + 1 }), null);
+  const restarted = await begin(db, project, now + 2);
+  assert.notEqual(restarted.token, challenge.token);
+  await verifyClaim(db, request(project, restarted), { now: now + 3, verifyProof: async () => true });
+  assert.equal(await findActiveChallenge(db, { project: await getProject(db, project.id), userId: 'owner-a' }, { now: now + 4 }), null);
 });
 
 test('proofs survive 47 hours of propagation while user rate limits remain hourly', async (t) => {
@@ -150,7 +187,24 @@ test('failed and unreachable proof retain a retryable challenge without ownershi
     now: now + 3000, verifyProof: async () => { throw new ProofError('timeout', 'Try again'); }
   }), (error) => error.code === 'timeout' && error.challenge.id === challenge.id);
   assert.equal((await getProject(db, project.id)).owner, null);
-  assert.equal(db.sqlite.prepare('SELECT attempts FROM verification_challenges').get().attempts, 2);
+  // The failed proof counts; the timeout says nothing about the proof and is refunded.
+  assert.equal(db.sqlite.prepare('SELECT attempts FROM verification_challenges').get().attempts, 1);
+});
+
+test('site outages do not use up checks but still respect the cooldown', async (t) => {
+  const { db, project, now } = await fixture(t);
+  const challenge = await begin(db, project, now);
+  for (const [index, code] of ['timeout', 'fetch_failed', 'dns_failed', 'http_failed'].entries()) {
+    await assert.rejects(verifyClaim(db, request(project, challenge), {
+      now: now + index * 3000, verifyProof: async () => { throw new ProofError(code, 'Try again'); }
+    }), { code });
+  }
+  assert.equal(db.sqlite.prepare('SELECT attempts FROM verification_challenges').get().attempts, 0);
+  await assert.rejects(verifyClaim(db, request(project, challenge), { now: now + 9001, verifyProof: async () => assert.fail() }), { code: 'retry_later' });
+  await assert.rejects(verifyClaim(db, request(project, challenge), {
+    now: now + 12000, verifyProof: async () => { throw new ProofError('meta_too_late', 'Move it'); }
+  }), { code: 'meta_too_late' });
+  assert.equal(db.sqlite.prepare('SELECT attempts FROM verification_challenges').get().attempts, 1);
 });
 
 test('cooldown and per-challenge attempt limit bound external verification requests', async (t) => {
