@@ -487,6 +487,18 @@ export const sites = [
     badges: ["desktop", "photos", "guestbook"],
     accent: "blue",
   },
+  {
+    id: "lunar-gallery",
+    name: "Lunar Gallery",
+    domain: "lunar.gallery",
+    url: "https://lunar.gallery/",
+    category: "objekts",
+    addedAt: "2026-11-17T11:35:54+09:00",
+    tagline: "Objekt catalog and wishlists",
+    description: "Browse tripleS, ARTMS, and idntt Objekts by member, season, class, and more. Build have/want lists and share them as a link, an image, or Discord text.",
+    badges: ["catalog", "want/have", "share lists"],
+    accent: "violet",
+  },
 ];
 
 export const categories = [

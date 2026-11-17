@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'November 15, 2026',
-      updateTitle: 'HaYeon OS added, COSMO Live Stats archived',
+      date: 'November 17, 2026',
+      updateTitle: 'Lunar Gallery added',
       updateBody:
-        'Log in to HaYeon OS, a fan-made desktop themed around Jeong HaYeon, to browse her photos, sign the live guestbook, and play Hedgehog Finder. COSMO Live Stats is currently unavailable, so its listing and saved screenshot are now in the archive.',
+        'Browse tripleS, ARTMS, and idntt Objekts in Lunar Gallery. Make have/want lists and share them as a link, an image, or Discord text.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'November 15, 2026',
+      statusValue: 'November 17, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -111,13 +111,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 11월 15일',
-      updateTitle: 'HaYeon OS 추가, COSMO Live Stats 기록 보관',
+      date: '2026년 11월 17일',
+      updateTitle: 'Lunar Gallery 추가',
       updateBody:
-        '정하연 테마의 팬메이드 데스크톱에서 사진을 둘러보고 실시간 방명록을 남기고 고슴도치 찾기도 할 수 있는 HaYeon OS를 추가했습니다. 현재 접속할 수 없는 COSMO Live Stats의 소개와 당시 화면은 아카이브에 남겼습니다.',
+        'tripleS·ARTMS·idntt 오브젝트를 둘러볼 수 있는 Lunar Gallery를 추가했습니다. 보유·희망 목록을 만들어 링크나 이미지, 디스코드용 텍스트로 공유할 수 있습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 11월 15일',
+      statusValue: '2026년 11월 17일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -478,6 +478,12 @@ export const siteCopy = {
         'tripleS 박시온의 사진과 영상을 모아둔 팬 아카이브입니다. 프로필과 오브젝트를 둘러보고, 오브젝트 월드컵에서 마음에 드는 카드를 골라볼 수도 있습니다.',
       badges: ['사진·영상', '오브젝트', '월드컵']
     },
+    'lunar-gallery': {
+      tagline: '오브젝트 카탈로그와 위시리스트',
+      description:
+        'tripleS·ARTMS·idntt 오브젝트를 멤버, 시즌, 클래스 등으로 골라 볼 수 있습니다. 보유·희망 목록을 만들어 링크나 이미지, 디스코드용 텍스트로 공유할 수 있습니다.',
+      badges: ['카탈로그', '보유·희망 목록', '목록 공유']
+    },
     hayeonos: {
       tagline: '정하연 팬메이드 데스크톱',
       description:
@@ -488,6 +494,7 @@ export const siteCopy = {
 };
 
 export const siteSearchAliases = {
+  'lunar-gallery': ['lunar', 'lunar gallery', '루나', '루나 갤러리', '루나갤러리', '위시리스트', 'wishlist', 'want/have'],
   havant: ['하반트', '해번트', 'have want', 'want/have'],
   tracker: ['want/have'],
   objektmy: ['want/have'],
