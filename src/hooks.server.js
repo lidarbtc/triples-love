@@ -1,13 +1,17 @@
-import { isSupportedLang } from '$lib/i18n.js';
-import { getUser } from '$lib/server/auth.js';
+import { env } from 'cloudflare:workers';
+import { isSupportedLang } from '#lib/i18n.js';
+import { getUser } from '#lib/server/auth.js';
 import { isHttpError, isRedirect } from '@sveltejs/kit';
-import { requestContext, recordResult, recordUnexpected, finishRequest } from '$lib/server/observability.js';
+import { requestContext, recordResult, recordUnexpected, finishRequest } from '#lib/server/observability.js';
 
-/** @type {import('@sveltejs/kit').Handle} */
+export { handleError } from '#lib/server/observability.js';
+
+/** @type {import('@sveltejs/kit/hooks').Handle} */
 export async function handle({ event, resolve }) {
   requestContext(event);
   let status = 500;
   try {
+    event.locals.env = env;
     const lang = isSupportedLang(event.params.lang)
       ? event.params.lang
       : (event.url.pathname.startsWith('/p/') || ['/badges', '/badges/'].includes(event.url.pathname)) && event.url.searchParams.get('lang') === 'ko' ? 'ko' : 'en';
@@ -33,10 +37,4 @@ export async function handle({ event, resolve }) {
   } finally {
     finishRequest(event, status);
   }
-}
-
-/** @type {import('@sveltejs/kit').HandleServerError} */
-export function handleError({ event, error, status }) {
-  if (status >= 500) recordUnexpected(event, 'request', error);
-  return { message: status >= 500 ? 'Internal Error' : 'Not Found' };
 }

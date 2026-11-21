@@ -1,20 +1,20 @@
 <script>
-  import { browser } from '$app/environment';
-  import { page } from '$app/stores';
-  import { projectCopy } from '$lib/project-copy.js';
-  import '$lib/project.css';
+  import { page } from '$app/state';
+  import { projectCopy } from '#lib/project-copy.js';
+  import '#lib/project.css';
 
-  export let lang = 'en';
-  export let user = null;
-  $: t = projectCopy[lang] || projectCopy.en;
-  $: nextLang = lang === 'ko' ? 'en' : 'ko';
-  $: languageUrl = (() => {
-    const url = new URL($page.url);
+  let { lang = 'en', user = null, children } = $props();
+  const t = $derived(projectCopy[lang] || projectCopy.en);
+  const nextLang = $derived(lang === 'ko' ? 'en' : 'ko');
+  const languageUrl = $derived.by(() => {
+    const url = new URL(page.url.href);
     url.searchParams.set('lang', nextLang);
     return `${url.pathname}${url.search}`;
-  })();
-  $: signInUrl = `/auth/github?returnTo=${encodeURIComponent($page.url.pathname + $page.url.search)}`;
-  $: if (browser) document.documentElement.lang = lang;
+  });
+  const signInUrl = $derived(`/auth/github?returnTo=${encodeURIComponent(page.url.pathname + page.url.search)}`);
+  $effect(() => {
+    document.documentElement.lang = lang;
+  });
 </script>
 
 <div class="project-shell" lang={lang}>
@@ -35,6 +35,6 @@
       {/if}
     </nav>
   </header>
-  <main class="project-main"><slot /></main>
+  <main class="project-main">{@render children?.()}</main>
   <footer class="project-footer"><a href={`/${lang}/`}>← {t.back}</a></footer>
 </div>

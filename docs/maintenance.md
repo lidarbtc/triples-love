@@ -122,7 +122,7 @@ npm run deploy
 The D1 instance is `triples-love-db`, bound as `DB` in `wrangler.jsonc`.
 The Wrangler account is pinned to the existing `lidarbtc` deployment, so signing
 in to an account with multiple memberships does not change the target.
-`npm run deploy` builds and deploys `.svelte-kit/cloudflare/`, including the Worker.
+`npm run deploy` builds and deploys the adapter's generated Worker and client assets.
 Neither `npm run build` nor `npm run deploy` runs the remote seed. A Git-triggered
 deployment also needs the D1 import unless its configured build process explicitly
 runs it; confirm the remote records regardless of deployment status.

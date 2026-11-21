@@ -1,9 +1,9 @@
 <script>
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
-  import ProjectShell from '$lib/components/ProjectShell.svelte';
-  import { badgeTypes, createBadgeEmbed } from '$lib/embed-badges.js';
-  import { localizedUrl } from '$lib/seo.js';
+  import ProjectShell from '#lib/components/ProjectShell.svelte';
+  import { badgeTypes, createBadgeEmbed } from '#lib/embed-badges.js';
+  import { localizedUrl } from '#lib/seo.js';
 
   export let data;
   export let form = null;
@@ -107,7 +107,7 @@
   function submitCheck() {
     checking = true;
     return async ({ update }) => {
-      try { await update({ reset: false, invalidateAll: true }); } finally { checking = false; }
+      try { await update({ reset: false, navigate: false }); } finally { checking = false; }
     };
   }
 
@@ -120,7 +120,7 @@
     copyState = '';
     const params = new URLSearchParams({ lang, type, theme });
     if (projectId) params.set('project', projectId);
-    await goto(`/badges/?${params}`, { replaceState: true, noScroll: true, keepFocus: true });
+    await goto(`/badges/?${params}`, { replace: true, reset: false });
   }
 
   async function copyCode() {

@@ -2,7 +2,6 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "triples-love",
   "account_id": "35b3305bfd095935de7070f4d99d6929",
-  "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2026-05-10",
   "compatibility_flags": ["nodejs_compat"],
   "upload_source_maps": true,
@@ -20,7 +19,6 @@
     "traces": { "enabled": false }
   },
   "assets": {
-    "directory": ".svelte-kit/cloudflare",
     "binding": "ASSETS"
   },
   "vars": {

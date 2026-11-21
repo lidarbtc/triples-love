@@ -1,15 +1,21 @@
+import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 /** @type {import('vite').UserConfig} */
 const config = {
-  plugins: [sveltekit(), {
-    name: 'private-server-source-maps',
-    enforce: 'post',
-    config(config) {
-      // SvelteKit selects SSR in its own config hook, after Vite's initial env.
-      return { build: { sourcemap: Boolean(config.build?.ssr) } };
+  plugins: [sveltekit({ adapter: adapter() })],
+  environments: {
+    client: { build: { sourcemap: false } },
+    ssr: {
+      build: {
+        sourcemap: true,
+        rolldownOptions: {
+          // Compile the Cron handler with the app so both share server dependencies.
+          input: { 'backlink-cron': './src/lib/server/backlink-cron.js' }
+        }
+      }
     }
-  }]
+  }
 };
 
 export default config;

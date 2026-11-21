@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { getDb } from '$lib/server/db.js';
-import { getProject, pageLanguage } from '$lib/server/projects.js';
-import { getBacklinkStatus } from '$lib/server/backlinks.js';
+import { getDb } from '#lib/server/db.js';
+import { getProject, pageLanguage } from '#lib/server/projects.js';
+import { getBacklinkStatus } from '#lib/server/backlinks.js';
 
 export async function load(event) {
   const db = getDb(event);

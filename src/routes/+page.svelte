@@ -1,5 +1,5 @@
 <script>
-  import { ui } from '$lib/i18n.js';
+  import { ui } from '#lib/i18n.js';
 
   const metaImage = 'https://triples.love/og-image.png';
   const metaImageAlt =

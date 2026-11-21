@@ -34,8 +34,10 @@ function expectFailure(response, operation, code, level = 'error') {
 }
 
 console.log('Bundling the actual SvelteKit Worker for an isolated HTTP flow test...');
+const workerConfig = new URL('../.svelte-kit/cloudflare/worker/wrangler.json', import.meta.url);
+const { main } = JSON.parse(await readFile(workerConfig, 'utf8'));
 const bundle = await build({
-  entryPoints: [fileURLToPath(new URL('../.svelte-kit/cloudflare/_worker.js', import.meta.url))],
+  entryPoints: [fileURLToPath(new URL(main, workerConfig))],
   bundle: true, write: false, format: 'esm', platform: 'neutral',
   // workerd formats object console arguments with util.inspect for local stdio.
   // Serialize only our structured records for assertions; leave all other output
@@ -280,6 +282,8 @@ try {
     const sql = migration.split('\n').filter(line => !line.trimStart().startsWith('--')).join('\n');
     await db.batch(sql.split(';').map(statement => statement.trim()).filter(Boolean).map(statement => db.prepare(statement)));
   }
+  const scheduled = await (await worker.getWorker()).scheduled({ cron: '23 * * * *' });
+  assert.equal(scheduled.outcome, 'ok', 'The deployed Cron handler can read the empty D1 database');
   const seeds = [];
   for (const [id, url] of Object.entries(projectUrls)) {
     seeds.push(db.prepare(`INSERT INTO projects (id,name,url,domain,category,added_at,updated_at)

@@ -1,6 +1,6 @@
 <script>
   import VerifiedSeal from './VerifiedSeal.svelte';
-  import { projectCopy, splitLastWord } from '$lib/project-copy.js';
+  import { projectCopy, splitLastWord } from '#lib/project-copy.js';
 
   export let name;
   export let lang = 'en';

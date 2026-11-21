@@ -25,7 +25,7 @@ share an ID and emit one failure detail. A later, more severe failure can add a
 detail after an earlier success or ordinary rejection. For request/error rates,
 count only `request.complete`, not all records.
 
-Enhanced form submissions may return HTTP 200 while the action failed. Use
+Enhanced form submissions return the HTTP status passed to `fail()`. Use
 `result_status` or `outcome` when investigating those flows. DNS/HTML dependency
 failures also intentionally remain HTTP 400 for the existing form UI, but are
 logged at error level.
@@ -88,11 +88,11 @@ flow includes a real ten-second GitHub timeout, DNS failure, stale/invalid edits
 initial session lookup failure and a page-load D1 failure. It checks correlation,
 deduplication and the absence of fixture credentials/proof tokens in runtime logs.
 
-Run `npx wrangler deploy --dry-run --outdir .wrangler/logging-dry-run` to check
-the upload. The emitted `_worker.js.map` must contain the original application
-sources, and `.svelte-kit/output/client` must contain no `.map` files. Vite
-generates server-only maps and Wrangler includes them in the private Worker
-upload. Custom `stack_locations` are conservative locations, not a full Error
+Run `npx wrangler deploy --dry-run --outfile .wrangler/logging-upload.multipart`
+to inspect the upload. Its `application/source-map` parts must include the original
+application sources for the server hooks, authentication and Cron modules. The
+published assets in `.svelte-kit/cloudflare/client/` must contain zero `.map`
+files. Custom `stack_locations` are conservative locations, not a full Error
 stack; automatic remapping of that custom field is not assumed. Retain the
 matching build/map when manually resolving a bundled location.
 

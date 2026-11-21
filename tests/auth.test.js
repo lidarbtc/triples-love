@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
+import { isHttpError, isRedirect } from '@sveltejs/kit';
 import {
   safeReturnTo, startGitHubLogin, completeGitHubLogin, getUser, requireUser, logout
 } from '../src/lib/server/auth.js';
@@ -50,9 +51,11 @@ function fixture(t) {
     const responseHeaders = new Map();
     return {
       url,
-      locals: {},
+      locals: { env: {
+        DB: db, APP_ORIGIN: options.appOrigin ?? ORIGIN,
+        GITHUB_CLIENT_ID: 'test-id', GITHUB_CLIENT_SECRET: 'test-secret'
+      } },
       request: new Request(url, { method, headers }),
-      platform: { env: { APP_ORIGIN: ORIGIN, GITHUB_CLIENT_ID: 'test-id', GITHUB_CLIENT_SECRET: 'test-secret', DB: db } },
       cookies: {
         get(name) { return jar.get(name); },
         set(name, value, settings) { jar.set(name, value); writtenCookies.push({ name, value, settings }); },
@@ -74,15 +77,19 @@ function fixture(t) {
 }
 
 async function redirected(work, expectedLocation) {
-  let redirect;
-  try { await work(); } catch (err) { redirect = err; }
-  assert.equal(redirect?.status, 303, 'expected a redirect');
-  if (expectedLocation) assert.equal(redirect.location, expectedLocation);
-  return redirect.location;
+  try {
+    await work();
+  } catch (err) {
+    if (!isRedirect(err)) throw err;
+    assert.equal(err.status, 303);
+    if (expectedLocation !== undefined) assert.equal(err.location, expectedLocation);
+    return err.location;
+  }
+  assert.fail('expected a redirect');
 }
 
 async function rejectsStatus(work, status) {
-  await assert.rejects(work, (err) => err.status === status);
+  await assert.rejects(work, (err) => isHttpError(err, status));
 }
 
 async function signIn(f) {
@@ -93,7 +100,10 @@ async function signIn(f) {
 }
 
 test('return destinations stay on-site and cannot point back into auth routes', () => {
-  for (const value of [null, '', 'https://evil.example', '//evil.example', '/\\evil.example', '/\tevil.example', '/auth/github', '/auth', '/p/../auth/github']) {
+  for (const value of [
+    null, '', 'https://evil.example', '//evil.example', '/\\evil.example', '/\tevil.example',
+    '/a/..//outside.example', '/auth/github', '/auth', '/p/../auth/github'
+  ]) {
     assert.equal(safeReturnTo(value, ORIGIN), '/', String(value));
   }
   assert.equal(safeReturnTo('/p/apollo/edit?lang=ko#intro', ORIGIN), '/p/apollo/edit?lang=ko#intro');
@@ -101,7 +111,7 @@ test('return destinations stay on-site and cannot point back into auth routes', 
 
 test('OAuth uses a hashed state, S256 PKCE, restricted cookies and no repo or email scopes', async (t) => {
   const f = fixture(t);
-  const request = f.event();
+  const request = f.event('/auth/github?returnTo=%2F%2Foutside.example');
   const location = new URL(await redirected(() => startGitHubLogin(request)));
   assert.equal(location.origin + location.pathname, 'https://github.com/login/oauth/authorize');
   assert.equal(location.searchParams.get('scope'), '');
@@ -113,13 +123,27 @@ test('OAuth uses a hashed state, S256 PKCE, restricted cookies and no repo or em
   assert.equal(location.searchParams.get('code_challenge'), challenge);
   assert.deepEqual(f.writtenCookies.at(-1).settings, { path: '/', httpOnly: true, secure: true, sameSite: 'lax', maxAge: 600 });
   assert.equal(request.responseHeaders.get('cache-control'), 'no-store');
+  assert.equal(row.return_to, '/');
+  const state = location.searchParams.get('state');
+  await redirected(() => completeGitHubLogin(f.event(`/auth/github/callback?state=${state}&code=github-code`)), '/');
 });
 
 test('preview login redirects to canonical host without writing state or cookies', async (t) => {
   const f = fixture(t);
-  await redirected(() => startGitHubLogin(f.event('https://preview.example/auth/github?returnTo=%2Fp%2Fapollo')), `${ORIGIN}/auth/github?returnTo=%2Fp%2Fapollo`);
+  const request = f.event('https://preview.example/auth/github?returnTo=%2Fp%2Fapollo', { appOrigin: 'https://canonical.example' });
+  await redirected(() => startGitHubLogin(request), 'https://canonical.example/auth/github?returnTo=%2Fp%2Fapollo');
   assert.equal(f.sqlite.prepare('SELECT COUNT(*) AS n FROM oauth_states').get().n, 0);
   assert.equal(f.jar.size, 0);
+});
+
+test('preview login rejects an invalid APP_ORIGIN before writing state or cookies', async (t) => {
+  const f = fixture(t);
+  for (const appOrigin of ['http://canonical.example', 'https://canonical.example/path']) {
+    const request = f.event('https://preview.example/auth/github', { appOrigin });
+    await rejectsStatus(() => startGitHubLogin(request), 503);
+  }
+  assert.equal(f.sqlite.prepare('SELECT COUNT(*) AS n FROM oauth_states').get().n, 0);
+  assert.equal(f.writtenCookies.length, 0);
 });
 
 test('OAuth initiation is limited per hashed client address before any state or cookie is issued', async (t) => {
@@ -240,7 +264,7 @@ test('upstream OAuth errors consume state without leaking credentials or creatin
   const request = f.event(`/auth/github/callback?state=${f.jar.get(STATE_COOKIE)}&code=code`);
   request.fetch = async () => { throw new Error('test-secret in upstream failure'); };
   await assert.rejects(() => completeGitHubLogin(request), (err) => {
-    assert.equal(err.status, 502);
+    assert.ok(isHttpError(err, 502));
     assert.ok(!JSON.stringify(err).includes('test-secret'));
     return true;
   });

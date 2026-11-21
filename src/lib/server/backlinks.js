@@ -1,5 +1,5 @@
 // Website-banner backlink checks and featured eligibility. Keep imports relative:
-// the scheduled Worker bundles this module outside SvelteKit's $lib alias.
+// the scheduled Worker bundles this module outside SvelteKit's #lib alias.
 import { parse } from 'parse5';
 import { ProofError, fetchSiteHtml, validateTargetUrl } from './proof.js';
 

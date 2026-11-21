@@ -2,6 +2,7 @@
 // and remote databases. No GitHub credentials or live ownership proofs needed.
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { isHttpError } from '@sveltejs/kit';
 import { Miniflare } from 'miniflare';
 import { startClaim, verifyClaim } from '../src/lib/server/claims.js';
 import { getProject, listProjects, saveProject } from '../src/lib/server/projects.js';
@@ -322,9 +323,9 @@ try {
       en: { tagline: 'Stale EN', description: 'Wrong', badges: [] },
       ko: { tagline: '오래된 값', description: '잘못된 값', badges: [] }
     } };
-    await assert.rejects(saveProject(db, fixture.project.id, fixture.ownerA, stale), error => error.status === 409);
+    await assert.rejects(saveProject(db, fixture.project.id, fixture.ownerA, stale), error => isHttpError(error, 409));
     assert.deepEqual(await getProject(db, fixture.project.id), saved);
-    await assert.rejects(saveProject(db, fixture.project.id, fixture.ownerB, { ...stale, version: saved.version }), error => error.status === 409);
+    await assert.rejects(saveProject(db, fixture.project.id, fixture.ownerB, { ...stale, version: saved.version }), error => isHttpError(error, 409));
     assert.deepEqual(await getProject(db, fixture.project.id), saved);
   });
 

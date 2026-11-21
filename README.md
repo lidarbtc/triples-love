@@ -17,7 +17,7 @@ Built with SvelteKit and Svelte, with Cloudflare Workers and D1.
 
 ## Development
 
-Use Node.js 22.12+ (or a newer supported LTS release) and npm.
+Use Node.js 24 or a newer supported LTS release and npm.
 
 ```sh
 npm ci

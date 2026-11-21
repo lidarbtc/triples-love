@@ -1,28 +1,26 @@
 <script>
   import { enhance } from '$app/forms';
-  import { page } from '$app/stores';
-  import ProjectShell from '$lib/components/ProjectShell.svelte';
-  import { categories } from '$lib/data.js';
-  import { categoryNames } from '$lib/i18n.js';
-  import { TAGLINE_DISPLAY_MAX, displayTagline, projectCopy, projectHref } from '$lib/project-copy.js';
-  import { badgePageHref } from '$lib/embed-badges.js';
+  import { page } from '$app/state';
+  import { untrack } from 'svelte';
+  import ProjectShell from '#lib/components/ProjectShell.svelte';
+  import { categories } from '#lib/data.js';
+  import { categoryNames } from '#lib/i18n.js';
+  import { TAGLINE_DISPLAY_MAX, displayTagline, projectCopy, projectHref } from '#lib/project-copy.js';
+  import { badgePageHref } from '#lib/embed-badges.js';
 
-  export let data;
-  export let form = null;
-  let saving = false;
-  let previewLang = data.lang;
-  let draft = initialDraft(data.project, form?.values);
-  let previousForm = form;
-  $: ({ project, user, lang } = data);
-  $: t = projectCopy[lang] || projectCopy.en;
-  $: if (form !== previousForm) {
-    previousForm = form;
-    if (form?.values) draft = { ...draft, ...form.values };
-  }
-  $: if (form?.saved) draft.version = data.project.version;
-  $: previewTagline = draft[`tagline_${previewLang}`] || draft.tagline_en;
-  $: previewDescription = draft[`description_${previewLang}`] || draft.description_en;
-  $: previewBadges = String(draft[`badges_${previewLang}`] || draft.badges_en).split(',').map((tag) => tag.trim()).filter(Boolean);
+  let { data, form = null } = $props();
+  const { project, user, lang } = $derived(data);
+  const t = $derived(projectCopy[lang] || projectCopy.en);
+  let saving = $state(false);
+  let previewLang = $state(untrack(() => lang));
+  const draft = $state(untrack(() => initialDraft(project, form?.values)));
+  $effect.pre(() => {
+    if (form?.values) Object.assign(draft, form.values);
+    if (form?.saved) draft.version = project.version;
+  });
+  const previewTagline = $derived(draft[`tagline_${previewLang}`] || draft.tagline_en);
+  const previewDescription = $derived(draft[`description_${previewLang}`] || draft.description_en);
+  const previewBadges = $derived(String(draft[`badges_${previewLang}`] || draft.badges_en).split(',').map((tag) => tag.trim()).filter(Boolean));
 
   // Tells the owner when a short description is longer than what visitors see.
   function taglineNote(value, copy) {
@@ -31,8 +29,8 @@
     const text = (over ? copy.taglineOver : copy.taglineLimit).replace('{count}', count).replace('{max}', TAGLINE_DISPLAY_MAX);
     return { over, text, count };
   }
-  $: taglineNoteEn = taglineNote(draft.tagline_en, t);
-  $: taglineNoteKo = taglineNote(draft.tagline_ko, t);
+  const taglineNoteEn = $derived(taglineNote(draft.tagline_en, t));
+  const taglineNoteKo = $derived(taglineNote(draft.tagline_ko, t));
 
   function initialDraft(project, values) {
     return {
@@ -47,7 +45,7 @@
   function savePage() {
     saving = true;
     return async ({ update }) => {
-      try { await update({ reset: false }); } finally { saving = false; }
+      try { await update({ reset: false, navigate: false }); } finally { saving = false; }
     };
   }
 </script>
@@ -61,7 +59,7 @@
   <a class="project-back" href={projectHref(project.id, lang)}>← {project.name}</a>
   <div class="editor-heading"><div><span class="project-eyebrow">{t.edit}</span><h1 class="project-flow-title">{t.editTitle}</h1><p class="project-intro">{t.editIntro}</p></div><div class="editor-actions"><a class="project-btn project-btn-secondary" href={projectHref(project.id, lang)}>{t.view} ↗</a></div></div>
   {#if form?.message}<div class="project-message project-message-error" role="alert">{form.message}</div>{/if}
-  {#if form?.saved}<div class="project-message" role="status">{t.saved}</div>{:else if $page.url.searchParams.get('claimed') === '1'}<div class="project-message" role="status">{t.claimedSuccess}</div>{/if}
+  {#if form?.saved}<div class="project-message" role="status">{t.saved}</div>{:else if page.url.searchParams.get('claimed') === '1'}<div class="project-message" role="status">{t.claimedSuccess}</div>{/if}
   <p class="editor-featured" class:on={data.featured}><span class="editor-featured-dot" aria-hidden="true"></span>{data.featured ? t.featuredOn : t.featuredOff} <a href={badgePageHref(project.id, lang)}>{data.featured ? t.featuredManage : t.featuredGet} →</a></p>
   <div class="editor-layout">
     <form method="POST" action={`?lang=${lang}`} use:enhance={savePage} class="editor-form">
@@ -101,7 +99,7 @@
       <div class="editor-save"><button class="project-btn" type="submit" disabled={saving}>{saving ? t.saving : t.save}</button></div>
     </form>
     <aside class="editor-preview">
-      <div class="editor-preview-heading"><span class="project-eyebrow">{t.preview}</span><div class="editor-preview-languages" aria-label={lang === 'ko' ? '미리보기 언어' : 'Preview language'}><button type="button" class:active={previewLang === 'en'} aria-pressed={previewLang === 'en'} on:click={() => previewLang = 'en'}>EN</button><button type="button" class:active={previewLang === 'ko'} aria-pressed={previewLang === 'ko'} on:click={() => previewLang = 'ko'}>KO</button></div></div>
+      <div class="editor-preview-heading"><span class="project-eyebrow">{t.preview}</span><div class="editor-preview-languages" aria-label={lang === 'ko' ? '미리보기 언어' : 'Preview language'}><button type="button" class:active={previewLang === 'en'} aria-pressed={previewLang === 'en'} onclick={() => previewLang = 'en'}>EN</button><button type="button" class:active={previewLang === 'ko'} aria-pressed={previewLang === 'ko'} onclick={() => previewLang = 'ko'}>KO</button></div></div>
       <div class="editor-preview-card project-theme" data-theme={draft.theme} data-accent={draft.accent}>
         <div class="editor-preview-stripe"><span>{project.domain}</span></div>
         <div class="editor-preview-content"><span class="editor-preview-category">{categoryNames[previewLang]?.[draft.category]}</span><h2>{draft.name || project.name}</h2><p class="editor-preview-tagline">{displayTagline(previewTagline) || t.previewEmpty}</p>{#if previewBadges.length}<div class="project-tag-list">{#each previewBadges as badge}<span class="project-tag">{badge}</span>{/each}</div>{/if}<div class="editor-preview-divider"></div><p class="editor-preview-description">{previewDescription || t.previewEmpty}</p><span class="editor-preview-visit">{projectCopy[previewLang].visit}</span></div>

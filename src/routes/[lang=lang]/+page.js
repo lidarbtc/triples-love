@@ -1,4 +1,4 @@
-import { supportedLangs } from '$lib/i18n.js';
+import { supportedLangs } from '#lib/i18n.js';
 
 export function entries() {
   return supportedLangs.map((lang) => ({ lang }));

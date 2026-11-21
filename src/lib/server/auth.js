@@ -4,7 +4,7 @@ import { recordResult } from './observability.js';
 
 function authFailure(event, operation, code, status, message, extras) {
   recordResult(event, operation, status, code, extras);
-  error(status, message);
+  return error(status, message);
 }
 
 const SESSION_COOKIE = '__Host-triples_session';
@@ -27,7 +27,7 @@ async function hashToken(value) {
 }
 
 function authConfig(event, needsCredentials = true) {
-  const env = event.platform?.env;
+  const env = event.locals?.env;
   let origin;
   try {
     const url = new URL(env?.APP_ORIGIN);
@@ -56,7 +56,9 @@ export function safeReturnTo(value, origin) {
   }
   try {
     const target = new URL(value, origin);
-    if (target.origin !== origin || target.pathname === '/auth' || target.pathname.startsWith('/auth/')) return '/';
+    // Normalizing dot segments can leave a path that starts with two slashes.
+    if (target.origin !== origin || target.pathname.startsWith('//')) return '/';
+    if (target.pathname === '/auth' || target.pathname.startsWith('/auth/')) return '/';
     return target.pathname + target.search + target.hash;
   } catch {
     return '/';
@@ -94,7 +96,7 @@ export async function requireUser(event) {
   const user = Object.hasOwn(event.locals ?? {}, 'user') ? event.locals.user : await getUser(event);
   if (user) return user;
   const returnTo = safeReturnTo(event.url.pathname + event.url.search, event.url.origin);
-  redirect(303, `/auth/github?${new URLSearchParams({ returnTo })}`);
+  return redirect(303, `/auth/github?${new URLSearchParams({ returnTo })}`);
 }
 
 export async function startGitHubLogin(event) {
@@ -103,7 +105,7 @@ export async function startGitHubLogin(event) {
   const returnTo = safeReturnTo(event.url.searchParams.get('returnTo'), config.origin);
   // Cookies and callbacks belong to the canonical host, including from previews.
   if (event.url.origin !== config.origin) {
-    redirect(303, `${config.origin}/auth/github?${new URLSearchParams({ returnTo })}`);
+    return redirect(303, `${config.origin}/auth/github?${new URLSearchParams({ returnTo })}`, { external: [config.origin] });
   }
   const db = getDb(event, 'oauth.state');
   // SvelteKit supplies this address in production. The fallback is for test events.
@@ -133,7 +135,7 @@ export async function startGitHubLogin(event) {
     code_challenge_method: 'S256'
   }).toString();
   recordResult(event, 'oauth.start', 303);
-  redirect(303, authorization.href);
+  return redirect(303, authorization, { external: ['https://github.com'] });
 }
 
 async function githubJson(event, operation, url, options) {
@@ -235,7 +237,7 @@ export async function completeGitHubLogin(event) {
   event.cookies.set(SESSION_COOKIE, session, { ...COOKIE_OPTIONS, maxAge: SESSION_SECONDS });
   event.locals.user = publicUser(user);
   recordResult(event, 'oauth.callback', 303);
-  redirect(303, safeReturnTo(attempt.return_to, config.origin));
+  return redirect(303, safeReturnTo(attempt.return_to, config.origin));
 }
 
 export async function logout(event) {
@@ -251,5 +253,5 @@ export async function logout(event) {
   event.cookies.delete(SESSION_COOKIE, COOKIE_OPTIONS);
   event.locals.user = null;
   recordResult(event, 'session.logout', 303);
-  redirect(303, '/');
+  return redirect(303, '/');
 }

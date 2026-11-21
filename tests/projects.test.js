@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { isHttpError } from '@sveltejs/kit';
 import { createTestDb } from './helpers/d1.js';
 import { getProject, listProjects, saveProject, validateProjectForm } from '../src/lib/server/projects.js';
 import { sites } from '../src/lib/data.js';
@@ -57,7 +58,7 @@ test('owner edits both locales and search aliases in one save without changing t
 test('stale editor cannot partially overwrite a newer save or its translations', async t => {
   const db = fixture(t);
   await saveProject(db, 'apollo', 'owner', validateProjectForm(form()));
-  await assert.rejects(() => saveProject(db, 'apollo', 'owner', validateProjectForm(form({ tagline_en: 'Stale value', tagline_ko: '오래된 값' }))), e => e.status === 409);
+  await assert.rejects(() => saveProject(db, 'apollo', 'owner', validateProjectForm(form({ tagline_en: 'Stale value', tagline_ko: '오래된 값' }))), e => isHttpError(e, 409));
   const project = await getProject(db, 'apollo');
   assert.equal(project.locales.en.tagline, 'A new tagline');
   assert.equal(project.locales.ko.tagline, '새 소개');
@@ -67,14 +68,14 @@ test('stale editor cannot partially overwrite a newer save or its translations',
 test('another account cannot edit the project even with the current version', async t => {
   const db = fixture(t);
   const before = await getProject(db, 'apollo');
-  await assert.rejects(() => saveProject(db, 'apollo', 'stranger', validateProjectForm(form())), e => e.status === 409);
+  await assert.rejects(() => saveProject(db, 'apollo', 'stranger', validateProjectForm(form())), e => isHttpError(e, 409));
   assert.deepEqual(await getProject(db, 'apollo'), before);
 });
 
 test('archived listings remain read-only', async t => {
   const db = fixture(t);
   db.sqlite.exec("UPDATE projects SET status='archived' WHERE id='apollo'");
-  await assert.rejects(() => saveProject(db, 'apollo', 'owner', validateProjectForm(form())), e => e.status === 409);
+  await assert.rejects(() => saveProject(db, 'apollo', 'owner', validateProjectForm(form())), e => isHttpError(e, 409));
 });
 
 test('seeding again never overwrites saved owner content', async t => {

@@ -1,10 +1,10 @@
 import { error, fail, isHttpError } from '@sveltejs/kit';
-import { requireUser } from '$lib/server/auth.js';
-import { budgetedRenderer, checkBacklink, getBacklinkStatus, recordBacklinkCheck } from '$lib/server/backlinks.js';
-import { consumeRateLimit, getDb } from '$lib/server/db.js';
-import { recordResult } from '$lib/server/observability.js';
-import { getProject, pageLanguage } from '$lib/server/projects.js';
-import { renderPageLinks } from '$lib/server/render.js';
+import { requireUser } from '#lib/server/auth.js';
+import { budgetedRenderer, checkBacklink, getBacklinkStatus, recordBacklinkCheck } from '#lib/server/backlinks.js';
+import { consumeRateLimit, getDb } from '#lib/server/db.js';
+import { recordResult } from '#lib/server/observability.js';
+import { getProject, pageLanguage } from '#lib/server/projects.js';
+import { renderPageLinks } from '#lib/server/render.js';
 
 export async function load(event) {
   const db = getDb(event);
@@ -43,7 +43,7 @@ export const actions = {
       recordResult(event, 'backlink.check', 429, 'rate_limited');
       return fail(429, { check: { projectId, state: 'unreachable', code: 'rate_limited' } });
     }
-    const browser = event.platform?.env?.BROWSER;
+    const browser = event.locals.env?.BROWSER;
     const result = await checkBacklink(project, {
       render: browser ? budgetedRenderer(db, url => renderPageLinks(browser, url)) : null
     });

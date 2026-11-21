@@ -10,16 +10,16 @@ const origin = 'https://triples.love';
 const bundle = await build({
   stdin: {
     contents: `
+      import { isHttpError, isRedirect } from '@sveltejs/kit';
       import { startGitHubLogin, completeGitHubLogin } from './src/lib/server/auth.js';
       export default {
         async fetch(request, env) {
-          const incoming = new URL(request.url);
-          const url = new URL(incoming.pathname + incoming.search, env.APP_ORIGIN);
+          const url = new URL(request.url);
           const responseHeaders = new Headers();
           const cookies = new Map((request.headers.get('cookie') || '').split('; ')
             .filter(Boolean).map(cookie => cookie.split('=')));
           const event = {
-            url, request, locals: {}, platform: { env },
+            url, request, locals: { env },
             getClientAddress: () => '127.0.0.1',
             setHeaders: values => Object.entries(values).forEach(([key,value]) => responseHeaders.set(key,value)),
             cookies: {
@@ -32,7 +32,7 @@ const bundle = await build({
             fetch: (input, init) => {
               const outgoing = new Request(input, init);
               if (outgoing.redirect !== 'manual') throw new Error('OAuth requests must never follow redirects');
-              outgoing.headers.set('origin', env.APP_ORIGIN);
+              outgoing.headers.set('origin', url.origin);
               return fetch(outgoing);
             }
           };
@@ -41,10 +41,14 @@ const bundle = await build({
             else await completeGitHubLogin(event);
             return new Response('Unexpected auth completion', { status: 500 });
           } catch (error) {
-            if (error.location) responseHeaders.set('location', error.location);
-            return new Response(error.location ? null : error.body?.message || 'Auth failed', {
-              status: error.status || 500, headers: responseHeaders
-            });
+            if (isRedirect(error)) {
+              responseHeaders.set('location', error.location);
+              return new Response(null, { status: error.status, headers: responseHeaders });
+            }
+            if (isHttpError(error)) {
+              return new Response(error.body.message, { status: error.status, headers: responseHeaders });
+            }
+            throw error;
           }
         }
       };
@@ -55,7 +59,10 @@ const bundle = await build({
   bundle: true,
   write: false,
   format: 'esm',
-  platform: 'browser',
+  // Use Kit's server-side origin lookup and esm-env's production flags in workerd.
+  platform: 'neutral',
+  conditions: ['workerd', 'production'],
+  external: ['node:*'],
   logLevel: 'silent'
 });
 

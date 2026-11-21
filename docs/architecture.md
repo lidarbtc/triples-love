@@ -2,7 +2,7 @@
 
 The site uses SvelteKit with `@sveltejs/adapter-cloudflare`. A Cloudflare Worker
 renders the directory and project pages from D1. Workers Static Assets serves
-images, styles and client scripts from `.svelte-kit/cloudflare/`. Only the language
+images, styles and client scripts from `.svelte-kit/cloudflare/client/`. Only the language
 entry page is prerendered.
 
 ## Source layout
@@ -183,7 +183,8 @@ keeps the previous evidence. A project is featured while its link was found
 within the last 7 days and the miss count is below 2. A maintainer can set
 `override` to `force_on` or `force_off`; overridden projects are not rechecked.
 
-adapter-cloudflare emits only a fetch handler and writes it to Wrangler's `main`
-path, so `npm run build` runs `scripts/add-scheduled-handler.mjs` afterwards. It
-renames the generated Worker to `_sveltekit_worker.js`, writes a `_worker.js` that
-adds `scheduled`, and excludes the server bundle from static assets.
+Vite builds the Cron module with the server so it shares dependencies with HTTP
+routes. After the Cloudflare adapter writes its Worker, `npm run build` runs
+`scripts/add-scheduled-handler.mjs`. The generated Wrangler configuration points
+to `worker/scheduled.js`, which forwards HTTP requests to the adapter and
+dispatches scheduled events to the Cron module. Static assets live in `client/`.

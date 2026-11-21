@@ -1,9 +1,9 @@
-import { recordResult } from '$lib/server/observability.js';
+import { recordResult } from '#lib/server/observability.js';
 import { error, fail, isHttpError } from '@sveltejs/kit';
-import { getDb, consumeRateLimit } from '$lib/server/db.js';
-import { requireUser } from '$lib/server/auth.js';
-import { getProject, pageLanguage, validateProjectForm, saveProject } from '$lib/server/projects.js';
-import { getBacklinkStatus } from '$lib/server/backlinks.js';
+import { getDb, consumeRateLimit } from '#lib/server/db.js';
+import { requireUser } from '#lib/server/auth.js';
+import { getProject, pageLanguage, validateProjectForm, saveProject } from '#lib/server/projects.js';
+import { getBacklinkStatus } from '#lib/server/backlinks.js';
 
 async function ownerContext(event) {
   const user = await requireUser(event);

@@ -1,11 +1,11 @@
 <script>
-  import ProjectShell from '$lib/components/ProjectShell.svelte';
-  import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
-  import VerificationPreview from '$lib/components/VerificationPreview.svelte';
-  import { categoryNames } from '$lib/i18n.js';
-  import { displayTagline, localizedProject, projectCopy, projectHref, splitLastWord } from '$lib/project-copy.js';
-  import { badgePageHref } from '$lib/embed-badges.js';
-  import { ROBOTS_CONTENT, jsonLdScript, projectJsonLd, projectMeta, projectUrl } from '$lib/seo.js';
+  import ProjectShell from '#lib/components/ProjectShell.svelte';
+  import VerifiedSeal from '#lib/components/VerifiedSeal.svelte';
+  import VerificationPreview from '#lib/components/VerificationPreview.svelte';
+  import { categoryNames } from '#lib/i18n.js';
+  import { displayTagline, localizedProject, projectCopy, projectHref, splitLastWord } from '#lib/project-copy.js';
+  import { badgePageHref } from '#lib/embed-badges.js';
+  import { ROBOTS_CONTENT, jsonLdScript, projectJsonLd, projectMeta, projectUrl } from '#lib/seo.js';
 
   export let data;
   $: ({ project, user, lang, featured } = data);

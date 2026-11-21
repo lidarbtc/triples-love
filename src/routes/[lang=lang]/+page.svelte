@@ -1,49 +1,50 @@
 <script>
-  import { browser } from '$app/environment';
-  import { page } from '$app/stores';
+  import { browser } from '$app/env';
+  import { disableScrollHandling, onNavigate } from '$app/navigation';
+  import { page } from '$app/state';
   import { onMount, tick } from 'svelte';
-  import VerifiedSeal from '$lib/components/VerifiedSeal.svelte';
-  import { categories } from '$lib/data.js';
-  import { badgePageHref } from '$lib/embed-badges.js';
-  import { categoryLabels, categoryNames, ui } from '$lib/i18n.js';
-  import { displayTagline, projectHref, splitLastWord } from '$lib/project-copy.js';
-  import { ROBOTS_CONTENT, jsonLdScript, siteJsonLd } from '$lib/seo.js';
+  import { on } from 'svelte/events';
+  import VerifiedSeal from '#lib/components/VerifiedSeal.svelte';
+  import { categories } from '#lib/data.js';
+  import { badgePageHref } from '#lib/embed-badges.js';
+  import { categoryLabels, categoryNames, ui } from '#lib/i18n.js';
+  import { displayTagline, projectHref, splitLastWord } from '#lib/project-copy.js';
+  import { ROBOTS_CONTENT, jsonLdScript, siteJsonLd } from '#lib/seo.js';
 
-  export let data;
+  let { data } = $props();
 
   const nameCollator = new Intl.Collator('en', { sensitivity: 'base' });
   const metaImage = 'https://triples.love/og-image.png';
   const metaImageAlt =
     'triples.love directory preview showing fan-made tripleS project cards and site screenshots.';
 
-  $: lang = data.lang;
-  $: sites = data.sites;
-  $: nextLang = lang === 'ko' ? 'en' : 'ko';
-  $: languageHref = getLanguageHref(nextLang, browser ? $page.url : null);
-  $: canonicalUrl = `https://triples.love/${lang}/`;
-  let active = 'all';
-  let query = '';
-  let expandedId = null;
-  let sort = 'alpha';
-  let interactive = false;
-  let archiveOpen = false;
+  const lang = $derived(data.lang);
+  const sites = $derived(data.sites);
+  const nextLang = $derived(lang === 'ko' ? 'en' : 'ko');
+  const languageHref = $derived(getLanguageHref(nextLang, browser ? page.url.href : null));
+  const canonicalUrl = $derived(`https://triples.love/${lang}/`);
+  let active = $state('all');
+  let query = $state('');
+  let expandedId = $state(null);
+  let sort = $state('alpha');
+  let interactive = $state(false);
   let directoryEl;
   let tabsEl;
   // The category strip fades at whichever end has more chips to scroll to.
-  let tabsMoreStart = false;
-  let tabsMoreEnd = true;
+  let tabsMoreStart = $state(false);
+  let tabsMoreEnd = $state(true);
 
-  let now = null;
-  $: locale = lang === 'ko' ? 'ko-KR' : 'en-GB';
-  $: todayDate = now ? now.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '—';
-  $: todayTime = now
+  let now = $state(null);
+  const locale = $derived(lang === 'ko' ? 'ko-KR' : 'en-GB');
+  const todayDate = $derived(now ? now.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '—');
+  const todayTime = $derived(now
     ? now.toLocaleTimeString(locale, {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         hour12: false
       })
-    : '--:--:--';
+    : '--:--:--');
 
   onMount(() => {
     interactive = true;
@@ -70,10 +71,15 @@
     return `${path}${url.search}${url.hash}`;
   }
 
-  $: t = ui[lang];
-  $: labels = categoryLabels[lang];
-  $: names = categoryNames[lang];
-  $: localizedSites = sites.map((site) => {
+  // Switching languages keeps the scroll position and lets the router reset keyboard focus.
+  onNavigate(({ type, to }) => {
+    if (type === 'link' && to?.url.pathname === `/${nextLang}/`) disableScrollHandling();
+  });
+
+  const t = $derived(ui[lang]);
+  const labels = $derived(categoryLabels[lang]);
+  const names = $derived(categoryNames[lang]);
+  const localizedSites = $derived(sites.map((site) => {
     const localizedCopy = site.locales[lang] || {};
     const koreanCopy = site.locales.ko || {};
 
@@ -103,9 +109,9 @@
         .join('\n')
         .toLocaleLowerCase()
     };
-  });
+  }));
 
-  $: if (browser) {
+  $effect(() => {
     document.documentElement.lang = lang;
     tick().then(updateTabEdges);
     try {
@@ -113,17 +119,17 @@
     } catch {
       // Language routes also work when browser storage is unavailable.
     }
-  }
+  });
 
-  $: counts = sites.reduce(
+  const counts = $derived(sites.reduce(
     (acc, site) => {
       acc[site.category] = (acc[site.category] || 0) + 1;
       return acc;
     },
     { all: sites.length }
-  );
+  ));
 
-  $: filtered = (() => {
+  const filtered = $derived.by(() => {
     let out = localizedSites;
 
     if (active !== 'all') out = out.filter((site) => site.category === active);
@@ -149,21 +155,21 @@
     }
 
     return out;
-  })();
+  });
 
-  $: directorySites = filtered.filter((site) => site.status !== 'archived');
-  $: featuredSites = (data.featuredIds || [])
+  const directorySites = $derived(filtered.filter((site) => site.status !== 'archived'));
+  const featuredSites = $derived((data.featuredIds || [])
     .map((id) => localizedSites.find((site) => site.id === id))
-    .filter((site) => site && site.status !== 'archived');
+    .filter((site) => site && site.status !== 'archived'));
   // Featured projects lead only the default view; searches, filters and other sorts stay neutral.
-  $: showFeatured = active === 'all' && !query.trim() && sort === 'alpha';
-  $: pinnedSites = showFeatured ? featuredSites : [];
-  $: pinnedIds = new Set(pinnedSites.map((site) => site.id));
-  $: listSites = directorySites.filter((site) => !pinnedIds.has(site.id));
-  $: showInvite = showFeatured && pinnedSites.length < (data.featuredSlots ?? 4);
-  $: archivedSites = filtered.filter((site) => site.status === 'archived');
-  $: archivedCount = sites.filter((site) => site.status === 'archived').length;
-  $: archiveOpen = Boolean(query.trim() && archivedSites.length);
+  const showFeatured = $derived(active === 'all' && !query.trim() && sort === 'alpha');
+  const pinnedSites = $derived(showFeatured ? featuredSites : []);
+  const pinnedIds = $derived(new Set(pinnedSites.map((site) => site.id)));
+  const listSites = $derived(directorySites.filter((site) => !pinnedIds.has(site.id)));
+  const showInvite = $derived(showFeatured && pinnedSites.length < (data.featuredSlots ?? 4));
+  const archivedSites = $derived(filtered.filter((site) => site.status === 'archived'));
+  const archivedCount = $derived(sites.filter((site) => site.status === 'archived').length);
+  let archiveOpen = $derived(Boolean(archivedSites.length && query.trim()));
 
   function setActiveTab(id, chip) {
     active = id;
@@ -246,8 +252,8 @@
     return url.href;
   }
 
-  function hideBrokenImage(event) {
-    event.currentTarget.hidden = true;
+  function hideBrokenImage(image) {
+    return on(image, 'error', () => { image.hidden = true; });
   }
 
   // Cards clip overflow, so nudge the seal tooltip back inside its card.
@@ -300,7 +306,7 @@
     class:card-featured={featured}
     name="site-cards"
     open={expandedId === site.id}
-    on:toggle={(event) => handleCardToggle(event, site.id)}
+    ontoggle={(event) => handleCardToggle(event, site.id)}
   >
     <summary class="card-summary">
       <span class="thumb">
@@ -342,7 +348,7 @@
           alt=""
           loading="lazy"
           decoding="async"
-          on:error={hideBrokenImage}
+          {@attach hideBrokenImage}
         />
       </span>
 
@@ -413,7 +419,7 @@
         </a>
         {/if}
         {#if interactive}
-          <button class="btn btn-ghost" type="button" on:click={closeCard}>
+          <button class="btn btn-ghost" type="button" onclick={closeCard}>
             {t.card.close}
           </button>
         {/if}
@@ -439,7 +445,7 @@
                 loading="lazy"
                 decoding="async"
                 referrerpolicy="no-referrer"
-                on:error={hideBrokenImage}
+                {@attach hideBrokenImage}
               />
             {/if}
             <span>@{site.owner.handle}</span>
@@ -549,7 +555,6 @@
             href={languageHref}
             hreflang={nextLang}
             aria-label={t.languageToggleLabel}
-            data-sveltekit-noscroll
           >
             {t.languagePill}
           </a>
@@ -602,7 +607,7 @@
             role="group"
             aria-label={t.toolbar.categories}
             bind:this={tabsEl}
-            on:scroll={updateTabEdges}
+            onscroll={updateTabEdges}
           >
             {#each categories as category}
               <button
@@ -610,7 +615,7 @@
                 class:tab-active={active === category.id}
                 type="button"
                 aria-pressed={active === category.id}
-                on:click={(event) => setActiveTab(category.id, event.currentTarget)}
+                onclick={(event) => setActiveTab(category.id, event.currentTarget)}
               >
                 <span>{labels[category.id] ?? category.label}</span>
                 <span class="tab-count">{counts[category.id] ?? 0}</span>
@@ -630,7 +635,7 @@
               enterkeyhint="search"
               autocomplete="off"
               value={query}
-              on:input={(event) => updateQuery(event.currentTarget.value)}
+              oninput={(event) => updateQuery(event.currentTarget.value)}
               placeholder={t.toolbar.searchPlaceholder}
               aria-label={t.toolbar.searchLabel}
             />
@@ -639,7 +644,7 @@
                 class="search-clear"
                 type="button"
                 aria-label={t.toolbar.clear}
-                on:click={() => updateQuery('')}
+                onclick={() => updateQuery('')}
               >
                 ×
               </button>
@@ -652,7 +657,7 @@
               <svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M2.5 4.5h11M2.5 8h7.5M2.5 11.5h4" />
               </svg>
-              <select id="site-sort" bind:value={sort} on:change={keepDirectoryInView}>
+              <select id="site-sort" bind:value={sort} onchange={keepDirectoryInView}>
                 <option value="alpha">{t.toolbar.sortAlpha}</option>
                 <option value="category">{t.toolbar.sortCategory}</option>
                 <option value="recent">{t.toolbar.sortRecent}</option>
@@ -671,7 +676,7 @@
             · {t.empty.category} <em>{names[active]}</em>
           {/if}
         </p>
-        <button class="btn btn-ghost" type="button" on:click={resetFilters}>{t.empty.reset}</button>
+        <button class="btn btn-ghost" type="button" onclick={resetFilters}>{t.empty.reset}</button>
       </div>
     {:else if directorySites.length}
       <div class="grid directory-grid">

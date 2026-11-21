@@ -1,8 +1,8 @@
 <script>
   import { enhance } from '$app/forms';
-  import ProjectShell from '$lib/components/ProjectShell.svelte';
-  import VerificationPreview from '$lib/components/VerificationPreview.svelte';
-  import { projectCopy, projectHref } from '$lib/project-copy.js';
+  import ProjectShell from '#lib/components/ProjectShell.svelte';
+  import VerificationPreview from '#lib/components/VerificationPreview.svelte';
+  import { projectCopy, projectHref } from '#lib/project-copy.js';
 
   export let data;
   export let form = null;
@@ -40,7 +40,7 @@
     return () => {
       pending = label;
       return async ({ update }) => {
-        try { await update({ reset: false }); } finally { pending = ''; }
+        try { await update({ reset: false, navigate: false }); } finally { pending = ''; }
       };
     };
   }

@@ -49,9 +49,17 @@ export function recordUnexpected(event, operation, cause) {
   // Keep only locations in known application modules. Error messages, function
   // names, arbitrary paths, URLs and the Error.cause chain may contain secrets.
   const stack = typeof cause?.stack === 'string' ? cause.stack : '';
-  const stack_locations = [...stack.matchAll(/(?:\/|\b)(observability|auth|db|claims|proof|projects|backlinks|backlink-cron|render|hooks\.server|_worker)\.js:(\d+):(\d+)(?=[)\s]|$)/g)]
-    .slice(0, 8).map(match => `${match[1]}.js:${match[2]}:${match[3]}`);
+  // Adapter 9 emits worker/index.js. A bundled Worker frame can also name the bare entry.
+  const location = /\b(?:observability|auth|db|claims|proof|projects|backlinks|backlink-cron|render|hooks\.server|_worker|worker\/index|(?<=[(\s])index)\.js:\d+:\d+(?=[)\s]|$)/g;
+  const stack_locations = (stack.match(location) ?? []).slice(0, 8);
   recordResult(event, operation, 500, 'unexpected_error', { stack_locations });
+}
+
+/** @type {import('@sveltejs/kit/hooks').HandleServerError} */
+export function handleError({ event, kind, error }) {
+  if (kind === 'unknown') recordUnexpected(event, 'request', error);
+  else recordResult(event, 'request', error.status, 'http_error');
+  // Returning nothing preserves Kit's public error body and masks unknown errors.
 }
 
 export function finishRequest(event, status) {

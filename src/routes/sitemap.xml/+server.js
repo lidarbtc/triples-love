@@ -1,6 +1,6 @@
-import { getDb } from '$lib/server/db.js';
-import { listProjects } from '$lib/server/projects.js';
-import { buildSitemap } from '$lib/seo.js';
+import { getDb } from '#lib/server/db.js';
+import { listProjects } from '#lib/server/projects.js';
+import { buildSitemap } from '#lib/seo.js';
 
 export async function GET(event) {
   const projects = await listProjects(getDb(event));

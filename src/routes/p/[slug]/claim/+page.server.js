@@ -1,9 +1,9 @@
-import { recordResult } from '$lib/server/observability.js';
+import { recordResult } from '#lib/server/observability.js';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { requireUser } from '$lib/server/auth.js';
-import { ClaimError, findActiveChallenge, startClaim, verifyClaim } from '$lib/server/claims.js';
-import { getDb } from '$lib/server/db.js';
-import { getProject } from '$lib/server/projects.js';
+import { requireUser } from '#lib/server/auth.js';
+import { ClaimError, findActiveChallenge, startClaim, verifyClaim } from '#lib/server/claims.js';
+import { getDb } from '#lib/server/db.js';
+import { getProject } from '#lib/server/projects.js';
 
 function language(event) {
   return event.url.searchParams.get('lang') === 'ko' ? 'ko' : 'en';

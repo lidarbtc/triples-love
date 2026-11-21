@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { recordResult } from './observability.js';
 
 export function getDb(event, operation = 'project.read') {
-  const db = event.platform?.env?.DB;
+  const db = event.locals?.env?.DB;
   if (!db) {
     recordResult(event, operation, 503, 'db_unavailable');
     error(503, 'The project database is unavailable. Please try again later.');
