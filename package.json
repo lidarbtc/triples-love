@@ -33,7 +33,7 @@
     "wrangler": "4.166.0"
   },
   "dependencies": {
-    "@cloudflare/puppeteer": "^1.4.0",
+    "@cloudflare/puppeteer": "^2.0.1",
     "parse5": "^8.1.1"
   }
 }
