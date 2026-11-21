@@ -12,9 +12,6 @@ const options = parseArgs(process.argv.slice(2));
 main().catch((error) => {
   if (String(error?.message ?? error).includes("Executable doesn't exist")) {
     console.error('Playwright Chromium is not installed. Run: npx playwright install chromium');
-    console.error(
-      'On this Ubuntu 26.04 environment, use: PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64 npx playwright install chromium'
-    );
   }
 
   console.error(error);

@@ -45,7 +45,7 @@ response bodies. Unexpected exceptions retain only file/line/column locations in
 known application modules; messages, arbitrary paths and causes are omitted.
 Logger failures do not change the application's response behavior.
 
-Wrangler is pinned to 4.155.0 so `redact_query_string: true` is supported.
+The pinned Wrangler version supports `redact_query_string: true`.
 Cloudflare attaches request URLs to custom-log metadata even with invocation
 logs disabled. Query redaction is therefore mandatory: disabling invocation logs
 alone does not protect OAuth code/state. The application still uses its own
