@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'November 17, 2026',
-      updateTitle: 'Lunar Gallery added',
+      date: 'November 21, 2026',
+      updateTitle: 'YEONJI ARCHIVE added',
       updateBody:
-        'Browse tripleS, ARTMS, and idntt Objekts in Lunar Gallery. Make have/want lists and share them as a link, an image, or Discord text.',
+        'Explore Kwak YeonJi’s photos, videos, and activity timeline. In the Objekt World Cup, choose your favorite of two cards each round.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'November 17, 2026',
+      statusValue: 'November 21, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -111,13 +111,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 11월 17일',
-      updateTitle: 'Lunar Gallery 추가',
+      date: '2026년 11월 21일',
+      updateTitle: 'YEONJI ARCHIVE 추가',
       updateBody:
-        'tripleS·ARTMS·idntt 오브젝트를 둘러볼 수 있는 Lunar Gallery를 추가했습니다. 보유·희망 목록을 만들어 링크나 이미지, 디스코드용 텍스트로 공유할 수 있습니다.',
+        '곽연지의 사진과 영상을 보고, 타임라인에서 연도별 활동을 살펴보세요. 오브젝트 월드컵에서는 두 장씩 비교해 최애 카드를 고를 수 있습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 11월 17일',
+      statusValue: '2026년 11월 21일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -478,6 +478,12 @@ export const siteCopy = {
         'tripleS 박시온의 사진과 영상을 모아둔 팬 아카이브입니다. 프로필과 오브젝트를 둘러보고, 오브젝트 월드컵에서 마음에 드는 카드를 골라볼 수도 있습니다.',
       badges: ['사진·영상', '오브젝트', '월드컵']
     },
+    yeonjiarchive: {
+      tagline: '곽연지 팬 아카이브',
+      description:
+        'tripleS 곽연지의 사진을 날짜별로 보고, 영상과 연도별 활동 기록을 찾아볼 수 있습니다. 시즌별 오브젝트를 둘러보거나 오브젝트 월드컵에서 가장 마음에 드는 카드를 골라보세요.',
+      badges: ['사진·영상', '타임라인', '오브젝트']
+    },
     'lunar-gallery': {
       tagline: '오브젝트 카탈로그와 위시리스트',
       description:
@@ -519,6 +525,7 @@ export const siteSearchAliases = {
   ssslot: ['sss slot', '트리플에스 슬롯', '슬롯', '슬롯머신', 'slot machine', '수집 게임'],
   kosmosss: ['kosmo SSS', 'kosmo', '코스모SSS', '코스모 SSS', '민팅', 'mint', '실시간 활동', 'live activity'],
   shionarchive: ['시온 아카이브', '시온아카이브', '박시온', 'Park ShiOn', 'ShiOn', 'S20', 'bbangshion', '월드컵', 'world cup'],
+  yeonjiarchive: ['연지 아카이브', '연지아카이브', '곽연지', 'Kwak YeonJi', 'S12', 'bbangshion', 'bbangshion.github.io/yeonji-archive', '월드컵', 'world cup'],
   hayeonos: ['하연 OS', '하연OS', '하연 운영체제', '정하연', 'Jeong HaYeon', 'HaYeon', 'S19', 'hayeon.eth', '방명록', 'guestbook', '고슴도치 찾기', 'Hedgehog Finder', '윈도우', 'Windows XP']
 };
 

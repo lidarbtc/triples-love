@@ -499,6 +499,18 @@ export const sites = [
     badges: ["catalog", "want/have", "share lists"],
     accent: "violet",
   },
+  {
+    id: "yeonjiarchive",
+    name: "YEONJI ARCHIVE",
+    domain: "yeonjiarchive.wav.haus",
+    url: "https://yeonjiarchive.wav.haus/",
+    category: "hub",
+    addedAt: "2026-11-21T13:50:45+09:00",
+    tagline: "Kwak YeonJi fan archive",
+    description: "Browse tripleS member Kwak YeonJi's photos by date, watch her videos, and follow her activity timeline. Explore her Objekts by season or pick your favorite card in the Objekt World Cup.",
+    badges: ["photos & videos", "timeline", "Objekts"],
+    accent: "violet",
+  },
 ];
 
 export const categories = [
