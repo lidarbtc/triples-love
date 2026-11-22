@@ -511,6 +511,18 @@ export const sites = [
     badges: ["photos & videos", "timeline", "Objekts"],
     accent: "violet",
   },
+  {
+    id: "chaewonarchive",
+    name: "CHAEWON ARCHIVE",
+    domain: "chaewonarchive.wav.haus",
+    url: "https://chaewonarchive.wav.haus/",
+    category: "hub",
+    addedAt: "2026-11-22T19:37:25+09:00",
+    tagline: "Kim ChaeWon fan archive",
+    description: "Browse tripleS member Kim ChaeWon's photos by date or album, watch SIGNAL and official videos, and follow her activity timeline. Search her Objekts by season or pick a favorite card in the Objekt World Cup.",
+    badges: ["photos & videos", "timeline", "Objekts"],
+    accent: "violet",
+  },
 ];
 
 export const categories = [
