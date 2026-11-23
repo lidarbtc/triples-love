@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'November 22, 2026',
-      updateTitle: 'CHAEWON ARCHIVE added',
+      date: 'November 23, 2026',
+      updateTitle: 'wavhaus25 added',
       updateBody:
-        'Browse Kim ChaeWon’s photos by date or album, watch SIGNAL and official videos, and follow her activity timeline. A single search finds her photos, videos, and Objekts.',
+        'Find Objekts by member or season, look up a collector’s wallet, and arrange swaps in a trade room.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'November 22, 2026',
+      statusValue: 'November 23, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -111,13 +111,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 11월 22일',
-      updateTitle: 'CHAEWON ARCHIVE 추가',
+      date: '2026년 11월 23일',
+      updateTitle: 'wavhaus25 추가',
       updateBody:
-        '김채원의 사진을 날짜·앨범별로 보고, SIGNAL과 공식 영상, 활동 타임라인을 살펴보세요. 통합 검색에서는 사진·영상·오브젝트를 한 번에 찾을 수 있습니다.',
+        '멤버나 시즌별로 오브젝트를 찾고 다른 수집가의 지갑을 둘러보세요. 거래방에서는 서로 교환할 카드를 정할 수 있습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 11월 22일',
+      statusValue: '2026년 11월 23일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -261,6 +261,12 @@ export const siteCopy = {
       description:
         'tripleS 팬 프로젝트에 쓸 .wav.haus 서브도메인을 무료로 받을 수 있습니다.',
       badges: ['서브도메인', '무료']
+    },
+    wavhaus25: {
+      tagline: '오브젝트 카탈로그와 개인 간 거래',
+      description:
+        'tripleS·ARTMS·idntt의 실물·디지털 오브젝트를 멤버, 시즌, 클래스별로 찾아볼 수 있습니다. COSMO 닉네임이나 지갑 주소로 컬렉션을 조회하고, 장터의 거래방에서 교환할 카드를 정할 수 있습니다. Playhaus에서 오늘의 오브젝트를 맞히거나 커뮤니티 나눔에 참여해 보세요.',
+      badges: ['카탈로그', '지갑 조회', '거래방']
     },
     objektify: {
       tagline: '오브젝트 스타일 카드 제작',
@@ -506,6 +512,7 @@ export const siteCopy = {
 };
 
 export const siteSearchAliases = {
+  wavhaus25: ['wavhaus 25', 'wav haus 25', '웨이브하우스25', '웨이브하우스 25', '웨이브 하우스 25', '코스모', 'P2P', '교환'],
   'lunar-gallery': ['lunar', 'lunar gallery', '루나', '루나 갤러리', '루나갤러리', '위시리스트', 'wishlist', 'want/have'],
   havant: ['하반트', '해번트', 'have want', 'want/have'],
   tracker: ['want/have'],

@@ -523,6 +523,18 @@ export const sites = [
     badges: ["photos & videos", "timeline", "Objekts"],
     accent: "violet",
   },
+  {
+    id: "wavhaus25",
+    name: "wavhaus25",
+    domain: "wavhaus25.my.id",
+    url: "https://wavhaus25.my.id/",
+    category: "objekts",
+    addedAt: "2026-11-23T20:39:24+09:00",
+    tagline: "Objekt catalog and P2P trading",
+    description: "Browse physical and digital Objekts from tripleS, ARTMS, and idntt by member, season, or class. Find collections by COSMO nickname or wallet address and arrange swaps in the marketplace's trade rooms. Try the daily Objekt quiz in Playhaus or join a giveaway.",
+    badges: ["catalog", "wallet lookup", "trade rooms"],
+    accent: "violet",
+  },
 ];
 
 export const categories = [
