@@ -535,6 +535,18 @@ export const sites = [
     badges: ["catalog", "wallet lookup", "trade rooms"],
     accent: "violet",
   },
+  {
+    id: "hayeonarchive-haus",
+    name: "HAYEON ARCHIVE",
+    domain: "hayeonarchive.wav.haus",
+    url: "https://hayeonarchive.wav.haus/",
+    category: "hub",
+    addedAt: "2026-11-26T10:38:00+09:00",
+    tagline: "Jeong HaYeon fan archive",
+    description: "Browse tripleS member Jeong HaYeon's photos by date or album, watch her videos, and follow her activity timeline. Explore her Objekts by season or pick a favorite card in the Objekt World Cup.",
+    badges: ["photos & videos", "timeline", "Objekts"],
+    accent: "blue",
+  },
 ];
 
 export const categories = [

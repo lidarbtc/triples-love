@@ -14,13 +14,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'fan-made',
       titleAfter: 'tripleS projects',
-      date: 'November 23, 2026',
-      updateTitle: 'wavhaus25 added',
+      date: 'November 26, 2026',
+      updateTitle: 'HAYEON ARCHIVE added',
       updateBody:
-        'Find Objekts by member or season, look up a collector’s wallet, and arrange swaps in a trade room.',
+        'Browse Jeong HaYeon’s photos by date or album, watch her videos, and follow her activity timeline. Search her Objekts by season or pick a favorite card in the Objekt World Cup.',
       today: 'today',
       status: 'last updated',
-      statusValue: 'November 23, 2026',
+      statusValue: 'November 26, 2026',
       directoryCount: 'sites in directory'
     },
     toolbar: {
@@ -111,13 +111,13 @@ export const ui = {
       titleBefore: '',
       titleEm: 'tripleS',
       titleAfter: '팬 프로젝트 모음',
-      date: '2026년 11월 23일',
-      updateTitle: 'wavhaus25 추가',
+      date: '2026년 11월 26일',
+      updateTitle: 'HAYEON ARCHIVE 추가',
       updateBody:
-        '멤버나 시즌별로 오브젝트를 찾고 다른 수집가의 지갑을 둘러보세요. 거래방에서는 서로 교환할 카드를 정할 수 있습니다.',
+        '정하연의 사진을 날짜·앨범별로 보고, 영상과 활동 타임라인을 살펴보세요. 시즌별 오브젝트를 둘러보거나 오브젝트 월드컵에서 마음에 드는 카드를 골라볼 수 있습니다.',
       today: '오늘',
       status: '최근 업데이트',
-      statusValue: '2026년 11월 23일',
+      statusValue: '2026년 11월 26일',
       directoryCount: '등록 사이트'
     },
     toolbar: {
@@ -507,6 +507,12 @@ export const siteCopy = {
       description:
         'tripleS 정하연을 테마로 만든 윈도우 XP·7 스타일의 팬메이드 데스크톱입니다. 사진과 프로필을 둘러보고, 실시간 방명록에 쪽지를 남기거나 고슴도치 찾기를 하고, 하연이 참여한 노래의 일렉트로닉 리믹스도 들을 수 있습니다.',
       badges: ['데스크톱', '사진', '방명록']
+    },
+    'hayeonarchive-haus': {
+      tagline: '정하연 팬 아카이브',
+      description:
+        'tripleS 정하연의 사진을 날짜와 앨범별로 보고, 영상과 활동 타임라인을 찾아볼 수 있습니다. 시즌별로 오브젝트를 둘러보거나 오브젝트 월드컵에서 가장 마음에 드는 카드를 골라보세요.',
+      badges: ['사진·영상', '타임라인', '오브젝트']
     }
   }
 };
@@ -540,7 +546,8 @@ export const siteSearchAliases = {
   shionarchive: ['시온 아카이브', '시온아카이브', '박시온', 'Park ShiOn', 'ShiOn', 'S20', 'bbangshion', '월드컵', 'world cup'],
   yeonjiarchive: ['연지 아카이브', '연지아카이브', '곽연지', 'Kwak YeonJi', 'S12', 'bbangshion', 'bbangshion.github.io/yeonji-archive', '월드컵', 'world cup'],
   chaewonarchive: ['채원 아카이브', '채원아카이브', '김채원', 'Kim ChaeWon', 'ChaeWon', 'S21', 'bbangshion', 'bbangshion.github.io/chaewon-archive', '월드컵', 'world cup'],
-  hayeonos: ['하연 OS', '하연OS', '하연 운영체제', '정하연', 'Jeong HaYeon', 'HaYeon', 'S19', 'hayeon.eth', '방명록', 'guestbook', '고슴도치 찾기', 'Hedgehog Finder', '윈도우', 'Windows XP']
+  hayeonos: ['하연 OS', '하연OS', '하연 운영체제', '정하연', 'Jeong HaYeon', 'HaYeon', 'S19', 'hayeon.eth', '방명록', 'guestbook', '고슴도치 찾기', 'Hedgehog Finder', '윈도우', 'Windows XP'],
+  'hayeonarchive-haus': ['하연 아카이브', '하연아카이브', '정하연', 'Jeong HaYeon', 'HaYeon', 'S19', 'bbangshion', 'bbangshion.github.io/hayeon-archive', '월드컵', 'world cup']
 };
 
 export function isSupportedLang(value) {
